@@ -1,49 +1,47 @@
-import { Keyboard, KeyboardAvoidingView, Platform, Pressable, TextInput, Text, View, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { Keyboard, ScrollView, StyleSheet, TextInput, View, Text, Pressable, TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
 import { globalStyles } from '../styles/global';
 import { Formik } from 'formik';
-import { useNavigation } from 'expo-router';
-import { useState } from 'react';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker'; 
 
-export default function SignUp () {
-  const [showPicker, setShowPicker] = useState(false);
-  const [visible, setVisibility] = useState(false);
+export default function EditForm({submitHandler}: any) {
+    const [showPicker, setShowPicker] = useState(false)
+    const [visible, setVisibility] = useState(false); 
+    const datePlaceholder = new Date();
 
-  const datePlaceholder = new Date();
-  const navigation: any = useNavigation(); 
+    return (
+        <View style={globalStyles.container}>
+            {/* This is to account for keyboard potentially blocking view of input fields */}
+            {/* Not really sure how to solve form being cut+overflow instead of shifting issue */}
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={{flex: 1}}>
+                    <Formik 
+                        style={{flex: 1}}
+                        initialValues={{name: '', password: '', height: '', weight: '', birthday: new Date()}}
+                        onSubmit={(values, actions) => {
+                            // TODO: make this link to the data displayed on profile page 
+                            actions.resetForm();
+                            submitHandler()
+                        }}>
+                        {/* Function that generates the required JSX/TSX */}
+                        {(formikProps) => (
+                            <View>
+                                <ScrollView style={{position: 'relative', bottom: 5}}>
+                                    <View>
+                                        <Text style={[globalStyles.para, styles.label]}>Name:</Text>
+                                        <TextInput 
+                                            style={globalStyles.input}
+                                            placeholder='John Cena'
+                                            // onChangeText, this function runs
+                                            // updating the associated value for 'name' input field
+                                            onChangeText={formikProps.handleChange('name')}
 
-  return (
-    <View style={globalStyles.container}>
-      {/* This is to account for keyboard potentially blocking view of input fields*/}
-      <KeyboardAvoidingView 
-      style={globalStyles.container}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}    
-      behavior={Platform.OS === "ios" ? "padding" : undefined}>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <View style={{flex: 1, padding: 20, justifyContent: 'center'}}>
-                  <Formik 
-                      style={{flex: 1}}
-                      initialValues={{name: '', password: '', height: '', weight: '', birthday: new Date()}}
-                      onSubmit={(values, actions) => {
-                          actions.resetForm();
-                          navigation.navigate('login'); 
-                      }}>
-                      {/* Function that generates the required JSX/TSX */}
-                      {(formikProps) => (
-                          <View>
-                              <Text style={globalStyles.header}>🧙  Welcome!  🧙</Text>
-                              <ScrollView style={{position: 'relative', bottom: 10}}>
-                                  <View>
-                                      <Text style={[globalStyles.para, styles.label]}>Name:</Text>
-                                      <TextInput 
-                                          style={globalStyles.input}
-                                          placeholder='John Cena'
-                                          onChangeText={formikProps.handleChange('name')}
-                                          value={formikProps.values.name}/>
-                                  </View>
-                                  
-                                  <View style={{position: 'relative', bottom: 9}}>
+                                            // grabs the updated value
+                                            value={formikProps.values.name}/>
+                                    </View>
+
+                                    <View style={{position: 'relative', bottom: 9}}>
                                       <Text style={[globalStyles.para, styles.label, {top: 15}]}>Password:</Text>
                                       <View style={[globalStyles.input, styles.label, styles.extra]}>
                                         <TextInput 
@@ -51,7 +49,11 @@ export default function SignUp () {
                                             // let parent (View) extend fully
                                             style={{borderRadius: 6, width: '90%', height: '100%'}}
                                             placeholder='youCantSeeMe69'
+
+                                            // updating the associated value for 'password' input field
                                             onChangeText={formikProps.handleChange('password')}
+
+                                            // grabs the updated value
                                             value={formikProps.values.password}
                                             secureTextEntry={!visible}/>
                                             
@@ -68,13 +70,16 @@ export default function SignUp () {
                                             </TouchableOpacity>}
                                       </View>
                                   </View>
-                                  
-                                  <View>
+                                    
+                                    <View>
                                         <Text style={[globalStyles.para, styles.label]}>Height (in metres):</Text>
                                         <TextInput 
                                             style={globalStyles.input}
                                             placeholder='1.80'
+                                            // updating the associated value for 'height' input field
                                             onChangeText={formikProps.handleChange('height')}
+
+                                            // grabs the updated value
                                             value={formikProps.values.height}
                                             keyboardType='numeric'/>
                                     </View>
@@ -84,7 +89,10 @@ export default function SignUp () {
                                         <TextInput 
                                         style={globalStyles.input}
                                         placeholder='69'
+                                        // updating the associated value for 'weight' input field
                                         onChangeText={formikProps.handleChange('weight')}
+
+                                        // grabs the updated value
                                         value={formikProps.values.weight}
                                         keyboardType='numeric'/>
                                     </View>
@@ -112,42 +120,44 @@ export default function SignUp () {
                                             <TextInput 
                                             style={globalStyles.input}
                                             placeholder={datePlaceholder.toDateString()}
+                                            // updating the associated value for 'birthday' input field
                                             onChangeText={formikProps.handleChange('birthday')}
+
+                                            // grabs the updated value
                                             value={formikProps.values.birthday.toLocaleDateString()}
                                             editable={false}
                                             onPressIn={() => setShowPicker(true)}/>
                                         </Pressable>}
                                     </View>                        
-
-                                  <TouchableOpacity onPress={() => navigation.navigate('login')} style={styles.submit}>
-                                      <Text style={{ ...globalStyles.header, textAlign: 'center', fontSize: 12}}>Create Account</Text>
-                                  </TouchableOpacity> 
-                              </ScrollView>
-                          </View>
-                      )}
-                  </Formik>
-              </View>
-          </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </View>
-  );
+                                    
+                                    <TouchableOpacity onPress={() => formikProps.handleSubmit()} style={styles.submit}>
+                                        <Text style={{ ...globalStyles.header, textAlign: 'center', fontSize: 12}}>Submit</Text>
+                                    </TouchableOpacity> 
+                                </ScrollView>
+                            </View>
+                        )}
+                    </Formik>
+                </View>
+            </TouchableWithoutFeedback>
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
-  label: {
-      position: 'relative',
-      top: 7
-  },
+    label: {
+        position: 'relative',
+        top: 7
+    },
 
-  extra: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
+    extra: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
 
-  submit: {
-      width: '100%',
-      backgroundColor: '#F5BABA',
-      borderRadius: 10,
-      marginTop: 15
-  },
+    submit: {
+        width: '100%',
+        backgroundColor: '#F5BABA',
+        borderRadius: 10,
+        marginTop: 15
+    },
 })

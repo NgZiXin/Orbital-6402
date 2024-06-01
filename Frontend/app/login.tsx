@@ -1,5 +1,5 @@
 import { Keyboard, KeyboardAvoidingView, Platform, TextInput, Text, View, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
-import { globalStyles } from '@/styles/global';
+import { globalStyles } from '../styles/global';
 import { Formik } from 'formik';
 import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';

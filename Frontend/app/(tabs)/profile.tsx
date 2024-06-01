@@ -1,7 +1,7 @@
 import { Platform, Linking, ScrollView, StyleSheet, Text, View, Image, Modal, TouchableOpacity, KeyboardAvoidingView } from 'react-native'; 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Card from "../../utility/card"
-import { globalStyles } from '@/styles/global';
+import { globalStyles } from '../../styles/global';
 import { TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';

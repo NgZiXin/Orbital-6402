@@ -3,7 +3,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useState } from 'react';
 import { Dimensions, Text, TextInput, View, StyleSheet, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
-import { globalStyles } from '@/styles/global';
+import { globalStyles } from '../../styles/global';
 
 export default function TabTwoScreen() {
   const [search, setSearch] = useState(''); 
