@@ -1,102 +1,111 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
-
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useState } from 'react';
+import { Text, TextInput, View, StyleSheet, ScrollView, TouchableOpacity, Keyboard} from 'react-native';
+import { globalStyles } from '@/styles/global';
 
 export default function TabTwoScreen() {
+  const [search, setSearch] = useState(''); 
+  const [activeSG, setActiveSG] = useState(false); 
+  const [park, setPark] = useState(false); 
+
+  const activeSGHandler = () => {
+    setActiveSG(!activeSG)
+    setPark(false)
+  }
+
+  const parkHandler = () => {
+    setPark(!park)
+    setActiveSG(false)
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText> library
-          to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <View style={{ ...globalStyles.container, padding: 15}}>
+      <View style={styles.firstHeader}>
+        <Text style={{ ...globalStyles.para, color: 'red', fontFamily: 'inter-bold'}}>Finder</Text>
+        <Text style={{ ...globalStyles.header, fontFamily: 'inter-bold', 
+          position: 'relative', bottom: 20}}>
+          Find Nearest Workout Facility & Park
+        </Text>
+      </View>
+
+      <View style={[styles.searchWrapper, styles.extra]}>
+        <TextInput 
+          style={{borderRadius: 10, width: '90%'}}
+          placeholder='Your Location'
+          onChangeText={(newText) => setSearch(newText)}
+          value={search}/>
+
+        <TouchableOpacity>
+          <Ionicons name='search-outline' size={20} style={{
+            position: 'relative', left: 5, top: 1}}/>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.buttonsWrapper}>
+        <TouchableOpacity onPress={activeSGHandler} style={[
+          styles.button, activeSG ? styles.highlightedButton : undefined]}>
+
+          <Text style={globalStyles.para}>ActiveSG</Text>
+          <MaterialIcons name='sports-gymnastics' size={20} style={{
+            position: 'relative', left: 5, top: 10}}/>
+
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={parkHandler} style={[
+          styles.button, {marginLeft: 10}, 
+          park ? styles.highlightedButton : undefined]}>
+          
+          <Text style={globalStyles.para}>Park</Text>
+          <MaterialIcons name='park' size={20} style={{
+            position: 'relative', left: 5, top: 10}}/>
+
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  firstHeader: {
+    width: '100%',
+    paddingLeft: 2
   },
-  titleContainer: {
+
+  searchWrapper: {
+    width: '100%',
+    position: 'relative',
+    bottom: 15,
     flexDirection: 'row',
-    gap: 8,
+    justifyContent: 'flex-start',
+    alignItems: 'center'
   },
+
+  extra: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    padding: 10
+  },
+
+  buttonsWrapper: {
+    flexDirection: 'row', 
+    position: 'relative',
+    bottom: 3,
+    alignItems: 'center'
+  },
+
+  button: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '33%',
+    backgroundColor: '#F6F2F2',
+    borderRadius: 12, 
+  }, 
+
+  highlightedButton: {
+    borderColor: 'red',
+    borderWidth: 1
+  }
+
 });
