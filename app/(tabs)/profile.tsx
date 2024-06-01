@@ -1,4 +1,4 @@
-import { Alert, Linking, ScrollView, StyleSheet, Text, View, Image, Modal, TouchableOpacity } from 'react-native'; 
+import { Platform, Linking, ScrollView, StyleSheet, Text, View, Image, Modal, TouchableOpacity, KeyboardAvoidingView } from 'react-native'; 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Card from "../../utility/card"
 import { globalStyles } from '@/styles/global';
@@ -23,8 +23,11 @@ export default function Profile() {
         return(
             <Modal animationType='slide' visible={editModal} transparent={true}>
                 <View style={styles.modalWrapper}>
-                    <View style={{ ...styles.modalContent, height: '70%'}}>
-                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <View style={{ ...styles.modalContent, height: '79%'}}>
+                        <KeyboardAvoidingView
+                        style={globalStyles.container}
+                        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}    
+                        behavior={Platform.OS === "ios" ? "padding" : undefined}>
                             <View style={{width: '100%', height:'100%'}}>
                                 <View 
                                     style={{
@@ -39,7 +42,7 @@ export default function Profile() {
                                 </View>
                                 <EditForm submitHandler={submitHandler}/>
                             </View>
-                        </TouchableWithoutFeedback>
+                        </KeyboardAvoidingView>
                     </View>   
                 </View>
             </Modal>
@@ -234,9 +237,12 @@ export default function Profile() {
                     
                     <View style={styles.authCode}>
                         <Card>
-                            <Text style={globalStyles.para}>This will display the authCode when the sync button is pressed!</Text>    
+                            <View style={{padding: 10}}>
+                                <Text style={globalStyles.para}>This will display the authCode when the sync button is pressed!</Text>    
+                            </View>
                         </Card>
                     </View>
+                    
                     <SafeAreaView style={{width: '100%'}}>        
                         <TouchableWithoutFeedback onPress={displayAuth}> 
                             <View style={styles.syncButton}>

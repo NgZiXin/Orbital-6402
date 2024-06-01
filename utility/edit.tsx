@@ -1,26 +1,24 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, KeyboardAvoidingView, TextInput, View, Text, Platform, Pressable, TouchableOpacity} from 'react-native';
+import { Keyboard, ScrollView, StyleSheet, KeyboardAvoidingView, TextInput, View, Text, Platform, Pressable, TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
 import { globalStyles } from '../styles/global';
 import { Formik } from 'formik';
 import DateTimePicker from '@react-native-community/datetimepicker'; 
 
 export default function EditForm({submitHandler}: any) {
     const [showPicker, setShowPicker] = useState(false)
+    const [visible, setVisibility] = useState(false); 
     const datePlaceholder = new Date();
 
-    // TODO: add a way to change password in future!  CCB! 
     return (
         <View style={globalStyles.container}>
-            {/* This is to account for keyboard potentially blocking view of input fields*/}
-            {/* Not really sure how to solve form being cut+overflow instead of shifting issue*/}
-            <KeyboardAvoidingView 
-            style={globalStyles.container}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}    
-            behavior={Platform.OS === "ios" ? "padding" : undefined}>
+            {/* This is to account for keyboard potentially blocking view of input fields */}
+            {/* Not really sure how to solve form being cut+overflow instead of shifting issue */}
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={{flex: 1}}>
                     <Formik 
                         style={{flex: 1}}
-                        initialValues={{name: '', height: '', weight: '', birthday: new Date()}}
+                        initialValues={{name: '', password: '', height: '', weight: '', birthday: new Date()}}
                         onSubmit={(values, actions) => {
                             // TODO: make this link to the data displayed on profile page 
                             actions.resetForm();
@@ -42,9 +40,39 @@ export default function EditForm({submitHandler}: any) {
                                             // grabs the updated value
                                             value={formikProps.values.name}/>
                                     </View>
+
+                                    <View style={{position: 'relative', bottom: 9}}>
+                                      <Text style={[globalStyles.para, styles.label, {top: 15}]}>Password:</Text>
+                                      <View style={[globalStyles.input, styles.label, styles.extra]}>
+                                        <TextInput 
+                                            // trick where child (TextInput) just matches the borderRadius
+                                            // let parent (View) extend fully
+                                            style={{borderRadius: 6, width: '90%', height: '100%'}}
+                                            placeholder='youCantSeeMe69'
+
+                                            // updating the associated value for 'password' input field
+                                            onChangeText={formikProps.handleChange('password')}
+
+                                            // grabs the updated value
+                                            value={formikProps.values.password}
+                                            secureTextEntry={!visible}/>
+                                            
+                                            {visible &&
+                                            <TouchableOpacity onPress={() => setVisibility(false)}>
+                                                <Ionicons name='eye-off-outline' size={20} style={{
+                                                    position: 'relative', top: 2}}/>
+                                            </TouchableOpacity>}
+
+                                            {!visible &&
+                                            <TouchableOpacity onPress={() => setVisibility(true)}>
+                                                <Ionicons name='eye-outline' size={20} style={{
+                                                    position: 'relative', top: 2}}/>
+                                            </TouchableOpacity>}
+                                      </View>
+                                  </View>
                                     
                                     <View>
-                                        <Text style={[globalStyles.para, styles.label]}>Height (in metres)</Text>
+                                        <Text style={[globalStyles.para, styles.label]}>Height (in metres):</Text>
                                         <TextInput 
                                             style={globalStyles.input}
                                             placeholder='1.80'
@@ -57,7 +85,7 @@ export default function EditForm({submitHandler}: any) {
                                     </View>
                                     
                                     <View>
-                                        <Text style={[globalStyles.para, styles.label]}>Weight (in kg)</Text>
+                                        <Text style={[globalStyles.para, styles.label]}>Weight (in kg):</Text>
                                         <TextInput 
                                         style={globalStyles.input}
                                         placeholder='69'
@@ -70,7 +98,7 @@ export default function EditForm({submitHandler}: any) {
                                     </View>
 
                                     <View>
-                                        <Text style={[globalStyles.para, styles.label]}>Birthday</Text>
+                                        <Text style={[globalStyles.para, styles.label]}>Birthday:</Text>
                                         {showPicker &&
                                         <DateTimePicker
                                             mode='date'
@@ -103,14 +131,14 @@ export default function EditForm({submitHandler}: any) {
                                     </View>                        
                                     
                                     <TouchableOpacity onPress={() => formikProps.handleSubmit()} style={styles.submit}>
-                                        <Text style={{ ...globalStyles.para, textAlign: 'center', fontSize: 14}}>Submit</Text>
+                                        <Text style={{ ...globalStyles.header, textAlign: 'center', fontSize: 12}}>Submit</Text>
                                     </TouchableOpacity> 
                                 </ScrollView>
                             </View>
                         )}
                     </Formik>
                 </View>
-            </KeyboardAvoidingView>
+            </TouchableWithoutFeedback>
         </View>
     )
 }
@@ -119,6 +147,11 @@ const styles = StyleSheet.create({
     label: {
         position: 'relative',
         top: 7
+    },
+
+    extra: {
+        flexDirection: 'row',
+        alignItems: 'center'
     },
 
     submit: {

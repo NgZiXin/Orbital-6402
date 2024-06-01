@@ -4,9 +4,12 @@ import { Formik } from 'formik';
 import { useNavigation } from 'expo-router';
 import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function SignUp () {
-  const [showPicker, setShowPicker] = useState(false)
+  const [showPicker, setShowPicker] = useState(false);
+  const [visible, setVisibility] = useState(false);
+
   const datePlaceholder = new Date();
   const navigation: any = useNavigation(); 
 
@@ -30,7 +33,7 @@ export default function SignUp () {
                       {(formikProps) => (
                           <View>
                               <Text style={globalStyles.header}>🧙  Welcome!  🧙</Text>
-                              <ScrollView style={{position: 'relative', bottom: 5}}>
+                              <ScrollView style={{position: 'relative', bottom: 10}}>
                                   <View>
                                       <Text style={[globalStyles.para, styles.label]}>Name:</Text>
                                       <TextInput 
@@ -40,19 +43,34 @@ export default function SignUp () {
                                           value={formikProps.values.name}/>
                                   </View>
                                   
-                                  <View>
-                                      <Text style={[globalStyles.para, styles.label]}>Password:</Text>
-                                      <TextInput 
-                                          style={globalStyles.input}
-                                          placeholder='youCantSeeMe69'
-                                          onChangeText={formikProps.handleChange('password')}
-                                          value={formikProps.values.password}
-                                          // TODO: add icon to toggle password visible/hidden
-                                          secureTextEntry={true}/>
+                                  <View style={{position: 'relative', bottom: 9}}>
+                                      <Text style={[globalStyles.para, styles.label, {top: 15}]}>Password:</Text>
+                                      <View style={[globalStyles.input, styles.label, styles.extra]}>
+                                        <TextInput 
+                                            // trick where child (TextInput) just matches the borderRadius
+                                            // let parent (View) extend fully
+                                            style={{borderRadius: 6, width: '90%', height: '100%'}}
+                                            placeholder='youCantSeeMe69'
+                                            onChangeText={formikProps.handleChange('password')}
+                                            value={formikProps.values.password}
+                                            secureTextEntry={!visible}/>
+                                            
+                                            {visible &&
+                                            <TouchableOpacity onPress={() => setVisibility(false)}>
+                                                <Ionicons name='eye-off-outline' size={20} style={{
+                                                    position: 'relative', top: 2}}/>
+                                            </TouchableOpacity>}
+
+                                            {!visible &&
+                                            <TouchableOpacity onPress={() => setVisibility(true)}>
+                                                <Ionicons name='eye-outline' size={20} style={{
+                                                    position: 'relative', top: 2}}/>
+                                            </TouchableOpacity>}
+                                      </View>
                                   </View>
                                   
                                   <View>
-                                        <Text style={[globalStyles.para, styles.label]}>Height (in metres)</Text>
+                                        <Text style={[globalStyles.para, styles.label]}>Height (in metres):</Text>
                                         <TextInput 
                                             style={globalStyles.input}
                                             placeholder='1.80'
@@ -62,7 +80,7 @@ export default function SignUp () {
                                     </View>
                                     
                                     <View>
-                                        <Text style={[globalStyles.para, styles.label]}>Weight (in kg)</Text>
+                                        <Text style={[globalStyles.para, styles.label]}>Weight (in kg):</Text>
                                         <TextInput 
                                         style={globalStyles.input}
                                         placeholder='69'
@@ -72,7 +90,7 @@ export default function SignUp () {
                                     </View>
 
                                     <View>
-                                        <Text style={[globalStyles.para, styles.label]}>Birthday</Text>
+                                        <Text style={[globalStyles.para, styles.label]}>Birthday:</Text>
                                         {showPicker &&
                                         <DateTimePicker
                                             mode='date'
@@ -102,7 +120,7 @@ export default function SignUp () {
                                     </View>                        
 
                                   <TouchableOpacity onPress={() => navigation.navigate('login')} style={styles.submit}>
-                                      <Text style={{ ...globalStyles.para, textAlign: 'center', fontSize: 14}}>Create Account</Text>
+                                      <Text style={{ ...globalStyles.header, textAlign: 'center', fontSize: 12}}>Create Account</Text>
                                   </TouchableOpacity> 
                               </ScrollView>
                           </View>
@@ -119,6 +137,11 @@ const styles = StyleSheet.create({
   label: {
       position: 'relative',
       top: 7
+  },
+
+  extra: {
+    flexDirection: 'row',
+    alignItems: 'center'
   },
 
   submit: {

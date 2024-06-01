@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-export default function Card(props : any) {
+export default function Card(props: any) {
     return (
         <View style={styles.card}>
             { props.children }
@@ -11,7 +11,7 @@ export default function Card(props : any) {
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 6,
+        borderRadius: 7,
         elevation: 3,
         backgroundColor: "#fff",
         // width: right offset, height: down offset
