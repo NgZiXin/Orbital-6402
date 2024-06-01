@@ -56,7 +56,7 @@ def strava_get_token(request):
         strava_refresh_token.save()
 
         return Response({'status': 'success'}, status=status.HTTP_200_OK)
-    return Response({'error': 'No code provided'}, status=400)
+    return Response({'error': 'Invalid Query'}, status=400)
 
 @api_view(['GET'])
 def strava_refresh_token(request):
