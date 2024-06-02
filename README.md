@@ -17,7 +17,7 @@ The overall objective of this app is to elevate the standard of fitness guidance
 [`app`](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend/app) The main frontend logic behind the app <br>
 [`styles`](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend/styles) Global CSS styles reused across the app <br> 
 [`utility`](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend/utility) Helper components and functions <br>
-[`backend`](https://github.com/NgZiXin/Orbital-6402/tree/main/backend) The back-end of the app, built using Django and PostgresSQL! <br>
+[`backend`](https://github.com/NgZiXin/Orbital-6402/tree/main/backend) The back-end of the app, built using Django and PostgreSQL! <br>
 
 
 ## 📚 Getting Started
