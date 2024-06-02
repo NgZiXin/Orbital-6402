@@ -36,19 +36,43 @@ To learn more about Expo, do look at the following resources:
    npm install
    ```
 
-2. Start the app
+2. Edit Frontend/config.py and change `api_endpoint` to your desired api endpoint (usually its device's IP Address)
+
+3. Start the app
 
    ```bash
     npx expo start --tunnel
    ```
 
-3. Scan the QR Code displayed on the terminal. If you are on IOS, use the phone camera. If you are on Android, use the Expo app's QR scanner. 
+4. Scan the QR Code displayed on the terminal. If you are on IOS, use the phone camera. If you are on Android, use the Expo app's QR scanner. 
 
 
 ### Setting up the Back-end:
 
-1. (Placeholder) 
+1. Activate the virtualenv for your project.
+    
+2. Install project dependencies:
 
+   ```bash
+    pip install -r requirements/local.txt
+   ```
+    
+3. Configure backend/backend/settings.py:
+   - Under `DATABASES`, change to your own postgres database and user
+   - Under `ALLOWED_HOSTS`, add your local device's IP address
+
+4. Apply the migrations:
+
+   ```bash
+    python manage.py migrate
+   ```
+   
+5. You can now run the development server:
+
+   ```bash
+    python manage.py runserver 0.0.0.0:8000
+   ```
+    
 ## 💙 The Team
 
 This project was made possible by two epic team members! <br> 
