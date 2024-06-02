@@ -7,7 +7,7 @@ import { globalStyles } from '../../styles/global';
 
 export default function TabTwoScreen() {
   const [search, setSearch] = useState(''); 
-  const [activeSG, setActiveSG] = useState(false); 
+  const [gym, setGym] = useState(false); 
   const [park, setPark] = useState(false); 
 
   // TODO 
@@ -15,14 +15,14 @@ export default function TabTwoScreen() {
     console.log('Placeholder!')
   };
 
-  const activeSGHandler = () => {
-    setActiveSG(!activeSG)
+  const gymHandler = () => {
+    setGym(!gym)
     setPark(false)
   };
 
   const parkHandler = () => {
     setPark(!park)
-    setActiveSG(false)
+    setGym(false)
   };
 
   return (
@@ -53,10 +53,10 @@ export default function TabTwoScreen() {
             </View>
 
             <View style={styles.buttonsWrapper}>
-              <TouchableOpacity onPress={activeSGHandler} style={[
-                styles.button, activeSG ? styles.highlightedButton : undefined]}>
+              <TouchableOpacity onPress={gymHandler} style={[
+                styles.button, gym ? styles.highlightedButton : undefined]}>
 
-                <Text style={{ ...globalStyles.para, position: 'relative', right: 3}}>ActiveSG</Text>
+                <Text style={{ ...globalStyles.para, position: 'relative', right: 3}}>Gym</Text>
                 <MaterialIcons name='sports-gymnastics' size={20} style={{
                   position: 'relative', left: 2, top: 10}}/>
 
