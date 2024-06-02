@@ -1,6 +1,6 @@
 ## 🌟 Introduction
 
-Workout Wizards 🧙 is a fitness app that complements the popular Strava fitness app. Its aim is to help local Singaporean users along in their fitness journey. It implements many meaningful features, such as personalized workout and running route recommendations. <br> 
+🧙 Workout Wizards 🧙 is a fitness app that complements the popular Strava fitness app. Its aim is to help local Singaporean users along in their fitness journey. It implements many meaningful features, such as personalized workout and running route recommendations. <br> 
 
 The overall objective is to elevate the standard of fitness guidance and support available to Singaporean Strava users, tailoring each aspect of their exercise regimen for an optimized and engaging workout journey that they will enjoy.
 
