@@ -5,7 +5,7 @@
 The overall objective of this app is to elevate the standard of fitness guidance and support available to Singaporean Strava users, tailoring each aspect of their exercise regimen for an optimized and engaging workout journey that they will enjoy.
 
 
-## Table of Contents
+## 📋 Table of Contents
 
 - [🗺 Project Layout](#-project-layout)
 - [📚 Getting started](#-getting-started)
