@@ -13,7 +13,7 @@ The overall objective is to elevate the standard of fitness guidance and support
 
 ## 🗺 Project Layout
 
-[`Frontend`](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend) The front=end of the app, built using React Native and TypeScript!<br>
+[`Frontend`](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend) The front-end of the app, built using React Native and TypeScript!<br>
 [`app`](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend/app) The main frontend logic behind the app <br>
 [`styles`](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend/styles) Global CSS styles reused across the app <br> 
 [`utility`](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend/utility) Helper components and functions <br>
