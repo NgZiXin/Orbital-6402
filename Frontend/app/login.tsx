@@ -30,7 +30,7 @@ export default function Login() {
     
             const data = await response.json();
             console.log('Response values:', data); // TODO: Save it to  global prop
-    
+
             // Handle successful login (navigate to profile page)
             actions.resetForm();
             navigation.navigate('(tabs)');
