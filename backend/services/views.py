@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .serializers import FindNearestGymSerializer
 from rest_framework.decorators import api_view, permission_classes
+from haversine import haversine, Unit
 import overpy
 
 # Create your views here.
@@ -30,12 +31,13 @@ def find_nearest_gym(request):
             gyms = []
             if result.nodes:
                 for node in result.nodes:
-                    gym = {
-                        "name": node.tags.get("name", "Unnamed Gym"),
-                        "latitude": node.lat,
-                        "longitude": node.lon,
-                        "tags": node.tags
-                    }
+                    if node.tags["name"]: # Filter out Unnamed Gym
+                        gym = {
+                            "name": node.tags["name"], 
+                            "latitude": node.lat,
+                            "longitude": node.lon,
+                            "distance": "{:.2f}".format(haversine((float(lat),float(lon)),(float(node.lat),float(node.lon)),unit=Unit.KILOMETERS))
+                        }
                     gyms.append(gym)
                 return Response(gyms, status=200)
             else:

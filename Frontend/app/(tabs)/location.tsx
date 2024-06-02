@@ -2,17 +2,80 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useState } from 'react';
-import { Dimensions, Text, TextInput, View, StyleSheet, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
+import { FlatList, Image, Dimensions, Alert, Text, TextInput, View, StyleSheet, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
 import { globalStyles } from '../../styles/global';
+
+interface GymInfo {
+  name: string, 
+  latitude: number,
+  longitude: number,
+  distance: number,
+}
 
 export default function TabTwoScreen() {
   const [search, setSearch] = useState(''); 
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [gymData, setGymData] = useState<GymInfo[] | null>(null);
+  const [message, setMessage] = useState<string>("Result of the search will be displayed here!");
   const [gym, setGym] = useState(false); 
   const [park, setPark] = useState(false); 
 
-  // TODO 
+
+  const getNearestGyms = async (lat: number, lon: number, radius: number) => {
+      const response = await fetch(`http://192.168.50.37:8000/services/find_gym/?lat=${lat}&lon=${lon}&radius=${radius}`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+      });
+
+      if (!response.ok) {
+          // TODO: Handle Error Response
+          throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      return data;
+  };
+
+
   const searchHandler = () => {
-    console.log('Placeholder!')
+    if (!gym && !park) {
+      Alert.alert('Choose Gym or Park!')
+    }
+    else if (gym) {
+      // Fetching data from the URL
+      fetch(`https://www.onemap.gov.sg/api/common/elastic/search?searchVal=${search}&returnGeom=Y&getAddrDetails=Y&pageNum=1`)
+      .then((response) => {
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+      })
+      .then((data) => {
+          if (data["results"].length == 0) {
+            Alert.alert('User Error', 'Invalid Postal Code / Address input');
+          } else {
+            setMessage(`Searching for gym(s) around ${data["results"][0]["SEARCHVAL"]}`)
+            getNearestGyms(data["results"][0]["LATITUDE"], data["results"][0]["LONGITUDE"], 1000)
+            .then((res: GymInfo[] ) => {
+              console.log(res)
+              setGymData(res);
+              let points: string[] = [];
+              res.forEach((entry: GymInfo) => {
+              if (entry.latitude && entry.longitude) {
+                points.push(`[${entry.latitude},${entry.longitude}]`);
+              }});
+              points.push(`[${data["results"][0]["LATITUDE"]},${data["results"][0]["LONGITUDE"]}]`)
+              setImageUri(`https://www.onemap.gov.sg/api/staticmap/getStaticImage?layerchosen=default&latitude=${data["results"][0]["LATITUDE"]}&longitude=${data["results"][0]["LONGITUDE"]}&zoom=15&width=400&height=400&points=${points.join('|')}`)
+            }) // Radius of 1km from first search result
+          }
+      })
+      .catch((error) => {
+          // Logging any errors
+          console.error('Error fetching data:', error);
+      });
+    }
   };
 
   const gymHandler = () => {
@@ -24,6 +87,14 @@ export default function TabTwoScreen() {
     setPark(!park)
     setGym(false)
   };
+
+  const renderItem = ({ item }: { item: GymInfo }) => (
+    <View style={styles.item}>
+      <Text style={styles.column}>{item.name}</Text>
+      <Text style={styles.column}>{item.distance + " km"}</Text>
+    </View>
+    // TODO: add reverse geocode for address
+  );
 
   return (
     <View style={{ ...globalStyles.container, padding: 12}}>
@@ -42,7 +113,7 @@ export default function TabTwoScreen() {
             <View style={[styles.searchWrapper, styles.extra]}>
               <TextInput 
                 style={{borderRadius: 7, width: '90%'}}
-                placeholder='Your Location'
+                placeholder='Your Location (Postal Code)'
                 onChangeText={(newText) => setSearch(newText)}
                 value={search}/>
 
@@ -77,7 +148,28 @@ export default function TabTwoScreen() {
               <Text style={{ ...globalStyles.header, fontFamily: 'inter-bold'}}>Result</Text>
               <View style={styles.card}>
                 <View style={styles.cardWrapper}>
-                  <Text style={globalStyles.para}>Result of the search will be displayed here!</Text>
+                  <Text style={globalStyles.para}>{message}</Text>
+                  {imageUri && 
+                    <View style={styles.imageWrapper}>
+                      <Image style={styles.banner} source={{ uri: imageUri }}/>
+                    </View>
+                  }
+                  {gymData && 
+                    <>  
+                      <Text style={{...globalStyles.para, color: 'grey'}}>Listing Gyms found within 1km radius:</Text>
+                      <FlatList
+                        data={gymData}
+                        renderItem={renderItem}
+                        keyExtractor={(item: GymInfo, index: number) => index.toString()}
+                        ListHeaderComponent={() => (
+                          <View style={styles.item}>
+                            <Text style={styles.headerText}>Name</Text>
+                            <Text style={styles.headerText}>Distance</Text>
+                          </View>
+                        )}
+                      />
+                    </>
+                  }
                 </View>
               </View>
             </View>
@@ -159,8 +251,38 @@ const styles = StyleSheet.create({
   },
 
   cardWrapper: {
+    height: 'auto',
     width: '100%',
-    height: 250,
     padding: 7
+  },
+
+  imageWrapper: {
+    height: 400,
+    width: '100%'
+  },
+
+  banner: {
+    flex: 1,
+    height: null,
+    width: null,
+    resizeMode: 'cover',
+  },
+
+  item: {
+    flexDirection: 'row',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+
+  headerText: {
+    flex: 1,
+    paddingHorizontal: 10,
+    fontWeight: 'bold',
+  },
+
+  column: {
+    flex: 1, // Take up equal space
+    paddingHorizontal: 10,
   },
 });

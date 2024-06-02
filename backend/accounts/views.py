@@ -13,11 +13,16 @@ class UserListCreate(generics.ListCreateAPIView): # listing and creating users
         print(request.data)  # This will log the request body
         return super().create(request, *args, **kwargs)
 
-class UserDetail(generics.RetrieveUpdateDestroyAPIView): # retrieving, updating, and deleting users
-    permission_classes = [IsAuthenticated, IsOwner]
+class UserDetail(generics.RetrieveAPIView): 
+    permission_classes = [AllowAny]
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
+class UserData(generics.RetrieveUpdateDestroyAPIView): # retrieving, updating, and deleting users
+    permission_classes = [IsAuthenticated]
+    serializer_class = CustomUserSerializer
+    def get_object(self):
+        return self.request.user
 
 
 
