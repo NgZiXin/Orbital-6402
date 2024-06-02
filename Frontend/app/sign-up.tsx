@@ -1,6 +1,6 @@
-import { Keyboard, KeyboardAvoidingView, Platform, Pressable, TextInput, Text, View, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, TextInput, Text, View, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Alert } from 'react-native';
 import { globalStyles } from '../styles/global';
-import { Formik } from 'formik';
+import { Formik, FormikHelpers } from 'formik';
 import { useNavigation } from 'expo-router';
 import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -13,6 +13,47 @@ export default function SignUp () {
   const datePlaceholder = new Date();
   const navigation: any = useNavigation(); 
 
+  interface SignUpValues {
+        username: string;
+        password: string;
+        height: string;
+        weight: string;
+        birthday: Date;
+        gender: string
+    }
+
+  const handleSubmit = async (values: SignUpValues, actions: FormikHelpers<SignUpValues>) => {
+    try {
+        // Custom serialization
+        const body = {
+            ...values,
+            birthday: values.birthday.toISOString().split('T')[0] // Convert date to 'YYYY-MM-DD' format
+        };
+        const response = await fetch('http://192.168.50.37:8000/accounts/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            // TODO: Handle Error Response
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Form values:', data);
+
+        // Handle successful signup (navigate to login screen)
+        actions.resetForm();
+        navigation.navigate('login');
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        Alert.alert('Signup Failed', 'Please check your information and try again.');
+    }
+};
+
   return (
     <View style={globalStyles.container}>
       {/* This is to account for keyboard potentially blocking view of input fields*/}
@@ -24,23 +65,20 @@ export default function SignUp () {
               <View style={{flex: 1, padding: 20, justifyContent: 'center'}}>
                   <Formik 
                       style={{flex: 1}}
-                      initialValues={{name: '', password: '', height: '', weight: '', birthday: new Date()}}
-                      onSubmit={(values, actions) => {
-                          actions.resetForm();
-                          navigation.navigate('login'); 
-                      }}>
+                      initialValues={{username: '', password: '', height: '', weight: '', birthday: new Date(), gender: "M"}}
+                      onSubmit={handleSubmit}>
                       {/* Function that generates the required JSX/TSX */}
                       {(formikProps) => (
                           <View>
                               <Text style={globalStyles.header}>🧙  Welcome!  🧙</Text>
                               <ScrollView style={{position: 'relative', bottom: 10}}>
                                   <View>
-                                      <Text style={[globalStyles.para, styles.label]}>Name:</Text>
+                                      <Text style={[globalStyles.para, styles.label]}>Username:</Text>
                                       <TextInput 
                                           style={globalStyles.input}
                                           placeholder='John Cena'
-                                          onChangeText={formikProps.handleChange('name')}
-                                          value={formikProps.values.name}/>
+                                          onChangeText={formikProps.handleChange('username')}
+                                          value={formikProps.values.username}/>
                                   </View>
                                   
                                   <View style={{position: 'relative', bottom: 9}}>
@@ -117,9 +155,27 @@ export default function SignUp () {
                                             editable={false}
                                             onPressIn={() => setShowPicker(true)}/>
                                         </Pressable>}
-                                    </View>                        
+                                    </View>    
 
-                                  <TouchableOpacity onPress={() => navigation.navigate('login')} style={styles.submit}>
+                                    <View>
+                                        <Text style={[globalStyles.para, styles.label]}>Gender:</Text>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <TouchableOpacity
+                                                style={[styles.genderOption, formikProps.values.gender === 'Male' && styles.selectedGender]}
+                                                onPress={() => formikProps.setFieldValue('gender', 'M')}
+                                            >
+                                                <Text>Male</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={[styles.genderOption, formikProps.values.gender === 'Female' && styles.selectedGender]}
+                                                onPress={() => formikProps.setFieldValue('gender', 'F')}
+                                            >
+                                                <Text>Female</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>                    
+
+                                  <TouchableOpacity onPress={() => formikProps.handleSubmit()} style={styles.submit}>
                                       <Text style={{ ...globalStyles.header, textAlign: 'center', fontSize: 12}}>Create Account</Text>
                                   </TouchableOpacity> 
                               </ScrollView>
@@ -150,4 +206,18 @@ const styles = StyleSheet.create({
       borderRadius: 10,
       marginTop: 15
   },
+
+  genderOption: {
+    flex: 1,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    alignItems: 'center',
+    margin: 5,
+},
+selectedGender: {
+    backgroundColor: '#6200ee',
+    borderColor: '#6200ee',
+},
 })
