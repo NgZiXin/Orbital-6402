@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=D:\Zixin\NUS\Orbital\react_native_test\venv
+set VIRTUAL_ENV=C:\Users\YQF\Documents\Projects\Orbital\Orbital-6402-1\venv
 
 if not defined PROMPT set PROMPT=$P$G
 
