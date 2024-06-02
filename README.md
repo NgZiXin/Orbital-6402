@@ -9,8 +9,7 @@ The overall objective is to elevate the standard of fitness guidance and support
 
 - [🗺 Project Layout](#-project-layout)
 - [📚 Getting started](#-getting-started)
-- [❤️ The Team](#-the-team)
-
+- [💙 The Team](#-the-team)
 
 ## 🗺 Project Layout
 
@@ -50,9 +49,9 @@ To learn more about Expo, do look at the following resources:
 
 1. (Placeholder) 
 
-## ❤️ The Team
+## 💙 The Team
 
 This project was made possible by two epic team members! <br> 
 [Team Member 1](https://github.com/NgZiXin) <br>
-[Team Member 2](https://github.com/YangQF2002) <br>
+[Team Member 2](https://github.com/YangQF2002) 
 
