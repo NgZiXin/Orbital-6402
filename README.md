@@ -1,8 +1,32 @@
-# Welcome to your Expo app 👋
+🌟 Introduction
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Workout Wizards 🧙 is a fitness app that complements the popular Strava fitness app. Its aim is to help local Singaporean users along in their fitness journey. Through implementing meaningful features like personalized workout and running route recommendations, the objective is to elevate the standard of fitness guidance and support available to Singaporean Strava users, tailoring each aspect of their exercise regimen for an optimized and engaging workout journey that they will enjoy. 
 
-## Get started
+
+## Table of Contents
+
+- [🗺 Project Layout](#-project-layout)
+- [📚 Getting started](#-documentation)
+- [❤️ The Team](#-the-team)
+
+
+## 🗺 Project Layout
+
+[Frontend](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend) The front=end of the app, built using React Native and TypeScript!
+[app](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend/app) The main frontend logic behind the app 
+[styles](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend/styles) Global CSS styles reused across the app 
+[utility](https://github.com/NgZiXin/Orbital-6402/tree/main/Frontend/utility) Helper components and functions 
+[backend](https://github.com/NgZiXin/Orbital-6402/tree/main/backend) The back-end of the app, built using Django and PostgresSQL! 
+
+
+## 📚 Getting Started
+
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app). 
+To learn more about Expo, look at the following resources:
+- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with their [guides](https://docs.expo.dev/guides).
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+
+### Setting up the Front-end:
 
 1. Install dependencies
 
@@ -13,38 +37,19 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 2. Start the app
 
    ```bash
-    npx expo start
+    npx expo start --tunnel
    ```
 
-In the output, you'll find options to open the app in a
+3. Scan the QR Code displayed on the terminal. If you are on IOS, use the phone camera. If you are on Android, use the Expo app's QR scanner. 
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Setting up the Back-end:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+1. (Placeholder) 
 
-## Get a fresh project
 
-When you're ready, run:
+## ❤️ The Team
 
-```bash
-npm run reset-project
-```
+This project was made possible by two epic team members! 
+[Team Member 1](https://github.com/NgZiXin)
+[Team Member 2](https://github.com/YangQF2002)
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
