@@ -58,7 +58,9 @@ To learn more about Expo, do look at the following resources:
    ```
     
 3. Configure backend/backend/settings.py:
-   - Under `DATABASES`, change to your own postgres database and user
+   - Under `DATABASES`, change to your own PostgreSQL database and user
+     - To set up PostgreSQL, you can refer to this [guide](https://www.microfocus.com/documentation/idol/IDOL_12_0/MediaServer/Guides/html/English/Content/Getting_Started/Configure/_TRN_Set_up_PostgreSQL.htm) 
+
    - Under `ALLOWED_HOSTS`, add your local device's IP address
 
 4. Apply the migrations:
