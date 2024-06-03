@@ -10,6 +10,7 @@ npm-debug.*
 *.orig.*
 web-build/
 venv/
+venv/*
 
 # macOS
 .DS_Store
