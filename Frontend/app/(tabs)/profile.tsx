@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import EditForm from '../../utility/edit'
 import { Link } from 'expo-router';
+import { getItem } from '../../utility/asyncStorage';
 
 export default function Profile() {
     // state variables to track modal state  
@@ -15,13 +16,52 @@ export default function Profile() {
     const [bmiModal, setBMIModal] = useState(false);
     const [syncModal, setSyncModal] = useState(false);
 
+    // state variable to track user profile details 
+    const [userDetails, setUserDetails] = useState<[string, any][]>([]); 
+
     const submitHandler = () => {
         setEditModal(false);
     }
 
+    const getUserDetails = async () => { 
+        // getItem('token') returns a Promise
+        // hence, we await to wait for the Promise to complete and grab its value 
+        const token: string | null =  await getItem('token')
+     
+        const response = await fetch(`http://192.168.50.37:8000/accounts/data`, { 
+            method: 'GET', 
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization': `Token ${token}`
+            }, 
+        }); 
+     
+        if (!response.ok) { 
+            throw new Error('Network response was not ok'); 
+        } 
+     
+        const data = await response.json(); 
+        const arrVersion = Object.entries(data); 
+        setUserDetails(arrVersion);
+    };
+
+    // trigger
+    getUserDetails(); 
+
+    // converting birthday from 'YYYY-MM-DD' to 'DD-MM-YYYY' format
+    // technical note: once the userDetails is populated, a re-rendered is triggered
+    // this part comes before the display below
+    // ensuring display is always correct
+    if (userDetails.length > 0) {
+        const initialBirthday: string = userDetails[4][1];
+        const [year, month, day] = initialBirthday.split('-');
+        const updatedBirthday: string = `${day}-${month}-${year}`;
+        userDetails[4][1] = updatedBirthday; 
+    }
+
     function renderEditModal() {
         return(
-            <Modal animationType='slide' visible={editModal} transparent={true}>
+            <Modal animationType='fade' visible={editModal} transparent={true}>
                 <View style={styles.modalWrapper}>
                     <View style={{ ...styles.modalContent, height: '79%'}}>
                         <KeyboardAvoidingView
@@ -51,7 +91,7 @@ export default function Profile() {
 
     function renderLogoutModal() {
         return(
-            <Modal animationType='slide' visible={logoutModal} transparent={true}>
+            <Modal animationType='fade' visible={logoutModal} transparent={true}>
                 <View style={styles.modalWrapper}>
                     <View style={styles.modalContent}>
                         <View 
@@ -157,11 +197,33 @@ export default function Profile() {
                 </View>
 
                 <View style={styles.profileWrapper}>
-                    <Image source={require('../../assets/images/pfp.png')} style={styles.pfp}/>
-                    <Text style={styles.userName}>
-                        <Text>Tom </Text>  
-                        <Text style={{color: 'red'}}>Hanks</Text>
-                    </Text>
+                    {/* 
+                        When userDetails is populated 
+                        After the async getUserDetails function finishes
+                        Then only, is this component rendered
+                        This same idea is repeated multiple times below! 
+                    */}
+                    {/* Gender is found at index 5 of the array */}
+                    {userDetails.length > 0 && userDetails[5][1] == "F" && (
+                        <Image source={require('../../assets/images/female-pfp.png')} style={styles.pfp}/>
+                    )}
+
+                    {userDetails.length > 0 && userDetails[5][1] == "M" && (
+                        <Image source={require('../../assets/images/male-pfp.png')} style={styles.pfp}/>
+                    )}
+
+                    {userDetails.length > 0 && (
+                        <View style={{height: '15%', marginBottom: -8}}>
+                            <Text style={styles.userName}>
+                                {/* Username is found at index 1 of the array */}
+                                {userDetails[1][1] + ' (' + userDetails[5][1] + ')'}
+                            </Text>
+
+                            {/* Change name to two parter in future */}
+                            {/* <Text>Tom </Text>  
+                            <Text style={{color: 'red'}}>Hanks</Text> */}
+                        </View>
+                    )}
                     
                     <View style={styles.iconWrapper}>
                         <TouchableOpacity onPress={() => setEditModal(true)}>
@@ -176,22 +238,31 @@ export default function Profile() {
                     <View style={styles.detailsWrapper}>
                         <View style={styles.merged}>
                             <Card>
-                                <View style={styles.cardWrapper}>
-                                    <Text style={styles.header}>Height:</Text>
-                                    <Text style={styles.para}>1.81m</Text>
-                                </View>
+                                {userDetails.length > 0 && (
+                                    <View style={styles.cardWrapper}>
+                                        <Text style={styles.header}>Height:</Text>
+                                        {/* Height is found at index 2 of the array */}
+                                        <Text style={styles.para}>{userDetails[2][1] + 'm'}</Text>
+                                    </View>
+                                )}
                             </Card>
                             <Card>
-                                <View style={styles.cardWrapper}>
-                                    <Text style={styles.header}>Weight:</Text>
-                                    <Text style={styles.para}>75kg</Text>
-                                </View>
+                                {userDetails.length > 0 && (
+                                    <View style={styles.cardWrapper}>
+                                        <Text style={styles.header}>Weight:</Text>
+                                        {/* Weight is found at index 3 of the array */}
+                                        <Text style={styles.para}>{userDetails[3][1] + 'kg'}</Text>
+                                    </View>
+                                )}
                             </Card>
                             <Card>
-                                <View style={styles.cardWrapper}>
-                                    <Text style={styles.header}>Birthday:</Text>
-                                    <Text style={styles.para}>12/02/2002</Text>
-                                </View>
+                                {userDetails.length > 0 && (
+                                    <View style={styles.cardWrapper}>
+                                        <Text style={styles.header}>Birthday:</Text>
+                                        {/* Birthday is found at index 4 of the array */}
+                                        <Text style={styles.para}>{userDetails[4][1]}</Text>
+                                    </View>
+                                )}
                             </Card>
                         </View>
 

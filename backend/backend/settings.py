@@ -86,8 +86,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'orbital',
-        'USER': 'zixin',
-        'PASSWORD': '12345',
+        'USER': 'yqf',
+        'PASSWORD': 'yqf2002',
         'HOST': 'localhost', 
         'PORT': '5432',
     }

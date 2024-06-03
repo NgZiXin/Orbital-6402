@@ -4,6 +4,7 @@ import { Formik, FormikHelpers } from 'formik';
 import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { setItem } from '../utility/asyncStorage';
 
 export default function Login() {
     const [visible, setVisibility] = useState(false);
@@ -24,13 +25,15 @@ export default function Login() {
             });
     
             if (!response.ok) {
-                // TODO: Handle Error Response
                 throw new Error('Network response was not ok');
             }
     
             const data = await response.json();
-            console.log('Response values:', data); // TODO: Save it to  global prop
-
+            const token: string = data['token']; 
+            
+            // stores the user (session-based) token string 
+            setItem('token', token);
+    
             // Handle successful login (navigate to profile page)
             actions.resetForm();
             navigation.navigate('(tabs)');
@@ -57,13 +60,13 @@ export default function Login() {
                             {(formikProps) => (
                                 <View>
                                     <Text style={globalStyles.header}>🧙  Welcome!  🧙</Text>
-                                    <ScrollView style={{position: 'relative', bottom: 10}}>
+                                    <ScrollView style={{position: 'relative', bottom: 15}}>
                                         <View>
                                             <Text style={[globalStyles.para, styles.label]}>Name:</Text>
                                             <TextInput 
                                                 style={globalStyles.input}
                                                 placeholder='John Cena'                                    
-                                                onChangeText={formikProps.handleChange('username')}
+                                                onChangeText={formikProps.handleChange('name')}
                                                 value={formikProps.values.username}/>
                                         </View>
                                         

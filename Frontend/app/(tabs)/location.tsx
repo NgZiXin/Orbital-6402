@@ -127,7 +127,7 @@ export default function TabTwoScreen() {
               <TouchableOpacity onPress={gymHandler} style={[
                 styles.button, gym ? styles.highlightedButton : undefined]}>
 
-                <Text style={{ ...globalStyles.para, position: 'relative', right: 3}}>gym</Text>
+                <Text style={{ ...globalStyles.para, position: 'relative', right: 3}}>Gym</Text>
                 <MaterialIcons name='sports-gymnastics' size={20} style={{
                   position: 'relative', left: 2, top: 10}}/>
 
