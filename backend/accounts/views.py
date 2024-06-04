@@ -2,7 +2,6 @@ from rest_framework import generics
 from .models import CustomUser
 from .serializers import CustomUserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .custom_permissions import IsOwner
 class UserListCreate(generics.ListCreateAPIView): # listing and creating users
     permission_classes = [AllowAny]
     queryset = CustomUser.objects.all()

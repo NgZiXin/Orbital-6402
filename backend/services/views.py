@@ -31,17 +31,17 @@ def find_nearest_gym(request):
             gyms = []
             if result.nodes:
                 for node in result.nodes:
-                    if node.tags["name"]: # Filter out Unnamed Gym
-                        gym = {
-                            "name": node.tags["name"], 
-                            "latitude": node.lat,
-                            "longitude": node.lon,
-                            "distance": "{:.2f}".format(haversine((float(lat),float(lon)),(float(node.lat),float(node.lon)),unit=Unit.KILOMETERS))
-                        }
+                    gym = {
+                        "name": node.tags.get("name","Gym (Name NOT FOUND)"), 
+                        "latitude": node.lat,
+                        "longitude": node.lon,
+                        "distance": "{:.2f}".format(haversine((float(lat),float(lon)),(float(node.lat),float(node.lon)),unit=Unit.KILOMETERS)),
+                        "image": f"https://www.onemap.gov.sg/api/staticmap/getStaticImage?layerchosen=grey&latitude={node.lat}&longitude={node.lon}&zoom=18&width=386&height=200&points=[{node.lat},{node.lon}]"
+                    }
                     gyms.append(gym)
                 return Response(gyms, status=200)
             else:
-                return Response({"message": "No gyms found within the specified radius."}, status=404)
+                return Response([], status=200)
         except Exception as e:
             return Response({'error': str(e)}, status=500)
     else:
