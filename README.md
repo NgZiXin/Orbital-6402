@@ -26,6 +26,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 To learn more about Expo, do look at the following resources:
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with their [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- Required software: Python, Node Package Manager (NPM), PostgresSQL
 
 
 ### Setting up the Front-end:
@@ -38,33 +39,33 @@ To learn more about Expo, do look at the following resources:
 
 2. Create `.env` in the root folder 
 
-3. Add the following attributes in the .env file. You may find your ip address by running `ipconfig` in your terminal. In setting up a postgres database for the django backend, you may this website useful: https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04
+3. Add the following attributes in the .env file. You may find your ip address by running `ipconfig` in your terminal. (Note: In setting up a postgres database for the django back-end, you may find this website useful: https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04)
 
-```
-# API Endpoint
-# Local device's IP address
-REACT_APP_DOMAIN='your device ip address'
+   ```
+   # API Endpoint
+   # Local device's IP address
+   REACT_APP_DOMAIN='your device ip address'
 
-# DB Config
-DATABASE_NAME='postgres database name'
-DATABASE_USER='postgres user'
-DATABASE_PASSWORD='postgres database password'
-DATABASE_HOST='postgres host' 
-DATABASE_PORT='postgres port'
-```
-An example of an .env file:
-```
-# API Endpoint
-# Local device's IP address
-REACT_APP_DOMAIN='100.100.10.10'
+   # DB Config
+   DATABASE_NAME='postgres database name'
+   DATABASE_USER='postgres user'
+   DATABASE_PASSWORD='postgres database password'
+   DATABASE_HOST='postgres host' 
+   DATABASE_PORT='postgres port'
+   ```
+   An example of an .env file:
+   ```
+   # API Endpoint
+   # Local device's IP address
+   REACT_APP_DOMAIN='100.100.10.10'
 
-# DB Config
-DATABASE_NAME='orbital'
-DATABASE_USER='Tom'
-DATABASE_PASSWORD='12345'
-DATABASE_HOST='localhost' 
-DATABASE_PORT='5432'
-```
+   # DB Config
+   DATABASE_NAME='orbital'
+   DATABASE_USER='Tom'
+   DATABASE_PASSWORD='12345'
+   DATABASE_HOST='localhost' 
+   DATABASE_PORT='5432'
+   ```
 
 
 4. Start the app
@@ -78,7 +79,7 @@ DATABASE_PORT='5432'
 
 ### Setting up the Back-end:
 
-1. Activate the virtualenv for your project.
+1. Create and activate a virtual environment for your project. (Note: In setting up your virtual environment, you may find this website useful: https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/)
     
 2. Install project dependencies:
 
@@ -86,7 +87,6 @@ DATABASE_PORT='5432'
     pip install -r requirements/local.txt
    ```
    
-
 3. Apply the migrations:
 
    ```bash
