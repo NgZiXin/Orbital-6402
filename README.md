@@ -105,6 +105,7 @@ The following pages have been implemented
 - Sign up page
 - Login page
 - Location page 
+
 Please note that the rest of the app is still in development.
     
 ## 💙 The Team
