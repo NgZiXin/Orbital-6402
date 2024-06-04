@@ -8,7 +8,8 @@ The overall objective of this app is to elevate the standard of fitness guidance
 ## 📋 Table of Contents
 
 - [🗺 Project Layout](#-project-layout)
-- [📚 Getting started](#-getting-started)
+- [📚 Getting Started](#-getting-started)
+- [📅 Current Progress](#-current-progress)
 - [💙 The Team](#-the-team)
 
 ## 🗺 Project Layout
@@ -53,7 +54,7 @@ To learn more about Expo, do look at the following resources:
    DATABASE_HOST='postgres host' 
    DATABASE_PORT='postgres port'
    ```
-   An example of an .env file:
+   An example of an `.env` file:
    ```
    # API Endpoint
    # Local device's IP address
@@ -99,7 +100,12 @@ To learn more about Expo, do look at the following resources:
     python manage.py runserver 0.0.0.0:8000
    ```
 
-
+## 📅 Current Progress
+The following pages have been implemented
+- Sign up page
+- Login page
+- Location page 
+Please note that the rest of the app is still in development.
     
 ## 💙 The Team
 

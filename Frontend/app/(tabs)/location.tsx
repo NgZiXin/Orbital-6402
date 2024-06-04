@@ -211,6 +211,7 @@ export default function TabTwoScreen() {
                   { marginLeft: 10 },
                   park ? styles.highlightedButton : undefined,
                 ]}
+                disabled // TODO
               >
                 <Text style={globalStyles.para}>Park</Text>
                 <MaterialCommunityIcons
