@@ -263,7 +263,7 @@ export default function Profile() {
           {/* Gender is found at index 5 of the array */}
           {userDetails.length > 0 && userDetails[5][1] == "F" && (
             <Image
-              source={require("../../assets/images/female-pfp.png")}
+              source={require("../../assets/images/female-pfp.jpg")}
               style={styles.pfp}
             />
           )}

@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.fitnessapp"
+      "package": "com.fitnessapp.anonymous"
     },
     "web": {
       "bundler": "metro",
@@ -32,6 +32,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ee85d1b5-c28c-4669-a097-d282b43448a6"
+      }
     }
   }
 }
