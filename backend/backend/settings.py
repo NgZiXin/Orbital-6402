@@ -11,10 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,9 +27,10 @@ SECRET_KEY = 'django-insecure-_k(659qxkqlal0+w%8$9n3q*=t6^yr8ea=7^g&622lvh^n1src
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    f'{os.environ.get("HOST")}',
-    '127.0.0.1',
-    f'{os.environ.get("REACT_APP_DOMAIN")}',
+    '0.0.0.0', 
+    'localhost', 
+    '127.0.0.1', 
+    'https://git.heroku.com/orbital6402.git'
 ]
 
 
@@ -87,14 +85,9 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': f'{os.environ.get("DATABASE_NAME")}',
-        'USER': f'{os.environ.get("DATABASE_USER")}',
-        'PASSWORD': f'{os.environ.get("DATABASE_PASSWORD")}',
-        'HOST': f'{os.environ.get("DATABASE_HOST")}', 
-        'PORT': f'{os.environ.get("DATABASE_PORT")}',
-    }
+    'default': dj_database_url.config(
+        default='postgres://username:password@hostname:port/dbname'
+    )
 }
 
 
