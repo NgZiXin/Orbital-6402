@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'accounts',
     'strava_api',
     'rest_framework.authtoken',
-    'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
