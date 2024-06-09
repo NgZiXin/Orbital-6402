@@ -30,7 +30,7 @@ ALLOWED_HOSTS = [
     '0.0.0.0', 
     'localhost', 
     '127.0.0.1', 
-    'https://git.heroku.com/orbital6402.git'
+    'https://orbital6402-0f3b6f7e6bfd.herokuapp.com'
 ]
 
 
@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgres://username:password@hostname:port/dbname'
+        default='postgres://u5fq7rh70on0i:p077f7036d5604cdfa4101df513c6248e2ffbb1260630589292517d4becd24913@c3nv2ev86aje4j.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d8omjca8k6bc5i'
     )
 }
 
