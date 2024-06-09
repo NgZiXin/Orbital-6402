@@ -1,1 +1,1 @@
-web: gunicorn Orbital-6402-Deployment.backend.wsgi
+gunicorn backend.wsgi:application --chdir backend
