@@ -1,23 +1,9 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useState } from "react";
-import {
-  Image,
-  Dimensions,
-  Alert,
-  Text,
-  TextInput,
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
-  KeyboardAvoidingView,
-} from "react-native";
-import { globalStyles } from "../../styles/global";
-import { REACT_APP_DOMAIN } from "@env";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { useState } from 'react';
+import { Image, Dimensions, Alert, Text, TextInput, View, StyleSheet, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
+import { globalStyles } from '../../styles/global';
 
 interface GymInfo {
   name: string;
@@ -37,8 +23,9 @@ export default function TabTwoScreen() {
   const [park, setPark] = useState(false);
 
   const getNearestGyms = async (lat: number, lon: number, radius: number) => {
+    // console.log(`${REACT_APP_DOMAIN}/services/find_gym/?lat=${lat}&lon=${lon}&radius=${radius}`);
     const response = await fetch(
-      `http://${REACT_APP_DOMAIN}:8000/services/find_gym/?lat=${lat}&lon=${lon}&radius=${radius}`,
+      `https://orbital6402-2e455ce4dc99.herokuapp.com/services/find_gym/?lat=${lat}&lon=${lon}&radius=${radius}`,
       {
         method: "GET",
         headers: {
