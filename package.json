@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "expo-web-browser": "^13.0.3",
     "react-native-dotenv": "^3.4.11"
   }
 }

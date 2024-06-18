@@ -20,6 +20,7 @@ import EditForm from "../../utility/edit";
 import { Link } from "expo-router";
 import { getItem } from "../../utility/asyncStorage";
 import { REACT_APP_DOMAIN } from "@env";
+import LinkStrava from "../../components/LinkStrava";
 
 export default function Profile() {
   // state variables to track modal state
@@ -392,30 +393,13 @@ export default function Profile() {
           </View>
 
           <SafeAreaView style={{ width: "100%" }}>
-            <TouchableWithoutFeedback onPress={displayAuth}>
-              <View style={styles.syncButton}>
-                <Text
-                  style={{
-                    ...globalStyles.header,
-                    letterSpacing: 0,
-                    textAlign: "center",
-                  }}
-                >
-                  Sync with Strava!
-                </Text>
-              </View>
-            </TouchableWithoutFeedback>
+            <LinkStrava />
           </SafeAreaView>
         </View>
       </ScrollView>
     </View>
   );
 }
-
-// TODO in future
-const displayAuth = () => {
-  console.log("Placeholder");
-};
 
 const styles = StyleSheet.create({
   modalWrapper: {
@@ -550,11 +534,4 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
 
-  syncButton: {
-    width: "100%",
-    marginTop: "-5%",
-    padding: 5,
-    borderRadius: 15,
-    backgroundColor: "#FFC4C4",
-  },
 });
