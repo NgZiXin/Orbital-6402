@@ -27,10 +27,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '0.0.0.0', 
-    'localhost', 
-    '127.0.0.1', 
-    'https://orbital6402-0f3b6f7e6bfd.herokuapp.com'
+    f'{os.environ.get("HOST")}',
+    '127.0.0.1',
+    f'{os.environ.get("REACT_APP_DOMAIN")}',
+    '192.168.50.37', # Temp solution
+    "*",
 ]
 
 
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'accounts',
     'strava_api',
     'rest_framework.authtoken',
+    'map',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -127,7 +129,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
