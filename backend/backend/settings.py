@@ -15,10 +15,13 @@ https://dev.to/giftedstan/heroku-how-to-deploy-a-django-app-with-postgres-in-5-m
 
 from pathlib import Path
 import os
-import dj_database_url
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -92,17 +95,15 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': '',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '', 
-        'PORT': '',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': f'{os.environ.get("DATABASE_NAME")}',
+        'USER': f'{os.environ.get("DATABASE_USER")}',
+        'PASSWORD': f'{os.environ.get("DATABASE_PASSWORD")}',
+        'HOST': f'{os.environ.get("DATABASE_HOST")}', 
+        'PORT': f'{os.environ.get("DATABASE_PORT")}',
     }
 }
-# Config database
-db_from_env = dj_database_url.config(conn_max_age=600)
-DATABASES['default'].update(db_from_env)
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
