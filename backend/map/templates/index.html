@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      #map {
+        top: 0;
+        bottom: 0;
+        height: 50%;
+        width: 100%;
+      }
+
+      #container {
+        height: 50%;
+        width: 50%;
+        overflow-y: auto;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+
+      #container-heading {
+        margin-top: 0;
+      }
+
+      .card {
+        background-color: grey;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card .info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .card .info .left-col {
+        flex: 1;
+        flex-wrap: wrap;
+      }
+
+      .card .info .right-col {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .card .info .right-col img {
+        width: 75px;
+        height: 25px;
+        object-fit: cover;
+        border-radius: 5px;
+      }
+
+      .card .info p {
+        margin: 0;
+      }
+    </style>
+    <title>Orbital 6402 Interactive Map</title>
+  </head>
+  <body>
+    <div id="map"></div>
+    <!-- Placeholder for the map -->
+    <div id="container">
+      <h3 id="container-heading">Select Strava segments to add to routes</h3>
+      <div id="data-list"></div>
+      <!-- Placeholder for the list -->
+    </div>
+  </body>
+  <script src="{% static 'Polyline.encoded.js' %}"></script>
+  <script src="{% static 'scripts.js' %}"></script>
+</html>

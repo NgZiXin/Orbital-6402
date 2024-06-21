@@ -6,7 +6,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { globalStyles } from "../styles/global";
-import { REACT_APP_DOMAIN } from "@env";
+// import { REACT_APP_DOMAIN } from "@env";
 import { getItem } from "../utility/asyncStorage";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
@@ -18,7 +18,7 @@ export default function LinkStrava() {
     const token: string | null = await getItem("token");
     const redirect_uri = Linking.createURL(""); // TODO: Bring app back to profile page and not home page
     fetch(
-      `http://${REACT_APP_DOMAIN}:8000/strava_api/get_access/?redirect_uri=${redirect_uri}/`,
+      `http://192.168.18.5:8000/strava_api/get_access/?redirect_uri=${redirect_uri}/`,
       {
         method: "GET",
         headers: {
@@ -47,7 +47,7 @@ export default function LinkStrava() {
               // Handle the queryParams
               if (queryParams && queryParams["code"] && queryParams["scope"]) {
                 fetch(
-                  `http://${REACT_APP_DOMAIN}:8000/strava_api/get_token/?code=${queryParams["code"]}&scope=${queryParams["scope"]}/`,
+                  `http://192.168.18.5:8000/strava_api/get_token/?code=${queryParams["code"]}&scope=${queryParams["scope"]}/`,
                   {
                     method: "GET",
                     headers: {

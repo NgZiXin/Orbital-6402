@@ -3,45 +3,43 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  TextInput,
   Text,
   View,
   ScrollView,
-  StyleSheet,
-  TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+
 import { globalStyles } from "../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useNavigation } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
 import { setItem } from "../utility/asyncStorage";
-import { REACT_APP_DOMAIN } from "@env";
+import {
+  UsernameField,
+  PasswordField,
+  SubmitButton,
+} from "../utility/formComponents/index";
+// import { REACT_APP_DOMAIN } from '@env';
 
 export default function Login() {
-  const [visible, setVisibility] = useState(false);
   const navigation: any = useNavigation();
 
   interface LoginValues {
     username: string;
     password: string;
   }
+
   const handleSubmit = async (
     values: LoginValues,
     actions: FormikHelpers<LoginValues>
   ) => {
     try {
-      const response = await fetch(
-        `http://${REACT_APP_DOMAIN}:8000/accounts/login/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        }
-      );
+      const response = await fetch(`http://192.168.18.5:8000/accounts/login/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -85,99 +83,16 @@ export default function Login() {
                 <View>
                   <Text style={globalStyles.header}>🧙 Welcome! 🧙</Text>
                   <ScrollView style={{ position: "relative", bottom: 15 }}>
-                    <View>
-                      <Text style={[globalStyles.para, styles.label]}>
-                        Name:
-                      </Text>
-                      <TextInput
-                        style={globalStyles.input}
-                        placeholder="John Cena"
-                        onChangeText={formikProps.handleChange("username")}
-                        value={formikProps.values.username}
-                      />
-                    </View>
-
-                    <View style={{ position: "relative", bottom: 9 }}>
-                      <Text
-                        style={[globalStyles.para, styles.label, { top: 15 }]}
-                      >
-                        Password:
-                      </Text>
-                      <View
-                        style={[globalStyles.input, styles.label, styles.extra]}
-                      >
-                        <TextInput
-                          style={{
-                            borderRadius: 6,
-                            width: "90%",
-                            height: "100%",
-                          }}
-                          placeholder="youCantSeeMe69"
-                          onChangeText={formikProps.handleChange("password")}
-                          value={formikProps.values.password}
-                          secureTextEntry={!visible}
-                        />
-
-                        {visible && (
-                          <TouchableOpacity
-                            onPress={() => setVisibility(false)}
-                          >
-                            <Ionicons
-                              name="eye-off-outline"
-                              size={20}
-                              style={{
-                                position: "relative",
-                                top: 2,
-                              }}
-                            />
-                          </TouchableOpacity>
-                        )}
-
-                        {!visible && (
-                          <TouchableOpacity onPress={() => setVisibility(true)}>
-                            <Ionicons
-                              name="eye-outline"
-                              size={20}
-                              style={{
-                                position: "relative",
-                                top: 2,
-                              }}
-                            />
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    </View>
-
-                    {/* For now, the login button directs straight into profile page*/}
-                    <TouchableOpacity
-                      onPress={() => formikProps.handleSubmit()}
-                      style={styles.submit}
-                    >
-                      <Text
-                        style={{
-                          ...globalStyles.header,
-                          textAlign: "center",
-                          fontSize: 12,
-                        }}
-                      >
-                        Log In
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      onPress={() => navigation.navigate("sign-up")}
-                      style={styles.submit}
-                    >
-                      <Text
-                        style={{
-                          ...globalStyles.header,
-                          textAlign: "center",
-                          fontSize: 12,
-                        }}
-                      >
-                        Sign Up
-                      </Text>
-                    </TouchableOpacity>
+                    <UsernameField formikProps={formikProps} />
+                    <PasswordField formikProps={formikProps} />
+                    <SubmitButton
+                      onPressHandler={() => formikProps.handleSubmit()}
+                      text="Log In"
+                    />
+                    <SubmitButton
+                      onPressHandler={() => navigation.navigate("sign-up")}
+                      text="Sign Up"
+                    />
                   </ScrollView>
                 </View>
               )}
@@ -188,23 +103,3 @@ export default function Login() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  label: {
-    position: "relative",
-    top: 7,
-  },
-
-  extra: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  submit: {
-    width: "100%",
-    backgroundColor: "#F5BABA",
-    borderRadius: 10,
-    marginTop: 15,
-  },
-});
-
