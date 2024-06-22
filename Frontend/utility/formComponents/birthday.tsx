@@ -9,35 +9,29 @@ export default function BirthdayField({ formikProps }: any) {
 
   return (
     <>
-      {/* TODO: Find a way to remove the flashing when click OK on DTP popup */}
       <View>
         <Text style={[globalStyles.para, globalStyles.label]}>Birthday:</Text>
         {showPicker && (
           <DateTimePicker
             mode="date"
             display="spinner"
+            negativeButton={{ label: "Cancel", textColor: "#F5BABA" }}
+            positiveButton={{ label: "OK", textColor: "#F5BABA" }}
             value={formikProps.values.birthday}
-            onChange={({ type }, selectedDate) => {
-              if (type == "set") {
-                // set event
-                formikProps.setFieldValue(
-                  "birthday",
-                  selectedDate || formikProps.values.birthday
-                );
-                setShowPicker(false);
-              } else {
-                // dismiss event
-                setShowPicker(false);
-              }
+            onChange={(event, selectedDate) => {
+              // closing the picker first before setting the field value
+              // magically resolves the buggy/flashy DTP!!
+              setShowPicker(false);
+              formikProps.setFieldValue("birthday", selectedDate || new Date());
             }}
-            maximumDate={new Date("2025-1-1")}
+            maximumDate={new Date()}
           />
         )}
 
         {!showPicker && (
           <Pressable onPress={() => setShowPicker(true)}>
             <TextInput
-              style={globalStyles.input}
+              style={[globalStyles.input, globalStyles.para]}
               placeholder={datePlaceholder.toDateString()}
               onChangeText={formikProps.handleChange("birthday")}
               value={formikProps.values.birthday.toLocaleDateString()}

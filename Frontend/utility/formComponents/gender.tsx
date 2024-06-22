@@ -1,56 +1,67 @@
-import { globalStyles } from '../../styles/global';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'; 
-import { useState } from 'react'; 
+import { globalStyles } from "../../styles/global";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
 
+export default function GenderField({ formikProps }: any) {
+  const [maleButton, setMaleButton] = useState(false);
+  const [femaleButton, setFemaleButton] = useState(false);
 
-export default function GenderField({ formikProps } : any) {
-    const [maleButton, setMaleButton] = useState(false); 
-    const [femaleButton, setFemaleButton] = useState(false); 
-  
-    const maleButtonHandler = (formikProps: any) => {
-      formikProps.setFieldValue('gender', 'M');
-      setMaleButton(!maleButton);
-      setFemaleButton(false);
-    };
-  
-    const femaleButtonHandler = (formikProps: any) => {
-      formikProps.setFieldValue('gender', 'F');
-      setFemaleButton(!femaleButton);
-      setMaleButton(false);
-    };
+  const maleButtonHandler = (formikProps: any) => {
+    formikProps.setFieldValue("gender", "M");
+    setMaleButton(!maleButton);
+    setFemaleButton(false);
+  };
 
-    return (
-        <>
-            <View>
-                <Text style={[globalStyles.para, globalStyles.label]}>Gender:</Text>
-                <View style={{ width: '95%', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <TouchableOpacity
-                        style={[styles.genderOption, maleButton ? styles.selectedGender : undefined]}
-                        onPress={() => maleButtonHandler(formikProps)}>
-                        <Text style={{fontSize: 12, fontFamily: 'inter-regular'}}>Male</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.genderOption, femaleButton ? styles.selectedGender : undefined]}
-                        onPress={() => femaleButtonHandler(formikProps)}>
-                        <Text style={{fontSize: 12, fontFamily: 'inter-regular'}}>Female</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>            
-        </>
-    )
+  const femaleButtonHandler = (formikProps: any) => {
+    formikProps.setFieldValue("gender", "F");
+    setFemaleButton(!femaleButton);
+    setMaleButton(false);
+  };
+
+  return (
+    <>
+      <View>
+        <Text style={[globalStyles.para, globalStyles.label]}>Gender:</Text>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <TouchableOpacity
+            style={[
+              styles.genderOption,
+              maleButton ? styles.selectedGender : undefined,
+            ]}
+            onPress={() => maleButtonHandler(formikProps)}
+          >
+            <Text style={{ fontSize: 12, fontFamily: "inter-regular" }}>
+              Male
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.genderOption,
+              femaleButton ? styles.selectedGender : undefined,
+            ]}
+            onPress={() => femaleButtonHandler(formikProps)}
+          >
+            <Text style={{ fontSize: 12, fontFamily: "inter-regular" }}>
+              Female
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
-    genderOption: {
-        width: '48%',
-        padding: 10,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 5,
-        alignItems: 'center',
-      },
-    
-      selectedGender: {
-        borderColor: 'red'
-      },
-})
+  genderOption: {
+    width: "48%",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+
+  selectedGender: {
+    borderColor: "red",
+  },
+});

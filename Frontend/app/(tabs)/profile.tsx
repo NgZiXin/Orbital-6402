@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View, Image } from "react-native";
 import { globalStyles } from "../../styles/global";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { getItem } from "../../utility/asyncStorage";
 import LinkStrava from "../../components/LinkStrava";
 
@@ -15,6 +15,7 @@ import {
 
 export default function Profile() {
   const [userDetails, setUserDetails] = useState<[string, any][]>([]);
+
   const [updateCount, setUpdateCount] = useState<number>(0);
   const [bool, setBool] = useState<boolean>(true);
 
@@ -28,8 +29,8 @@ export default function Profile() {
     // getItem('token') returns a Promise
     // hence, we await to wait for the Promise to complete and grab its value
     const token: string | null = await getItem("token");
-
-    const response = await fetch(`http://192.168.18.5:8000/accounts/data`, {
+    const ip = process.env.EXPO_PUBLIC_DOMAIN;
+    const response = await fetch(`http://${ip}:8000/accounts/data`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

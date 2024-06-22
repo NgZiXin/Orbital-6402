@@ -16,8 +16,10 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
+    "@react-native-assets/slider": "^7.2.1",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-community/datetimepicker": "8.0.1",
+    "@react-native-community/slider": "^4.5.2",
     "@react-navigation/native": "^6.0.2",
     "expo": "~51.0.9",
     "expo-constants": "~16.0.2",

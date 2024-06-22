@@ -40,12 +40,15 @@ export default function SignUp() {
     actions: FormikHelpers<SignUpValues>
   ) => {
     try {
+      console.log(values.birthday);
       // Custom serialization
       const body = {
         ...values,
         birthday: values.birthday.toISOString().split("T")[0], // Convert date to 'YYYY-MM-DD' format
       };
-      const response = await fetch(`http://192.168.18.5:8000/accounts/`, {
+
+      const ip = process.env.EXPO_PUBLIC_DOMAIN;
+      const response = await fetch(`http://${ip}:8000/accounts/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,46 +84,46 @@ export default function SignUp() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
-            <Formik
-              style={{ flex: 1 }}
-              initialValues={{
-                username: "",
-                password: "",
-                height: "",
-                weight: "",
-                birthday: new Date(),
-                gender: "",
-              }}
-              onSubmit={handleSubmit}
-            >
-              {/* Function that generates the required JSX/TSX */}
-              {(formikProps) => (
-                <View>
-                  <Text style={globalStyles.header}>🧙 Welcome! 🧙</Text>
-                  <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    style={{ position: "relative", bottom: 10 }}
-                  >
-                    <View style={{ position: "relative", bottom: 5 }}>
-                      <UsernameField formikProps={formikProps} />
-                      <GenderField formikProps={formikProps} />
-                      <PasswordField formikProps={formikProps} />
-                      <HeightField formikProps={formikProps} />
-                      <WeightField formikProps={formikProps} />
-                      <BirthdayField formikProps={formikProps} />
-                      <SubmitButton
-                        onPressHandler={() => navigation.navigate("login")}
-                        text="Create Account"
-                      />
-                    </View>
-                  </ScrollView>
-                </View>
-              )}
-            </Formik>
-          </View>
-        </TouchableWithoutFeedback>
+        <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
+          <Formik
+            style={{ flex: 1 }}
+            initialValues={{
+              username: "",
+              password: "",
+              height: "",
+              weight: "",
+              birthday: new Date(),
+              gender: "",
+            }}
+            validateOnChange={false}
+            validateOnBlur={false}
+            onSubmit={handleSubmit}
+          >
+            {/* Function that generates the required JSX/TSX */}
+            {(formikProps) => (
+              <View>
+                <Text style={globalStyles.header}>🧙 Welcome! 🧙</Text>
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  style={{ position: "relative", bottom: 10 }}
+                >
+                  <View style={{ position: "relative", bottom: 5 }}>
+                    <UsernameField formikProps={formikProps} />
+                    <GenderField formikProps={formikProps} />
+                    <PasswordField formikProps={formikProps} />
+                    <HeightField formikProps={formikProps} />
+                    <WeightField formikProps={formikProps} />
+                    <BirthdayField formikProps={formikProps} />
+                    <SubmitButton
+                      onPressHandler={() => formikProps.handleSubmit()}
+                      text="Create Account"
+                    />
+                  </View>
+                </ScrollView>
+              </View>
+            )}
+          </Formik>
+        </View>
       </KeyboardAvoidingView>
     </View>
   );

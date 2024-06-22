@@ -37,8 +37,9 @@ export default function Location() {
   const [park, setPark] = useState(false);
 
   const getNearestGyms = async (lat: number, lon: number, radius: number) => {
+    const ip = process.env.EXPO_PUBLIC_DOMAIN;
     const response = await fetch(
-      `http://192.168.18.5:8000/services/find_gym/?lat=${lat}&lon=${lon}&radius=${radius}`,
+      `http://${ip}:8000/services/find_gym/?lat=${lat}&lon=${lon}&radius=${radius}`,
       {
         method: "GET",
         headers: {
@@ -235,7 +236,8 @@ export default function Location() {
               <View style={globalStyles.cardV2}>
                 <View style={{ ...styles.cardInner, height: 170 }}>
                   <Text style={globalStyles.para}>
-                    Result will be shown here{" "}
+                    Result will be shown{" "}
+                    <Text style={{ color: "red" }}>here</Text>
                   </Text>
                 </View>
               </View>

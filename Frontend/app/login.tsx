@@ -33,7 +33,8 @@ export default function Login() {
     actions: FormikHelpers<LoginValues>
   ) => {
     try {
-      const response = await fetch(`http://192.168.18.5:8000/accounts/login/`, {
+      const ip = process.env.EXPO_PUBLIC_DOMAIN;
+      const response = await fetch(`http://${ip}:8000/accounts/login/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -71,34 +72,34 @@ export default function Login() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
-            <Formik
-              style={{ flex: 1 }}
-              initialValues={{ username: "", password: "" }}
-              onSubmit={handleSubmit}
-            >
-              {/* Function that generates the required JSX/TSX */}
-              {(formikProps) => (
-                <View>
-                  <Text style={globalStyles.header}>🧙 Welcome! 🧙</Text>
-                  <ScrollView style={{ position: "relative", bottom: 15 }}>
-                    <UsernameField formikProps={formikProps} />
-                    <PasswordField formikProps={formikProps} />
-                    <SubmitButton
-                      onPressHandler={() => formikProps.handleSubmit()}
-                      text="Log In"
-                    />
-                    <SubmitButton
-                      onPressHandler={() => navigation.navigate("sign-up")}
-                      text="Sign Up"
-                    />
-                  </ScrollView>
-                </View>
-              )}
-            </Formik>
-          </View>
-        </TouchableWithoutFeedback>
+        <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
+          <Formik
+            style={{ flex: 1 }}
+            initialValues={{ username: "", password: "" }}
+            validateOnChange={false}
+            validateOnBlur={false}
+            onSubmit={handleSubmit}
+          >
+            {/* Function that generates the required JSX/TSX */}
+            {(formikProps) => (
+              <View>
+                <Text style={globalStyles.header}>🧙 Welcome! 🧙</Text>
+                <ScrollView style={{ position: "relative", bottom: 15 }}>
+                  <UsernameField formikProps={formikProps} />
+                  <PasswordField formikProps={formikProps} />
+                  <SubmitButton
+                    onPressHandler={() => formikProps.handleSubmit()}
+                    text="Log In"
+                  />
+                  <SubmitButton
+                    onPressHandler={() => navigation.navigate("sign-up")}
+                    text="Sign Up"
+                  />
+                </ScrollView>
+              </View>
+            )}
+          </Formik>
+        </View>
       </KeyboardAvoidingView>
     </View>
   );

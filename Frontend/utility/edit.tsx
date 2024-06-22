@@ -40,7 +40,8 @@ export default function EditForm({ submitHandler }: any) {
     };
 
     const token: string | null = await getItem("token");
-    const response = await fetch("http://192.168.18.5:8000/accounts/data/", {
+    const ip = process.env.EXPO_PUBLIC_DOMAIN;
+    const response = await fetch(`http://${ip}:8000/accounts/data/`, {
       // put request to update existing user details
       // of the current user logged in
       method: "PUT",
@@ -62,45 +63,42 @@ export default function EditForm({ submitHandler }: any) {
 
   return (
     <View style={globalStyles.container}>
-      {/* This is to account for keyboard potentially blocking view of input fields */}
-      {/* Not really sure how to solve form being cut+overflow instead of shifting issue */}
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={{ flex: 1 }}>
-          <Formik
-            style={{ flex: 1 }}
-            initialValues={{
-              username: "",
-              password: "",
-              height: "",
-              weight: "",
-              birthday: new Date(),
-              gender: "",
-            }}
-            onSubmit={handleSubmit}
-          >
-            {/* Function that generates the required JSX/TSX */}
-            {(formikProps) => (
+      <View style={{ flex: 1 }}>
+        <Formik
+          style={{ flex: 1 }}
+          initialValues={{
+            username: "",
+            password: "",
+            height: "",
+            weight: "",
+            birthday: new Date(),
+            gender: "",
+          }}
+          // optimizations
+          validateOnChange={false}
+          validateOnBlur={false}
+          onSubmit={handleSubmit}
+        >
+          {/* Function that generates the required JSX/TSX */}
+          {(formikProps) => (
+            <ScrollView showsVerticalScrollIndicator={false}>
               <View>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                  <View>
-                    <UsernameField formikProps={formikProps} />
-                    <GenderField formikProps={formikProps} />
-                    <PasswordField formikProps={formikProps} />
-                    <HeightField formikProps={formikProps} />
-                    <WeightField formikProps={formikProps} />
-                    {/* <BirthdayField formikProps={formikProps} /> */}
+                <UsernameField formikProps={formikProps} />
+                <GenderField formikProps={formikProps} />
+                <PasswordField formikProps={formikProps} />
+                <HeightField formikProps={formikProps} />
+                <WeightField formikProps={formikProps} />
+                <BirthdayField formikProps={formikProps} />
 
-                    <SubmitButton
-                      onPressHandler={() => formikProps.handleSubmit()}
-                      text="Create Account"
-                    />
-                  </View>
-                </ScrollView>
+                <SubmitButton
+                  onPressHandler={() => formikProps.handleSubmit()}
+                  text="Create Account"
+                />
               </View>
-            )}
-          </Formik>
-        </View>
-      </TouchableWithoutFeedback>
+            </ScrollView>
+          )}
+        </Formik>
+      </View>
     </View>
   );
 }

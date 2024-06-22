@@ -82,5 +82,6 @@ const styles = StyleSheet.create({
     textAlign: "right",
     position: "relative",
     right: 10,
+    color: "red",
   },
 });
