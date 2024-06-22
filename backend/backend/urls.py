@@ -22,5 +22,6 @@ urlpatterns = [
     path('strava_api/', include('strava_api.urls')),
     path('services/', include('services.urls')),
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls'))
+    path('api-auth/', include('rest_framework.urls')),
+    path("map/", include("map.urls")),
 ]

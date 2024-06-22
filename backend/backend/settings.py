@@ -8,6 +8,9 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
+
+How to deploy, see
+https://dev.to/giftedstan/heroku-how-to-deploy-a-django-app-with-postgres-in-5-minutes-5lk
 """
 
 from pathlib import Path
@@ -33,6 +36,9 @@ ALLOWED_HOSTS = [
     f'{os.environ.get("HOST")}',
     '127.0.0.1',
     f'{os.environ.get("REACT_APP_DOMAIN")}',
+    '192.168.50.37', # Temp solution
+    '192.168.18.5',
+    "*",
 ]
 
 
@@ -43,6 +49,7 @@ INSTALLED_APPS = [
     'accounts',
     'strava_api',
     'rest_framework.authtoken',
+    'map',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -133,6 +140,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

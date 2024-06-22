@@ -41,6 +41,19 @@ export default function TabLayout() {
         })}>
 
         <Tabs.Screen
+          name="profile"
+          options={{
+            // After login --> profile 
+            // So can sync strava
+
+            // Hides it from tab bar
+            // Nonetheless, route still exists 
+            // Routing to profile this way allows the bottom tab bar to be visible! 
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
           name="index"
           options={{
             tabBarIcon: ({ focused }) => (
@@ -75,15 +88,6 @@ export default function TabLayout() {
               <TabBarIcon name={focused ? 'newspaper' : 'newspaper-outline'} color='black' />
             ),
             tabBarLabel: 'Forum'
-          }}
-        />
-        <Tabs.Screen
-          name="profile"
-          options={{
-            // Hides it from tab bar
-            // Nonetheless, route still exists 
-            // Routing to profile this way allows the bottom tab bar to be visible! 
-            href: null,
           }}
         />
       </Tabs>
