@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { globalStyles } from "../../styles/global";
-import PageHeader from "../../utility/pageHeader";
+import PageHeader from "@/components/general/pageHeader";
 
 export default function Forum() {
   const createPost = () => {
@@ -12,7 +12,7 @@ export default function Forum() {
     <View style={{ ...globalStyles.container, padding: 12 }}>
       <PageHeader topText="Community" bottomText="Fitness Help Forum" />
       <View style={{ position: "relative", bottom: 28 }}>
-        <Text style={{ ...globalStyles.para }}>
+        <Text style={globalStyles.para}>
           Post any fitness related questions & share your fitness related
           moments! Please keep all discussions civil.
         </Text>

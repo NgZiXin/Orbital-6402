@@ -1,27 +1,23 @@
 import {
   Alert,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Text,
   View,
   ScrollView,
-  TouchableWithoutFeedback,
 } from "react-native";
 
 import { globalStyles } from "../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useNavigation } from "expo-router";
-import {
-  UsernameField,
-  PasswordField,
-  GenderField,
-  HeightField,
-  WeightField,
-  BirthdayField,
-  SubmitButton,
-} from "../utility/formComponents/index";
-// import { REACT_APP_DOMAIN } from '@env';
+
+import UsernameField from "@/components/form/fragments/accountDetails/username";
+import PasswordField from "@/components/form/fragments/accountDetails/password";
+import GenderField from "@/components/form/fragments/accountDetails/gender";
+import HeightField from "@/components/form/fragments/accountDetails/height";
+import WeightField from "@/components/form/fragments/accountDetails/weight";
+import BirthdayField from "@/components/form/fragments/accountDetails/birthday";
+import SubmitButton from "@/components/general/submit";
 
 export default function SignUp() {
   const navigation: any = useNavigation();
@@ -77,54 +73,56 @@ export default function SignUp() {
   };
 
   return (
-    <View style={globalStyles.container}>
-      {/* This is to account for keyboard potentially blocking view of input fields*/}
-      <KeyboardAvoidingView
-        style={globalStyles.container}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+    <KeyboardAvoidingView
+      style={globalStyles.container}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <View
+        style={{
+          flex: 1,
+          padding: 20,
+          justifyContent: "center",
+        }}
       >
-        <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
-          <Formik
-            style={{ flex: 1 }}
-            initialValues={{
-              username: "",
-              password: "",
-              height: "",
-              weight: "",
-              birthday: new Date(),
-              gender: "",
-            }}
-            validateOnChange={false}
-            validateOnBlur={false}
-            onSubmit={handleSubmit}
-          >
-            {/* Function that generates the required JSX/TSX */}
-            {(formikProps) => (
-              <View>
+        <Formik
+          initialValues={{
+            username: "",
+            password: "",
+            height: "",
+            weight: "",
+            birthday: new Date(),
+            gender: "",
+          }}
+          validateOnChange={false}
+          validateOnBlur={false}
+          onSubmit={handleSubmit}
+        >
+          {(formikProps) => (
+            <View>
+              <ScrollView showsVerticalScrollIndicator={false}>
                 <Text style={globalStyles.header}>🧙 Welcome! 🧙</Text>
-                <ScrollView
-                  showsVerticalScrollIndicator={false}
-                  style={{ position: "relative", bottom: 10 }}
-                >
-                  <View style={{ position: "relative", bottom: 5 }}>
-                    <UsernameField formikProps={formikProps} />
-                    <GenderField formikProps={formikProps} />
-                    <PasswordField formikProps={formikProps} />
-                    <HeightField formikProps={formikProps} />
-                    <WeightField formikProps={formikProps} />
-                    <BirthdayField formikProps={formikProps} />
-                    <SubmitButton
-                      onPressHandler={() => formikProps.handleSubmit()}
-                      text="Create Account"
-                    />
-                  </View>
-                </ScrollView>
-              </View>
-            )}
-          </Formik>
-        </View>
-      </KeyboardAvoidingView>
-    </View>
+
+                <UsernameField formikProps={formikProps} />
+                <GenderField formikProps={formikProps} />
+                <PasswordField formikProps={formikProps} />
+                <HeightField formikProps={formikProps} />
+                <WeightField formikProps={formikProps} />
+                <BirthdayField formikProps={formikProps} />
+
+                <SubmitButton
+                  onPressHandler={() => formikProps.handleSubmit()}
+                  text="Create Account"
+                />
+                <SubmitButton
+                  onPressHandler={() => navigation.navigate("login")}
+                  text="Go Back"
+                />
+              </ScrollView>
+            </View>
+          )}
+        </Formik>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
