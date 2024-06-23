@@ -4,7 +4,6 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import * as React from "react";
 
-// This is basically the app.js file!
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     "inter-bold": require("../assets/fonts/Inter-Bold.ttf"),

@@ -1,78 +1,60 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { globalStyles } from "@/styles/global";
-import PageHeader from "@/utility/pageHeader";
+import PageHeader from "@/components/general/pageHeader";
+import WorkoutModal from "@/components/modal/workoutPage/workout";
+
 import {
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 
-import {
-  FitnessLevel,
-  NumExercise,
-  HealthCond,
-  OtherRemarks,
-  SubmitButton,
-} from "../../utility/formComponents/index";
-
-import { Formik, FormikHelpers } from "formik";
-
 export default function Workout() {
-  const handleSubmit = () => {
-    console.log("TODO");
-  };
   return (
-    <View style={{ ...globalStyles.container, padding: 12 }}>
-      <PageHeader topText="AI-Based" bottomText="Workout Recommendation" />
-      <View style={styles.workoutForm}>
-        <KeyboardAvoidingView
-          keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
-          <View style={{ padding: 8 }}>
-            <Formik
-              initialValues={{
-                fitnessLevel: 1,
-                numExercise: 3,
-                healthCond: "",
-                otherRemarks: "",
-              }}
-              validateOnChange={false}
-              validateOnBlur={false}
-              onSubmit={handleSubmit}
-            >
-              {(formikProps) => (
-                <ScrollView showsVerticalScrollIndicator={false}>
-                  <View style={{ position: "relative", bottom: 10 }}>
-                    <FitnessLevel formikProps={formikProps} />
-                    <NumExercise formikProps={formikProps} />
-                    <HealthCond formikProps={formikProps} />
-                    <OtherRemarks formikProps={formikProps} />
-                    <SubmitButton
-                      onPressHandler={() => formikProps.handleSubmit()}
-                      text="Create Workout"
-                    />
-                  </View>
-                </ScrollView>
-              )}
-            </Formik>
+    <KeyboardAvoidingView
+      style={{ ...globalStyles.container, padding: 12 }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      {/* This scrollview gives us the space to push up and overflow */}
+      {/* Allowing keyboard avoiding view to work */}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <PageHeader topText="AI-Based" bottomText="Workout Recommendation" />
+        <View style={{ position: "relative", bottom: 28 }}>
+          <Text style={globalStyles.para}>
+            Click on the button below and fill up the form to get your workout
+            recommendation!
+          </Text>
+        </View>
+
+        <WorkoutModal />
+
+        <PageHeader topText="" bottomText="Suggested Workout" />
+        <View style={styles.workoutPlan}>
+          <View style={globalStyles.cardV2}>
+            <View style={{ ...styles.cardInner, height: 170 }}>
+              <Text style={globalStyles.para}>
+                Result will be shown <Text style={{ color: "red" }}>here</Text>
+              </Text>
+            </View>
           </View>
-        </KeyboardAvoidingView>
-      </View>
-    </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  workoutForm: {
-    height: 500,
-    backgroundColor: "#F6F2F2",
+  workoutPlan: {
     position: "relative",
     bottom: 15,
+  },
+
+  cardInner: {
+    height: "auto",
+    width: "100%",
+    padding: 7,
   },
 });

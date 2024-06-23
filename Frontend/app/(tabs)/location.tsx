@@ -6,7 +6,6 @@ import {
   Image,
   Alert,
   Text,
-  TextInput,
   View,
   StyleSheet,
   ScrollView,
@@ -16,9 +15,9 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 
+import CustomTextInput from "@/components/general/customTextInput";
 import { globalStyles } from "../../styles/global";
-import PageHeader from "../../utility/pageHeader";
-// import { REACT_APP_DOMAIN } from '@env';
+import PageHeader from "@/components/general/pageHeader";
 
 interface GymInfo {
   name: string;
@@ -144,7 +143,7 @@ export default function Location() {
             <PageHeader topText="Finder" bottomText="Find Nearest Gym & Park" />
 
             <View style={[styles.searchWrapper, styles.extra]}>
-              <TextInput
+              <CustomTextInput
                 style={{ borderRadius: 7, width: "90%" }}
                 placeholder="Your Location (Postal Code)"
                 onChangeText={(newText) => setSearch(newText)}

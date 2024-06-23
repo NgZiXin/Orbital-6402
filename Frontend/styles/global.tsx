@@ -12,13 +12,6 @@ export const globalStyles = StyleSheet.create({
     fontSize: 18,
   },
 
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 10,
-    borderRadius: 6,
-  },
-
   header: {
     fontFamily: "inter-semibold",
     fontSize: 14,
@@ -35,8 +28,23 @@ export const globalStyles = StyleSheet.create({
 
   // label for form fields
   label: {
-    position: "relative",
-    top: 7,
+    fontFamily: "inter-regular",
+    fontSize: 12,
+
+    // position: "relative",
+    // top: 0,
+  },
+
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    padding: 10,
+    borderRadius: 6,
+    fontFamily: "inter-regular",
+    fontSize: 12,
+
+    // position: "relative",
+    // bottom: 0,
   },
 
   // mostly for profile page

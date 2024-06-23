@@ -2,27 +2,29 @@ import { ScrollView, StyleSheet, Text, View, Image } from "react-native";
 import { globalStyles } from "../../styles/global";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
-import { getItem } from "../../utility/asyncStorage";
-import LinkStrava from "../../components/LinkStrava";
+import { getItem } from "../../components/general/asyncStorage";
+import LinkStrava from "../../components/strava/LinkStrava";
 
-import {
-  EditModal,
-  LogoutModal,
-  BmiModal,
-  SyncModal,
-} from "../../utility/modalComponents/index";
-// import { REACT_APP_DOMAIN } from "@env";
+import EditModal from "@/components/modal/profilePage/edit";
+import LogoutModal from "@/components/modal/profilePage/logout";
+import BmiModal from "@/components/modal/profilePage/bmi";
+import SyncModal from "@/components/modal/profilePage/sync";
 
 export default function Profile() {
-  const [userDetails, setUserDetails] = useState<[string, any][]>([]);
+  const [userDetails, setUserDetails] = useState<string[]>([]);
+  const [age, setAge] = useState<number>(0);
+  const [bmi, setBMI] = useState<number>(0.0);
+  const [maxHR, setMaxHR] = useState<number>(0);
 
-  const [updateCount, setUpdateCount] = useState<number>(0);
-  const [bool, setBool] = useState<boolean>(true);
+  // boolFlag1: interacts with edit
+  // boolFlag2: interacts with processing
+  const [boolFlag1, setBoolFlag1] = useState<boolean>(true);
+  const [boolFlag2, setBoolFlag2] = useState<boolean>(true);
 
   // this function is called after closing the edit modal
   // it triggers getUserDetails()
   const triggerUpdate = () => {
-    setUpdateCount((prev) => prev + 1);
+    setBoolFlag1((prev) => !prev);
   };
 
   const getUserDetails = async () => {
@@ -42,10 +44,9 @@ export default function Profile() {
       throw new Error("Network response was not ok");
     }
 
-    const data = await response.json();
-    const arrayVersion = Object.entries(data);
-
-    setUserDetails(arrayVersion);
+    const dataObj = await response.json();
+    const valuesArray: string[] = Object.values(dataObj).map(String);
+    setUserDetails(valuesArray);
   };
 
   // getUserDetails() fetches the user data of the current user that's logged in
@@ -53,25 +54,57 @@ export default function Profile() {
   // the fetched user data is then stored under userDetails
   useEffect(() => {
     getUserDetails();
-  }, [updateCount]);
+  }, [boolFlag1]);
 
   // when userDetail changes, effect function is invoked
-  // it converts birthday from YYYYY-MM-DD to DD-MM-YYYY
+  // it does a bunch of processing
   // then, it flips a boolean flag, triggering a ('final') re-render
   // in the mount - edit - submit - close process
   useEffect(() => {
     if (userDetails.length > 0) {
-      const initialBirthday: string = userDetails[4][1];
+      // Conversion part
+      // Change bday from YYYY-MM-DD to DD-MM-YYYY
+      const initialBirthday = userDetails[4];
       const [year, month, day] = initialBirthday.split("-");
-      const updatedBirthday: string = `${day}-${month}-${year}`;
-      userDetails[4][1] = updatedBirthday;
-      setBool(!bool);
+      const updatedBirthday = `${day}-${month}-${year}`;
+      userDetails[4] = updatedBirthday;
+
+      // Calculate age part
+      const birthDate = new Date(initialBirthday);
+      const currentDate = new Date();
+
+      let userAge = currentDate.getFullYear() - birthDate.getFullYear();
+      const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+
+      // If current month is before birth month OR in the same month but birth day is ahead of current day
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())
+      ) {
+        userAge--;
+      }
+
+      // Calculate BMI part
+      // Formula: BMI = Weight (kg) / Height (m) square
+      const userWeight = Number(userDetails[3]);
+      const userHeight = Number(userDetails[2]);
+      const userBMI = (userWeight * 1.0) / userHeight ** 2;
+
+      // Calculate Max HR part
+      // Formula: 220 - age
+      const userMaxHR = 220 - userAge;
+
+      setAge(userAge);
+      setBMI(Math.round((userBMI + Number.EPSILON) * 100) / 100);
+      setMaxHR(userMaxHR);
+
+      setBoolFlag2(!boolFlag2);
     }
   }, [userDetails]);
 
   return (
     <View style={globalStyles.container}>
-      <ScrollView style={styles.scroll}>
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.bgWrapper}>
           <Image
             source={require("../../assets/images/bg-image.jpg")}
@@ -87,14 +120,14 @@ export default function Profile() {
             This same idea is repeated multiple times below! 
           */}
           {/* Gender is found at index 5 of the array */}
-          {userDetails.length > 0 && userDetails[5][1] == "F" && (
+          {userDetails.length > 0 && userDetails[5] == "F" && (
             <Image
               source={require("../../assets/images/female-pfp.jpg")}
               style={styles.pfp}
             />
           )}
 
-          {userDetails.length > 0 && userDetails[5][1] == "M" && (
+          {userDetails.length > 0 && userDetails[5] == "M" && (
             <Image
               source={require("../../assets/images/male-pfp.png")}
               style={styles.pfp}
@@ -105,7 +138,7 @@ export default function Profile() {
             <View style={{ height: "15%", marginBottom: -8 }}>
               <Text style={styles.userName}>
                 {/* Username is found at index 1 of the array */}
-                {userDetails[1][1] + " (" + userDetails[5][1] + ")"}
+                {userDetails[1] + " (" + userDetails[5] + ")"}
               </Text>
 
               {/* Change name to two parter in future */}
@@ -126,7 +159,7 @@ export default function Profile() {
                   <View style={styles.cardInner}>
                     <Text style={styles.header}>Height:</Text>
                     {/* Height is found at index 2 of the array */}
-                    <Text style={styles.para}>{userDetails[2][1] + "m"}</Text>
+                    <Text style={styles.para}>{userDetails[2] + "m"}</Text>
                   </View>
                 )}
               </View>
@@ -135,7 +168,7 @@ export default function Profile() {
                   <View style={styles.cardInner}>
                     <Text style={styles.header}>Weight:</Text>
                     {/* Weight is found at index 3 of the array */}
-                    <Text style={styles.para}>{userDetails[3][1] + "kg"}</Text>
+                    <Text style={styles.para}>{userDetails[3] + "kg"}</Text>
                   </View>
                 )}
               </View>
@@ -144,7 +177,7 @@ export default function Profile() {
                   <View style={styles.cardInner}>
                     <Text style={styles.header}>Birthday:</Text>
                     {/* Birthday is found at index 4 of the array */}
-                    <Text style={styles.para}>{userDetails[4][1]}</Text>
+                    <Text style={styles.para}>{userDetails[4]}</Text>
                   </View>
                 )}
               </View>
@@ -152,25 +185,31 @@ export default function Profile() {
 
             <View style={styles.merged}>
               <View style={globalStyles.cardV1}>
-                <View style={styles.cardInner}>
-                  <Text style={styles.header}>Age:</Text>
-                  <Text style={styles.para}>22</Text>
-                </View>
-              </View>
-              <View style={globalStyles.cardV1}>
-                <View style={styles.cardInner}>
-                  <View style={styles.infoWrapper}>
-                    <Text style={styles.header}>BMI: </Text>
-                    <BmiModal />
+                {userDetails.length > 0 && (
+                  <View style={styles.cardInner}>
+                    <Text style={styles.header}>Age:</Text>
+                    <Text style={styles.para}>{age}</Text>
                   </View>
-                  <Text style={styles.para}>22.9</Text>
-                </View>
+                )}
               </View>
               <View style={globalStyles.cardV1}>
-                <View style={styles.cardInner}>
-                  <Text style={styles.header}>Max HR:</Text>
-                  <Text style={styles.para}>198bpm</Text>
-                </View>
+                {userDetails.length > 0 && (
+                  <View style={styles.cardInner}>
+                    <View style={styles.infoWrapper}>
+                      <Text style={styles.header}>BMI: </Text>
+                      <BmiModal />
+                    </View>
+                    <Text style={styles.para}>{bmi}</Text>
+                  </View>
+                )}
+              </View>
+              <View style={globalStyles.cardV1}>
+                {userDetails.length > 0 && (
+                  <View style={styles.cardInner}>
+                    <Text style={styles.header}>Max HR:</Text>
+                    <Text style={styles.para}>{maxHR + "bpm"}</Text>
+                  </View>
+                )}
               </View>
             </View>
           </View>

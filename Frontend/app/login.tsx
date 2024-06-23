@@ -3,22 +3,20 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Text,
-  View,
   ScrollView,
+  Text,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
 
 import { globalStyles } from "../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useNavigation } from "expo-router";
-import { setItem } from "../utility/asyncStorage";
-import {
-  UsernameField,
-  PasswordField,
-  SubmitButton,
-} from "../utility/formComponents/index";
-// import { REACT_APP_DOMAIN } from '@env';
+import { setItem } from "../components/general/asyncStorage";
+
+import UsernameField from "@/components/form/fragments/accountDetails/username";
+import PasswordField from "@/components/form/fragments/accountDetails/password";
+import SubmitButton from "@/components/general/submit";
 
 export default function Login() {
   const navigation: any = useNavigation();
@@ -65,42 +63,51 @@ export default function Login() {
   };
 
   return (
-    <View style={globalStyles.container}>
-      {/* This is to account for keyboard potentially blocking view of input fields*/}
+    <>
       <KeyboardAvoidingView
         style={globalStyles.container}
         keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
-          <Formik
-            style={{ flex: 1 }}
-            initialValues={{ username: "", password: "" }}
-            validateOnChange={false}
-            validateOnBlur={false}
-            onSubmit={handleSubmit}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View
+            style={{
+              flex: 1,
+              padding: 20,
+              justifyContent: "center",
+            }}
           >
-            {/* Function that generates the required JSX/TSX */}
-            {(formikProps) => (
-              <View>
-                <Text style={globalStyles.header}>🧙 Welcome! 🧙</Text>
-                <ScrollView style={{ position: "relative", bottom: 15 }}>
-                  <UsernameField formikProps={formikProps} />
-                  <PasswordField formikProps={formikProps} />
-                  <SubmitButton
-                    onPressHandler={() => formikProps.handleSubmit()}
-                    text="Log In"
-                  />
-                  <SubmitButton
-                    onPressHandler={() => navigation.navigate("sign-up")}
-                    text="Sign Up"
-                  />
-                </ScrollView>
-              </View>
-            )}
-          </Formik>
-        </View>
+            <Formik
+              initialValues={{ username: "", password: "" }}
+              // optimizations
+              validateOnChange={false}
+              validateOnBlur={false}
+              onSubmit={handleSubmit}
+            >
+              {/* Function that generates the form*/}
+              {(formikProps) => (
+                <View>
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    <Text style={globalStyles.header}>🧙 Welcome! 🧙</Text>
+
+                    <UsernameField formikProps={formikProps} />
+                    <PasswordField formikProps={formikProps} />
+
+                    <SubmitButton
+                      onPressHandler={() => formikProps.handleSubmit()}
+                      text="Log In"
+                    />
+                    <SubmitButton
+                      onPressHandler={() => navigation.navigate("sign-up")}
+                      text="Sign Up"
+                    />
+                  </ScrollView>
+                </View>
+              )}
+            </Formik>
+          </View>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
-    </View>
+    </>
   );
 }
