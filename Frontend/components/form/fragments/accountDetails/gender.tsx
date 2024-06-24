@@ -1,6 +1,7 @@
 import { globalStyles } from "../../../../styles/global";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
+import { formStyles } from "@/styles/form";
 
 export default function GenderField({ formikProps }: any) {
   const [maleButton, setMaleButton] = useState(false);
@@ -20,7 +21,7 @@ export default function GenderField({ formikProps }: any) {
 
   return (
     <>
-      <View style={{ marginBottom: 15 }}>
+      <View style={formStyles.accountDetailsFormCommon}>
         <Text style={globalStyles.label}>Gender:</Text>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <TouchableOpacity

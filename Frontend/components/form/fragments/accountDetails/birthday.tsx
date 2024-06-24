@@ -3,6 +3,7 @@ import { globalStyles } from "../../../../styles/global";
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomTextInput from "@/components/general/customTextInput";
+import { formStyles } from "@/styles/form";
 
 export default function BirthdayField({ formikProps }: any) {
   const datePlaceholder = new Date();
@@ -10,7 +11,7 @@ export default function BirthdayField({ formikProps }: any) {
 
   return (
     <>
-      <View style={{ marginBottom: 15 }}>
+      <View style={formStyles.accountDetailsFormCommon}>
         <Text style={globalStyles.label}>Birthday:</Text>
         {showPicker && (
           <DateTimePicker

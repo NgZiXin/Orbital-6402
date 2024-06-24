@@ -1,14 +1,23 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useState, useRef } from "react";
 import { modalStyles } from "../../../../styles/modal";
 import { globalStyles } from "../../../../styles/global";
 import { Ionicons } from "@expo/vector-icons";
-
 import { MaterialIcons as Icon } from "@expo/vector-icons";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
-import muscleGroupsList from "./list";
-import MultiSelectHeader from "./header";
-import MultiSelectFooter from "./footer";
+import muscleGroupsList from "./helper/list";
+import MultiSelectHeader from "./helper/header";
+import MultiSelectFooter from "./helper/footer";
 import GuideModal from "./guide";
+import SubmitButton from "@/components/general/submit";
+import ValidationModal from "./validation";
 
 export default function MuscleGroupModal({
   setMuscleGroupModal,
@@ -16,6 +25,9 @@ export default function MuscleGroupModal({
   setSelectedItems,
   formikProps,
 }: any) {
+  const [validationModal, setValidationModal] = useState(false);
+  const validationMessage = useRef("");
+
   function renderSelectText() {
     return "Select Muscle Groups";
   }
@@ -53,9 +65,15 @@ export default function MuscleGroupModal({
   function renderChips(props: any) {
     return (
       <View
-        style={{ padding: 12, borderWidth: 1, borderRadius: 8, height: "65%" }}
+        style={{
+          padding: 12,
+          borderColor: "#bbb",
+          borderWidth: 1,
+          borderRadius: 8,
+          height: "65%",
+        }}
       >
-        <Text>
+        <Text style={styles.boxText}>
           Custom render chip function, chips will be displayed within this box!
           TODO
         </Text>
@@ -63,11 +81,31 @@ export default function MuscleGroupModal({
     );
   }
 
+  function handleSubmit() {
+    const numMain = getCount();
+    if (numMain < 1) {
+      validationMessage.current = "Must select at least one main muscle group!";
+      setValidationModal(true);
+    } else if (numMain > formikProps.values.numExercises) {
+      validationMessage.current =
+        "Number of main muscle groups cannot exceed total number of workouts!";
+      setValidationModal(true);
+    } else {
+      formikProps.setFieldValue("muscleGroups", selectedItems);
+      setMuscleGroupModal(false);
+    }
+  }
+
   return (
     <>
       <Modal animationType="fade" visible={true} transparent={true}>
-        <View style={modalStyles.modalWrapper}>
-          <View style={{ ...modalStyles.modalContent, height: "68%" }}>
+        <View
+          style={{
+            ...modalStyles.modalWrapper,
+            backgroundColor: "rgba(0, 0, 0, 0)",
+          }}
+        >
+          <View style={{ ...modalStyles.modalContent, height: "75%" }}>
             <View
               style={{
                 flexDirection: "row",
@@ -76,16 +114,22 @@ export default function MuscleGroupModal({
               }}
             >
               <Text style={globalStyles.header}>Plan Your Workout</Text>
+
               <TouchableOpacity onPress={() => setMuscleGroupModal(false)}>
                 <Ionicons name="close-circle-outline" size={25}></Ionicons>
               </TouchableOpacity>
             </View>
             <Text
-              style={{ ...globalStyles.para, position: "relative", bottom: 5 }}
+              style={{
+                ...globalStyles.para,
+                position: "relative",
+                bottom: 5,
+              }}
             >
               Click on the button below to start planning. Read the guide if you
               are uncertain of something.
             </Text>
+
             <View style={{ marginTop: 7 }}>
               {/* @ts-ignore */}
               <SectionedMultiSelect
@@ -103,9 +147,6 @@ export default function MuscleGroupModal({
                 selectedIconComponent={CustomTickIcon}
                 selectedItems={selectedItems}
                 onSelectedItemsChange={selectValidation}
-                onConfirm={() =>
-                  formikProps.setFieldValue("muscleGroups", selectedItems)
-                }
                 renderSelectText={renderSelectText}
                 customChipsRenderer={renderChips}
                 parentChipsRemoveChildren={true}
@@ -118,13 +159,38 @@ export default function MuscleGroupModal({
                   chipContainer: styles.chipContainer,
                   chipText: styles.chipText,
                   item: { marginVertical: 5 },
-                  itemText: { fontFamily: "inter-semibold", fontSize: 16 },
-                  subItemText: { fontFamily: "inter-regular", fontSize: 12 },
-                  confirmText: { fontFamily: "inter-regular", fontSize: 16 },
+                  itemText: {
+                    fontWeight: "normal",
+                    fontFamily: "inter-semibold",
+                    fontSize: 16,
+                  },
+                  subItemText: {
+                    fontWeight: "normal",
+                    fontFamily: "inter-regular",
+                    fontSize: 12,
+                  },
+                  confirmText: {
+                    fontWeight: "normal",
+                    fontFamily: "inter-regular",
+                    fontSize: 16,
+                  },
                 }}
               />
             </View>
             <GuideModal />
+            <SubmitButton
+              onPressHandler={handleSubmit}
+              text="Submit Workout"
+              style={{ position: "relative", bottom: "24%" }}
+            />
+            {validationModal && (
+              <ValidationModal
+                setValidationModal={setValidationModal}
+                topText="Workout Validation"
+                bottomText={validationMessage.current}
+                style={{ backgroundColor: "rgba(0, 0, 0, 0.35)" }}
+              />
+            )}
           </View>
         </View>
       </Modal>

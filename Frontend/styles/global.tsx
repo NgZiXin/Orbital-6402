@@ -26,7 +26,6 @@ export const globalStyles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // label for form fields
   label: {
     fontFamily: "inter-regular",
     fontSize: 12,

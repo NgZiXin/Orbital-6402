@@ -1,11 +1,12 @@
 import { Text, View } from "react-native";
 import { globalStyles } from "../../../../styles/global";
 import CustomTextInput from "@/components/general/customTextInput";
+import { formStyles } from "@/styles/form";
 
 export default function HealthConditions({ formikProps }: any) {
   return (
     <>
-      <View style={{ marginBottom: 12 }}>
+      <View style={{ ...formStyles.workoutDetailsFormCommon, width: "95%" }}>
         <Text style={globalStyles.label}>Health Conditions (if any):</Text>
         <CustomTextInput
           multiline={true}
@@ -15,7 +16,7 @@ export default function HealthConditions({ formikProps }: any) {
             textAlignVertical: "top",
           }}
           placeholder="List out your health conditions here"
-          onChangeText={formikProps.handleChange("healthCond")}
+          onChangeText={formikProps.handleChange("healthConds")}
           value={formikProps.values.healthCond}
         />
       </View>
