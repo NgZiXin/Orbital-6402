@@ -27,30 +27,40 @@ export default function WorkoutModal() {
       {workoutModal == true && (
         <Modal animationType="fade" visible={workoutModal} transparent={true}>
           <View style={modalStyles.modalWrapper}>
-            <View style={{ ...modalStyles.modalContent, height: "75%" }}>
+            <View
+              style={{
+                ...modalStyles.modalContent,
+                height: "75%",
+                paddingLeft: 6,
+              }}
+            >
               <KeyboardAvoidingView
-                style={globalStyles.container}
+                style={{ flex: 1 }}
                 keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
                 behavior={Platform.OS === "ios" ? "padding" : undefined}
               >
-                <View style={{ width: "100%", height: "100%" }}>
-                  <View
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      ...globalStyles.header,
+                      position: "relative",
+                      left: 9,
                     }}
                   >
-                    <Text style={globalStyles.header}>Workout Planner</Text>
-                    <TouchableOpacity onPress={() => setWorkoutModal(false)}>
-                      <Ionicons
-                        name="close-circle-outline"
-                        size={25}
-                      ></Ionicons>
-                    </TouchableOpacity>
-                  </View>
-                  <WorkoutForm setWorkoutModal={setWorkoutModal} />
+                    Workout Planner
+                  </Text>
+                  <TouchableOpacity onPress={() => setWorkoutModal(false)}>
+                    <Ionicons name="close-circle-outline" size={25}></Ionicons>
+                  </TouchableOpacity>
                 </View>
+
+                <WorkoutForm setWorkoutModal={setWorkoutModal} />
               </KeyboardAvoidingView>
             </View>
           </View>

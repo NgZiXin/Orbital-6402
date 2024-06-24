@@ -1,11 +1,12 @@
 import { Text, View } from "react-native";
 import { globalStyles } from "../../../../styles/global";
 import CustomTextInput from "@/components/general/customTextInput";
+import { formStyles } from "@/styles/form";
 
 export default function OtherRemarks({ formikProps }: any) {
   return (
     <>
-      <View style={{ marginBottom: 12 }}>
+      <View style={{ ...formStyles.workoutDetailsFormCommon, width: "95%" }}>
         <Text style={globalStyles.label}>Other Remarks (if any):</Text>
 
         <CustomTextInput

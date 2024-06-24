@@ -13,12 +13,17 @@ export default function GuideModal() {
       <SubmitButton
         onPressHandler={() => setGuideModal(true)}
         text="Read Guide"
-        style={{ position: "relative", bottom: "20%" }}
+        style={{ position: "relative", bottom: "23%" }}
       />
 
       {guideModal == true && (
         <Modal animationType="fade" visible={guideModal} transparent={true}>
-          <View style={modalStyles.modalWrapper}>
+          <View
+            style={{
+              ...modalStyles.modalWrapper,
+              backgroundColor: "rgba(0, 0, 0, 0.35)",
+            }}
+          >
             <View style={modalStyles.modalContent}>
               <View
                 style={{

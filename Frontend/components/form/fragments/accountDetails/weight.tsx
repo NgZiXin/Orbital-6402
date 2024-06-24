@@ -1,11 +1,12 @@
 import { Text, View } from "react-native";
 import { globalStyles } from "../../../../styles/global";
 import CustomTextInput from "@/components/general/customTextInput";
+import { formStyles } from "@/styles/form";
 
 export default function WeightField({ formikProps }: any) {
   return (
     <>
-      <View style={{ marginBottom: 15 }}>
+      <View style={formStyles.accountDetailsFormCommon}>
         <Text style={globalStyles.label}>Weight (in kg):</Text>
         <CustomTextInput
           style={globalStyles.input}

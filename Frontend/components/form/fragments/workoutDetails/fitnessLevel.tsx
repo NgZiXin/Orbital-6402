@@ -1,12 +1,13 @@
 import { Slider } from "@react-native-assets/slider";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { globalStyles } from "../../../../styles/global";
+import { formStyles } from "@/styles/form";
 
 export default function FitnessLevel({ formikProps, setScroll }: any) {
   return (
     <>
-      <View style={{ marginBottom: 12 }}>
-        <View style={styles.mainLabel}>
+      <View style={formStyles.workoutDetailsFormCommon}>
+        <View style={formStyles.sliderLabel}>
           <Text style={globalStyles.label}>Level of Fitness:</Text>
           <Text style={{ ...globalStyles.label, left: 5 }}>
             {formikProps.values.fitnessLevel}
@@ -14,15 +15,15 @@ export default function FitnessLevel({ formikProps, setScroll }: any) {
         </View>
 
         <Slider
-          style={styles.slider}
+          style={formStyles.slider}
           minimumValue={1}
           maximumValue={10}
-          trackHeight={3.5}
+          trackHeight={3}
           step={1}
           thumbSize={16.5}
-          minimumTrackTintColor="#F5BABA" // Change the color of the filled part
+          minimumTrackTintColor="#FFC4C4" // Change the color of the filled part
           maximumTrackTintColor="#D0D0D0" // Change the color of the unfilled part
-          thumbTintColor="#F5BABA"
+          thumbTintColor="#FFC4C4"
           onSlidingStart={(value) => setScroll(false)}
           onSlidingComplete={(value) => setScroll(true)}
           onValueChange={(value) => {
@@ -33,17 +34,3 @@ export default function FitnessLevel({ formikProps, setScroll }: any) {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  mainLabel: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: -5,
-  },
-
-  slider: {
-    paddingVertical: 10,
-    width: "90%",
-    height: 30,
-  },
-});

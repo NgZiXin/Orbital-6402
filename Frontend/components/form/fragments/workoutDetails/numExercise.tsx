@@ -1,47 +1,36 @@
 import { Slider } from "@react-native-assets/slider";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { globalStyles } from "../../../../styles/global";
+import { formStyles } from "@/styles/form";
 
-export default function NumExercise({ formikProps, setScroll }: any) {
+export default function NumExercises({ formikProps, setScroll }: any) {
   return (
     <>
-      <View style={{ marginBottom: 12 }}>
-        <View style={styles.mainLabel}>
+      <View style={formStyles.workoutDetailsFormCommon}>
+        <View style={formStyles.sliderLabel}>
           <Text style={globalStyles.label}>Number of Exercises:</Text>
           <Text style={{ ...globalStyles.label, left: 5 }}>
-            {formikProps.values.numExercise}
+            {formikProps.values.numExercises}
           </Text>
         </View>
 
         <Slider
-          style={styles.slider}
+          style={formStyles.slider}
           minimumValue={3}
-          maximumValue={12}
-          trackHeight={3.5}
+          maximumValue={10}
+          trackHeight={3}
           step={1}
           thumbSize={16.5}
-          minimumTrackTintColor="#F5BABA"
+          minimumTrackTintColor="#FFC4C4"
           maximumTrackTintColor="#D0D0D0"
-          thumbTintColor="#F5BABA"
+          thumbTintColor="#FFC4C4"
           onSlidingStart={(value) => setScroll(false)}
           onSlidingComplete={(value) => setScroll(true)}
           onValueChange={(value) =>
-            formikProps.setFieldValue("numExercise", value)
+            formikProps.setFieldValue("numExercises", value)
           }
         />
       </View>
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  mainLabel: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  slider: {
-    width: "90%",
-    height: 30,
-  },
-});

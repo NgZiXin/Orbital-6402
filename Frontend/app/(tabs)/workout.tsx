@@ -1,15 +1,17 @@
-import { globalStyles } from "@/styles/global";
-import PageHeader from "@/components/general/pageHeader";
-import WorkoutModal from "@/components/modal/workoutPage/workout";
-
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
+
+import { globalStyles } from "@/styles/global";
+import PageHeader from "@/components/general/pageHeader";
+import WorkoutModal from "@/components/modal/workoutPage/workout";
+import Table from "@/components/general/table/table";
 
 export default function Workout() {
   return (
@@ -33,12 +35,32 @@ export default function Workout() {
 
         <PageHeader topText="" bottomText="Suggested Workout" />
         <View style={styles.workoutPlan}>
-          <View style={globalStyles.cardV2}>
+          {/* <View style={globalStyles.cardV2}>
             <View style={{ ...styles.cardInner, height: 170 }}>
               <Text style={globalStyles.para}>
                 Result will be shown <Text style={{ color: "red" }}>here</Text>
               </Text>
             </View>
+          </View> */}
+          <Table />
+          <View
+            style={{
+              marginTop: 18,
+              marginBottom: 7,
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                ...styles.commonButton,
+              }}
+            >
+              <Text style={styles.buttonText}>Retry All</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.commonButton}>
+              <Text style={styles.buttonText}>Retry Missing</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -56,5 +78,17 @@ const styles = StyleSheet.create({
     height: "auto",
     width: "100%",
     padding: 7,
+  },
+
+  buttonText: {
+    ...globalStyles.header,
+    fontSize: 12,
+    textAlign: "center",
+  },
+
+  commonButton: {
+    width: "48%",
+    borderRadius: 10,
+    backgroundColor: "#FFC4C4",
   },
 });

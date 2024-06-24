@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MuscleGroupModal from "@/components/modal/workoutPage/muscleGroup/muscleGroup";
 import { globalStyles } from "@/styles/global";
+import { formStyles } from "@/styles/form";
 
 export default function MuscleGroups({ formikProps }: any) {
   const [selectButton, setSelectButton] = useState(false);
@@ -27,7 +28,7 @@ export default function MuscleGroups({ formikProps }: any) {
 
   return (
     <>
-      <View style={{ marginBottom: 12 }}>
+      <View style={{ ...formStyles.workoutDetailsFormCommon, width: "95%" }}>
         <Text style={globalStyles.label}>Target Muscle Groups: </Text>
         <View style={styles.wrapper}>
           <TouchableOpacity
