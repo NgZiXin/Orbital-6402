@@ -1,12 +1,13 @@
-import { WebView } from 'react-native-webview';
-import Constants from 'expo-constants';
-import { StyleSheet } from 'react-native';
+import { WebView } from "react-native-webview";
+import { StyleSheet } from "react-native";
 
 export default function App() {
   return (
     <WebView
       style={styles.container}
-      source={{ uri: 'https://www.onemap.gov.sg/amm/amm.html?mapStyle=Default&zoomLevel=15&popupWidth=200' }}
+      javaScriptEnabled={true}
+      startInLoadingState={true}
+      source={{ uri: "http://192.168.50.37:8000/map" }}
     />
   );
 }
@@ -14,6 +15,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: Constants.statusBarHeight,
   },
 });

@@ -5,6 +5,7 @@ import { useNavigation } from 'expo-router';
 import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
+import { REACT_APP_DOMAIN } from '@env';
 
 export default function SignUp () {
   const [showPicker, setShowPicker] = useState(false);
@@ -44,7 +45,7 @@ export default function SignUp () {
             ...values,
             birthday: values.birthday.toISOString().split('T')[0] // Convert date to 'YYYY-MM-DD' format
         };
-        const response = await fetch('https://orbital6402-2e455ce4dc99.herokuapp.com/accounts/', {
+        const response = await fetch(`http://${REACT_APP_DOMAIN}:8000/accounts/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -5,15 +5,15 @@ from rest_framework.permissions import AllowAny
 from .models import StravaAccessToken, StravaRefreshToken
 from .serializers import StravaGetTokenSerializer
 from rest_framework.decorators import api_view, permission_classes
-from django.shortcuts import redirect
 from django.utils import timezone
 from datetime import timedelta
-from backend.settings import CLIENT_ID, CLIENT_SECRET, SCOPE, REDIRECT_URI
+from backend.settings import CLIENT_ID, CLIENT_SECRET, SCOPE
 
 @api_view(['GET'])
 def strava_get_access(request):
     user = request.user
     
+    # TODO: Use Serializer
     redirect_uri = request.GET.get('redirect_uri')
     if not redirect_uri:
         return Response({'error': 'redirect_uri is required'}, status=400)
@@ -69,7 +69,6 @@ def strava_get_token(request):
                 'grant_type': 'authorization_code',
             }
         )
-        print(code)
 
         # Obtain data
         token_json = token_response.json()

@@ -42,7 +42,7 @@ export default function Profile() {
     const token: string | null = await getItem("token");
 
     const response = await fetch(
-      `https://orbital6402-2e455ce4dc99.herokuapp.com/accounts/data`,
+      `http://${REACT_APP_DOMAIN}:8000/accounts/data`,
       {
         method: "GET",
         headers: {

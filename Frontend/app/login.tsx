@@ -5,6 +5,7 @@ import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { setItem } from '../utility/asyncStorage';
+import { REACT_APP_DOMAIN } from '@env';
 
 export default function Login() {
     const [visible, setVisibility] = useState(false);
@@ -16,7 +17,7 @@ export default function Login() {
     }
     const handleSubmit = async (values: LoginValues, actions: FormikHelpers<LoginValues>) => {
         try {
-            const response = await fetch('https://orbital6402-2e455ce4dc99.herokuapp.com/accounts/login/', {
+            const response = await fetch(`http://${REACT_APP_DOMAIN}:8000/accounts/login/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
