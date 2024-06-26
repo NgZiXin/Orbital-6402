@@ -7,11 +7,6 @@ export const globalStyles = StyleSheet.create({
     backgroundColor: "white",
   },
 
-  titleText: {
-    fontFamily: "inter-bold",
-    fontSize: 18,
-  },
-
   header: {
     fontFamily: "inter-semibold",
     fontSize: 14,

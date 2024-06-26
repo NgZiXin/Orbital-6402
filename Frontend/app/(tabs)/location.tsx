@@ -146,7 +146,7 @@ export default function Location() {
               <CustomTextInput
                 style={{ borderRadius: 7, width: "90%" }}
                 placeholder="Your Location (Postal Code)"
-                onChangeText={(newText) => setSearch(newText)}
+                onChangeText={(newText: string) => setSearch(newText)}
                 value={search}
               />
 

@@ -3,59 +3,45 @@ import { StyleSheet } from "react-native";
 const commonStyles = StyleSheet.create({
   commonHeaderStyles: {
     alignItems: "center",
-    flex: 1,
     justifyContent: "center",
     borderWidth: 1,
     borderColor: "#D9D9D9",
-    backgroundColor: "dsdd",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    backgroundColor: "#F6F2F2",
+    padding: 8,
   },
 
   commonCellStyles: {
     padding: 8,
     borderWidth: 1,
     borderColor: "#D9D9D9",
+    height: "auto",
   },
 });
 
 const tableStyles = StyleSheet.create({
   nameHeader: {
     ...commonStyles.commonHeaderStyles,
+    flex: 2.3,
   },
 
   otherHeader: {
     ...commonStyles.commonHeaderStyles,
-    width: 90,
-  },
-
-  container: {
-    alignItems: "center",
-    backgroundColor: "white",
-    justifyContent: "center",
-    padding: 16,
-    width: "100%",
-  },
-
-  tableHeader: {
-    alignItems: "center",
-    flexDirection: "row",
+    flex: 1,
   },
 
   rowContainer: {
     flexDirection: "row",
   },
 
-  firstColCellWrapper: {
+  firstCellWrapper: {
     ...commonStyles.commonCellStyles,
-    height: 80,
+    flex: 2.3,
     flexDirection: "row",
   },
 
-  otherColCellWrapper: {
+  otherCellWrapper: {
     ...commonStyles.commonCellStyles,
-    width: 90,
-    height: 80,
+    flex: 1,
   },
 });
 

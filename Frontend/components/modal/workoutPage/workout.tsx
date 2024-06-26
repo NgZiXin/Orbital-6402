@@ -21,7 +21,7 @@ export default function WorkoutModal() {
       <SubmitButton
         onPressHandler={() => setWorkoutModal(true)}
         text="Create Workout"
-        style={{ position: "relative", bottom: 25, marginBottom: 22 }}
+        style={{ position: "relative", bottom: 25, marginBottom: 19 }}
       />
 
       {workoutModal == true && (

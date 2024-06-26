@@ -21,7 +21,7 @@ export default function LogoutModal() {
       {logoutModal == true && (
         <Modal animationType="fade" visible={logoutModal} transparent={true}>
           <View style={modalStyles.modalWrapper}>
-            <View style={{ ...modalStyles.modalContent, height: 180 }}>
+            <View style={{ ...modalStyles.modalContent, height: 170 }}>
               <View
                 style={{
                   flexDirection: "column",

@@ -8,8 +8,8 @@ import React, {
 
 import {
   FlatList,
-  ScrollView,
   SectionList,
+  StyleSheet,
   View,
   Text,
   TouchableOpacity,
@@ -21,31 +21,43 @@ import { globalStyles } from "@/styles/global";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ValidationModal from "@/components/modal/workoutPage/muscleGroup/validation";
 
-export default function Table() {
-  // use a memoized version so they don't keep rebuilding on every render
-  const scrollableColumns = useMemo(() => ["Weight", "Reps", "Sets"], []);
-  const fixedColumn = useMemo(() => ["Name"], []);
+type TableData = {
+  name: string;
+  weight: number;
+  amount: string;
+};
 
-  const [tableData, setTableData] = useState([]);
+export default function Table() {
+  // returns a memoized array value, that never changes
+  // so don't need to keep rebuilding on every render
+  const columns = useMemo(() => ["Name", "Weight", "Amount"], []);
+
+  const [tableData, setTableData] = useState<TableData[]>([]);
   const [validationModal, setValidationModal] = useState<boolean>(false);
   const deleteIndex = useRef<number>(-1);
 
+  // on mount, setTableData based on the sampleData (placeholder for now)
   useEffect(() => {
     setTableData(sampleData);
   }, []);
 
+  // returns a memoized function object, that never changes
+  // so don't need to keep rebuilding on every render
   const renderHeader = useCallback(
-    (columns: string[], isFixedHeader: boolean) => (
+    (columns: string[]) => (
       <View style={{ flexDirection: "row" }}>
         {columns.map((column: string, index: number) => (
           <View
             key={index}
             style={
-              isFixedHeader ? tableStyles.nameHeader : tableStyles.otherHeader
+              index === 0 ? tableStyles.nameHeader : tableStyles.otherHeader
             }
           >
             <Text
-              style={{ ...globalStyles.label, fontFamily: "inter-semibold" }}
+              style={[
+                styles.headerLabel,
+                index === 2 ? styles.extra : undefined,
+              ]}
             >
               {column + " "}
             </Text>
@@ -53,45 +65,42 @@ export default function Table() {
         ))}
       </View>
     ),
+    []
+  );
+
+  // same idea
+  const renderRows = useCallback(
+    ({ item, index }: any) => {
+      return (
+        <View style={tableStyles.rowContainer}>
+          <View style={tableStyles.firstCellWrapper}>
+            <TouchableOpacity
+              style={{ width: "10%" }}
+              onPress={() => handlePress(index)}
+            >
+              <Ionicons
+                name="close-outline"
+                size={15}
+                style={{ position: "relative", right: 5 }}
+              />
+            </TouchableOpacity>
+            <Text style={globalStyles.label}>{item.name}</Text>
+          </View>
+
+          <View style={tableStyles.otherCellWrapper}>
+            <Text style={globalStyles.label}>{item.weight}</Text>
+          </View>
+
+          <View style={tableStyles.otherCellWrapper}>
+            <Text style={globalStyles.label}>{item.amount}</Text>
+          </View>
+        </View>
+      );
+    },
     [tableData]
   );
 
-  function renderNameCol({ item, index }: any) {
-    return (
-      <View style={tableStyles.firstColCellWrapper}>
-        <TouchableOpacity
-          style={{ width: "10%" }}
-          onPress={() => handlePress(index)}
-        >
-          <Ionicons
-            name="close-outline"
-            size={15}
-            style={{ position: "relative", right: 5 }}
-          />
-        </TouchableOpacity>
-        <Text style={{ ...globalStyles.label, width: "90%" }}>{item.name}</Text>
-      </View>
-    );
-  }
-
-  function renderOtherCols({ item }: any) {
-    return (
-      <View style={tableStyles.rowContainer}>
-        <View style={tableStyles.otherColCellWrapper}>
-          <Text style={globalStyles.label}>{item.weight}</Text>
-        </View>
-
-        <View style={tableStyles.otherColCellWrapper}>
-          <Text style={globalStyles.label}>{item.reps}</Text>
-        </View>
-
-        <View style={tableStyles.otherColCellWrapper}>
-          <Text style={globalStyles.label}>{item.sets}</Text>
-        </View>
-      </View>
-    );
-  }
-
+  // no need to over-optimize for these two functions
   function handlePress(index: number) {
     deleteIndex.current = index;
     setValidationModal(true);
@@ -104,33 +113,14 @@ export default function Table() {
   }
 
   return (
-    // Future TODO: better way to link both flatlists
-    <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
-      <View style={tableStyles.rowContainer}>
-        <FlatList
-          data={tableData}
-          style={{ flex: 1 }}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item, index) => index + ""}
-          ListHeaderComponent={renderHeader(fixedColumn, true)}
-          renderItem={renderNameCol}
-        />
+    <View style={{ height: 281, marginTop: -19 }}>
+      <FlatList
+        data={tableData}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={renderHeader(columns)}
+        renderItem={renderRows}
+      />
 
-        <ScrollView
-          style={{ flex: 1 }}
-          showsHorizontalScrollIndicator={false}
-          horizontal
-        >
-          <FlatList
-            data={tableData}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item, index) => index + ""}
-            ListHeaderComponent={renderHeader(scrollableColumns, false)}
-            renderItem={renderOtherCols}
-          />
-        </ScrollView>
-      </View>
       {validationModal && (
         <ValidationModal
           setValidationModal={setValidationModal}
@@ -139,6 +129,18 @@ export default function Table() {
           handleDelete={handleDelete}
         />
       )}
-    </ScrollView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  headerLabel: {
+    ...globalStyles.label,
+    fontFamily: "inter-semibold",
+  },
+
+  extra: {
+    position: "relative",
+    left: 2.5,
+  },
+});
