@@ -2,11 +2,18 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { globalStyles } from "@/styles/global";
 import Header from "./header";
+import { useIsFocused } from "@react-navigation/native";
 
-// Fix the any later based on ChatGPT
-export default function HomeHeader({ navigation }: any) {
+export default function HomeHeader({ navigation, route }: any) {
+  const isFocused = useIsFocused();
+  React.useEffect(() => {
+    if (isFocused) {
+      console.log(route.name);
+      // ref/state var to store this
+    }
+  }, [isFocused, route.name]);
   return (
-    <View>
+    <>
       <Header
         navigation={navigation}
         style={{ position: "relative", top: 21 }}
@@ -14,7 +21,7 @@ export default function HomeHeader({ navigation }: any) {
       <View style={styles.topNavigationWrapper}>
         <TouchableOpacity
           style={styles.topNavigation}
-          onPress={() => navigation.navigate("home")}
+          onPress={() => navigation.navigate("stats")}
         >
           <Text style={{ ...globalStyles.para, fontSize: 14 }}>
             Visualization
@@ -27,7 +34,7 @@ export default function HomeHeader({ navigation }: any) {
           <Text style={{ ...globalStyles.para, fontSize: 14 }}>Calendar</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </>
   );
 }
 

@@ -10,9 +10,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
-  KeyboardAvoidingView,
 } from "react-native";
 
 import CustomTextInput from "@/components/general/customTextInput";
@@ -136,115 +133,112 @@ export default function Location() {
   };
 
   return (
-    <View style={{ ...globalStyles.container, padding: 12 }}>
-      <KeyboardAvoidingView style={{ flex: 1 }}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
-            <PageHeader topText="Finder" bottomText="Find Nearest Gym & Park" />
+    <ScrollView>
+      <View style={{ ...globalStyles.container, padding: 12 }}>
+        <PageHeader topText="Finder" bottomText="Find Nearest Gym & Park" />
 
-            <View style={[styles.searchWrapper, styles.extra]}>
-              <CustomTextInput
-                style={{ borderRadius: 7, width: "90%" }}
-                placeholder="Your Location (Postal Code)"
-                onChangeText={(newText: string) => setSearch(newText)}
-                value={search}
-              />
+        <View style={[styles.searchWrapper, styles.extra]}>
+          <CustomTextInput
+            style={{ borderRadius: 7, width: "90%" }}
+            placeholder="Your Location (Postal Code)"
+            onChangeText={(newText: string) => setSearch(newText)}
+            value={search}
+          />
 
-              <TouchableOpacity onPress={searchHandler}>
-                <Ionicons
-                  name="search-outline"
-                  size={20}
-                  style={{
-                    position: "relative",
-                    left: 5,
-                    top: 1,
-                  }}
-                />
-              </TouchableOpacity>
+          <TouchableOpacity onPress={searchHandler}>
+            <Ionicons
+              name="search-outline"
+              size={20}
+              style={{
+                position: "relative",
+                left: 5,
+                top: 1,
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.buttonsWrapper}>
+          <TouchableOpacity
+            onPress={gymHandler}
+            style={[styles.button, gym ? styles.highlightedButton : undefined]}
+          >
+            <Text
+              style={{
+                ...globalStyles.para,
+                position: "relative",
+                right: 3,
+              }}
+            >
+              Gym
+            </Text>
+            <MaterialIcons
+              name="sports-gymnastics"
+              size={20}
+              style={{
+                position: "relative",
+                left: 2,
+                top: 10,
+              }}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={parkHandler}
+            style={[
+              styles.button,
+              { marginLeft: 10 },
+              park ? styles.highlightedButton : undefined,
+            ]}
+            disabled // TODO
+          >
+            <Text style={globalStyles.para}>Park</Text>
+            <MaterialCommunityIcons
+              name="tree-outline"
+              size={20}
+              style={{
+                position: "relative",
+                left: 5,
+                top: 10,
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            ...globalStyles.cardV2,
+            position: "relative",
+            bottom: 10,
+            marginBottom: 38,
+          }}
+        >
+          <View
+            style={[
+              styles.cardInner,
+              gymData.length == 0 ? { height: 170 } : undefined,
+            ]}
+          >
+            {/* Before search, searching, failed search */}
+            {gymData.length == 0 && (
+              <Text style={globalStyles.para}>{message}</Text>
+            )}
+            {gymData.length > 0 && <>{gymData.map(renderItem)}</>}
+          </View>
+        </View>
+
+        <PageHeader topText="" bottomText="Explore New Running Routes" />
+        <View style={styles.runningRouteResult}>
+          <View style={globalStyles.cardV2}>
+            <View style={{ ...styles.cardInner, height: 170 }}>
+              <Text style={globalStyles.para}>
+                Result will be shown <Text style={{ color: "red" }}>here</Text>
+              </Text>
             </View>
-
-            <View style={styles.buttonsWrapper}>
-              <TouchableOpacity
-                onPress={gymHandler}
-                style={[
-                  styles.button,
-                  gym ? styles.highlightedButton : undefined,
-                ]}
-              >
-                <Text
-                  style={{
-                    ...globalStyles.para,
-                    position: "relative",
-                    right: 3,
-                  }}
-                >
-                  Gym
-                </Text>
-                <MaterialIcons
-                  name="sports-gymnastics"
-                  size={20}
-                  style={{
-                    position: "relative",
-                    left: 2,
-                    top: 10,
-                  }}
-                />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={parkHandler}
-                style={[
-                  styles.button,
-                  { marginLeft: 10 },
-                  park ? styles.highlightedButton : undefined,
-                ]}
-                disabled // TODO
-              >
-                <Text style={globalStyles.para}>Park</Text>
-                <MaterialCommunityIcons
-                  name="tree-outline"
-                  size={20}
-                  style={{
-                    position: "relative",
-                    left: 5,
-                    top: 10,
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.gymParkResult}>
-              <View style={globalStyles.cardV2}>
-                <View
-                  style={[
-                    styles.cardInner,
-                    gymData.length == 0 ? { height: 170 } : undefined,
-                  ]}
-                >
-                  {/* Before search, searching, failed search */}
-                  {gymData.length == 0 && (
-                    <Text style={globalStyles.para}>{message}</Text>
-                  )}
-                  {gymData.length > 0 && <>{gymData.map(renderItem)}</>}
-                </View>
-              </View>
-            </View>
-
-            <PageHeader topText="" bottomText="Explore New Running Routes" />
-            <View style={styles.runningRouteResult}>
-              <View style={globalStyles.cardV2}>
-                <View style={{ ...styles.cardInner, height: 170 }}>
-                  <Text style={globalStyles.para}>
-                    Result will be shown{" "}
-                    <Text style={{ color: "red" }}>here</Text>
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </ScrollView>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </View>
+          </View>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -290,15 +284,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
 
-  gymParkResult: {
-    position: "relative",
-    bottom: 10,
-    marginBottom: 38,
-  },
-
   cardInner: {
-    height: "auto",
-    width: "100%",
     padding: 7,
   },
 

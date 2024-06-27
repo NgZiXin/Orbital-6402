@@ -50,13 +50,17 @@ export default function Table() {
           <View
             key={index}
             style={
-              index === 0 ? tableStyles.nameHeader : tableStyles.otherHeader
+              index === 0
+                ? tableStyles.nameHeader
+                : index === 1
+                ? tableStyles.weightHeader
+                : tableStyles.amountHeader
             }
           >
             <Text
               style={[
                 styles.headerLabel,
-                index === 2 ? styles.extra : undefined,
+                index === 2 ? styles.headerExtra : undefined,
               ]}
             >
               {column + " "}
@@ -71,9 +75,15 @@ export default function Table() {
   // same idea
   const renderRows = useCallback(
     ({ item, index }: any) => {
+      const lastIndex: number = tableData.length - 1;
       return (
         <View style={tableStyles.rowContainer}>
-          <View style={tableStyles.firstCellWrapper}>
+          <View
+            style={[
+              tableStyles.nameCellWrapper,
+              index === lastIndex ? styles.cellsExtra : undefined,
+            ]}
+          >
             <TouchableOpacity
               style={{ width: "10%" }}
               onPress={() => handlePress(index)}
@@ -84,14 +94,26 @@ export default function Table() {
                 style={{ position: "relative", right: 5 }}
               />
             </TouchableOpacity>
-            <Text style={globalStyles.label}>{item.name}</Text>
+            <Text style={{ ...globalStyles.label, width: "90%" }}>
+              {item.name}
+            </Text>
           </View>
 
-          <View style={tableStyles.otherCellWrapper}>
+          <View
+            style={[
+              tableStyles.weightCellWrapper,
+              index === lastIndex ? styles.cellsExtra : undefined,
+            ]}
+          >
             <Text style={globalStyles.label}>{item.weight}</Text>
           </View>
 
-          <View style={tableStyles.otherCellWrapper}>
+          <View
+            style={[
+              tableStyles.amountCellWrapper,
+              index === lastIndex ? styles.cellsExtra : undefined,
+            ]}
+          >
             <Text style={globalStyles.label}>{item.amount}</Text>
           </View>
         </View>
@@ -113,7 +135,7 @@ export default function Table() {
   }
 
   return (
-    <View style={{ height: 281, marginTop: -19 }}>
+    <View style={{ flex: 1 }}>
       <FlatList
         data={tableData}
         showsVerticalScrollIndicator={false}
@@ -139,8 +161,12 @@ const styles = StyleSheet.create({
     fontFamily: "inter-semibold",
   },
 
-  extra: {
+  headerExtra: {
     position: "relative",
     left: 2.5,
+  },
+
+  cellsExtra: {
+    borderBottomWidth: 0,
   },
 });

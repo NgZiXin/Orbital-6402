@@ -12,26 +12,26 @@ import { globalStyles } from "../../../styles/global";
 import { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SubmitButton from "@/components/general/submit";
-import WorkoutForm from "@/components/form/full/workout";
+import AgendaCalendar from "@/components/general/agendaCalendar";
 
-export default function WorkoutModal() {
-  const [workoutModal, setWorkoutModal] = useState<boolean>(false);
+export default function CalendarModal() {
+  const [calendarModal, setCalendarModal] = useState<boolean>(false);
   return (
     <>
       <SubmitButton
-        onPressHandler={() => setWorkoutModal(true)}
-        text="Create Workout"
-        style={{ position: "relative", bottom: 25, marginBottom: 19 }}
+        onPressHandler={() => setCalendarModal(true)}
+        text="View Calendar"
+        style={{ position: "relative", bottom: 25, marginBottom: 27 }}
       />
 
-      {workoutModal == true && (
-        <Modal animationType="fade" visible={workoutModal} transparent={true}>
+      {calendarModal == true && (
+        <Modal animationType="slide" visible={calendarModal} transparent={true}>
           <View style={modalStyles.modalWrapper}>
             <View
               style={{
                 ...modalStyles.modalContent,
-                height: "75%",
-                paddingLeft: 6,
+                width: "95%",
+                height: "93.5%",
               }}
             >
               <KeyboardAvoidingView
@@ -44,23 +44,16 @@ export default function WorkoutModal() {
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
+                    marginBottom: 3,
                   }}
                 >
-                  <Text
-                    style={{
-                      ...globalStyles.header,
-                      position: "relative",
-                      left: 9,
-                    }}
-                  >
-                    Workout Planner
-                  </Text>
-                  <TouchableOpacity onPress={() => setWorkoutModal(false)}>
+                  <Text style={globalStyles.header}>Workout Calendar</Text>
+                  <TouchableOpacity onPress={() => setCalendarModal(false)}>
                     <Ionicons name="close-circle-outline" size={25}></Ionicons>
                   </TouchableOpacity>
                 </View>
 
-                <WorkoutForm setWorkoutModal={setWorkoutModal} />
+                <AgendaCalendar />
               </KeyboardAvoidingView>
             </View>
           </View>

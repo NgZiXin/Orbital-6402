@@ -2,12 +2,11 @@ import { Tabs, useNavigation } from "expo-router";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Platform, View } from "react-native";
 import Header from "../../components/navigation/header";
-import HomeHeader from "@/components/navigation/homeHeader";
 
 export default function TabLayout() {
   const navigation = useNavigation();
 
-  const screenOptions = ({ route }: any) => {
+  const screenOptions = () => {
     let headerStyle = {
       height: 95,
       backgroundColor: "#E5E5E5",
@@ -17,13 +16,7 @@ export default function TabLayout() {
       tabBarInactiveTintColor: "black",
       headerShown: true,
       headerTitle: () => {
-        switch (route.name) {
-          case "home":
-          case "calendar":
-            return <HomeHeader navigation={navigation} />;
-          default:
-            return <Header navigation={navigation} />;
-        }
+        return <Header navigation={navigation} />;
       },
       headerStyle: headerStyle,
       tabBarStyle: {
@@ -66,14 +59,6 @@ export default function TabLayout() {
         />
 
         <Tabs.Screen
-          name="calendar"
-          options={{
-            // Hides it from tab bar
-            href: null,
-          }}
-        />
-
-        <Tabs.Screen
           name="home"
           options={{
             tabBarIcon: ({ focused }) => (
@@ -83,6 +68,7 @@ export default function TabLayout() {
               />
             ),
             tabBarLabel: "Home",
+            headerShown: false,
           }}
         />
         <Tabs.Screen

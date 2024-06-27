@@ -24,9 +24,6 @@ export const globalStyles = StyleSheet.create({
   label: {
     fontFamily: "inter-regular",
     fontSize: 12,
-
-    // position: "relative",
-    // top: 0,
   },
 
   input: {
@@ -36,36 +33,43 @@ export const globalStyles = StyleSheet.create({
     borderRadius: 6,
     fontFamily: "inter-regular",
     fontSize: 12,
-
-    // position: "relative",
-    // bottom: 0,
   },
 
-  // mostly for profile page
+  // for profile page only
   cardV1: {
     borderRadius: 7,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#F6F2F2",
     backgroundColor: "#fff",
-    // width: right offset, height: down offset
-    shadowOffset: { width: 1, height: 1 },
     shadowColor: "#333",
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
+
     marginHorizontal: 4,
     marginVertical: 6,
-  },
 
-  // generally for all other pages
-  cardV2: {
-    borderRadius: 7,
-    elevation: 3,
-    backgroundColor: "#fff",
-    shadowOffset: { width: 0, height: 1 },
-    shadowColor: "#333",
+    // android only
+    // width: right offset, height: down offset
+    elevation: 2.5,
+
+    // ios only
+    shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 2,
-    // very slight horizontal margin
-    // preserving the shadow card effect and also somewhat preserving alignment
-    marginHorizontal: "0.15%",
+  },
+
+  // for all other pages
+  cardV2: {
+    borderRadius: 7,
+    borderWidth: 1,
+    borderColor: "#F6F2F2",
+    backgroundColor: "#fff",
+    shadowColor: "#333",
+
+    // android only
+    elevation: 2.5,
+
+    // ios only
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
   },
 });

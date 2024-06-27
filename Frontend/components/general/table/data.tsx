@@ -1,5 +1,3 @@
-// limit testing with 10 exercises generated and values as long as feasibly possible
-
 const sampleData = [
   {
     name: "Deadlift",
@@ -12,12 +10,12 @@ const sampleData = [
     amount: "20 reps, 5 sets",
   },
   {
-    name: "Rear foot elevated split squat fake throw stomps",
+    name: "Farmers Walk",
     weight: 102,
     amount: "20 reps, 5 sets",
   },
   {
-    name: "Rear foot elevated split squat fake throw stomps",
+    name: "Standing Broad Jump",
     weight: 103,
     amount: "20 reps, 5 sets",
   },
@@ -29,26 +27,6 @@ const sampleData = [
   {
     name: "Rear foot elevated split squat fake throw stomps",
     weight: 105,
-    amount: "20 reps, 5 sets",
-  },
-  {
-    name: "Rear foot elevated split squat fake throw stomps",
-    weight: 106,
-    amount: "20 reps, 5 sets",
-  },
-  {
-    name: "Rear foot elevated split squat fake throw stomps",
-    weight: 107,
-    amount: "20 reps, 5 sets",
-  },
-  {
-    name: "Rear foot elevated split squat fake throw stomps",
-    weight: 108,
-    amount: "20 reps, 5 sets",
-  },
-  {
-    name: "Rear foot elevated split squat fake throw stomps",
-    weight: 109,
     amount: "20 reps, 5 sets",
   },
 ];

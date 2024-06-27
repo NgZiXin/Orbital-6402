@@ -22,26 +22,43 @@ const tableStyles = StyleSheet.create({
   nameHeader: {
     ...commonStyles.commonHeaderStyles,
     flex: 2.3,
+    borderTopWidth: 0,
+    borderLeftWidth: 0,
   },
 
-  otherHeader: {
+  weightHeader: {
     ...commonStyles.commonHeaderStyles,
     flex: 1,
+    borderTopWidth: 0,
+  },
+
+  amountHeader: {
+    ...commonStyles.commonHeaderStyles,
+    flex: 1,
+    borderTopWidth: 0,
+    borderRightWidth: 0,
   },
 
   rowContainer: {
     flexDirection: "row",
   },
 
-  firstCellWrapper: {
+  nameCellWrapper: {
     ...commonStyles.commonCellStyles,
     flex: 2.3,
     flexDirection: "row",
+    borderLeftWidth: 0,
   },
 
-  otherCellWrapper: {
+  weightCellWrapper: {
     ...commonStyles.commonCellStyles,
     flex: 1,
+  },
+
+  amountCellWrapper: {
+    ...commonStyles.commonCellStyles,
+    flex: 1,
+    borderRightWidth: 0,
   },
 });
 

@@ -12,6 +12,7 @@ import { globalStyles } from "@/styles/global";
 import PageHeader from "@/components/general/pageHeader";
 import WorkoutModal from "@/components/modal/workoutPage/workout";
 import Table from "@/components/general/table/table";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Workout() {
   return (
@@ -25,25 +26,36 @@ export default function Workout() {
       </View>
 
       <WorkoutModal />
-
-      <PageHeader topText="" bottomText="Suggested Workout" />
-      <Table />
+      <View style={styles.secondaryHeader}>
+        <PageHeader topText="" bottomText="Suggested Workout" />
+        <TouchableOpacity>
+          <Ionicons
+            size={25}
+            name="reload-outline"
+            style={{ position: "relative", right: 30, bottom: 18 }}
+          />
+        </TouchableOpacity>
+      </View>
 
       <View
+        style={{
+          height: "50%",
+          borderWidth: 2,
+          borderColor: "#FFC4C4",
+          marginTop: -19,
+        }}
+      >
+        <Table />
+      </View>
+
+      {/* <View
         style={{
           marginTop: 19.5,
           marginBottom: 7,
           flexDirection: "row",
           justifyContent: "space-between",
         }}
-      >
-        <TouchableOpacity style={styles.commonButton}>
-          <Text style={styles.buttonText}>Retry All</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.commonButton}>
-          <Text style={styles.buttonText}>Retry Missing</Text>
-        </TouchableOpacity>
-      </View>
+      ></View> */}
 
       {/* Conditionally render this as whats shown when loading */}
       {/* <View style={styles.workoutPlan}>
@@ -60,6 +72,11 @@ export default function Workout() {
 }
 
 const styles = StyleSheet.create({
+  secondaryHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
   workoutPlan: {
     position: "relative",
     bottom: 15,
