@@ -1,10 +1,58 @@
+import { ORIGINAL, DEFAULT, NIGHT, GREY } from "./basemaps.js";
+import {
+  normalPoint,
+  normalPolyline,
+  highlightPoint,
+  highlightPolyline,
+  selectSegmentPoint,
+  selectPoint,
+  selectPolyline,
+} from "./styles.js";
+
 // Global variables
-const token = "96bdd905f77363bd5906fea379f13aa7c622b23a"; // Temp
-segmentsId = []; // Record all segments that have been added to map
-route = []; // Contains markers of waypoints & segment's start and end
-next = new Map(); // Store marker's next
-prev = new Map(); // Store marker's prev
-totalDistance = 0; // Track distance of route
+const token = "a9026ea1829ce3f7edaab9c99936febcbba0f02d"; // Temp
+const segmentsId = []; // Record all segments that have been added to map
+const next = new Map(); // Store marker's next
+const prev = new Map(); // Store marker's prev
+let prevMarker = undefined; // Previous point user has marked
+let totalDistance = 0; // Track distance of route
+
+// Creating map overlays
+const stravaSegments = L.layerGroup([]);
+const route = L.layerGroup([]);
+
+// Configure map
+const mapOptions = {
+  center: [1.28416,103.8533816],
+  zoom: 17,
+  layers: [ORIGINAL, route, stravaSegments],
+};
+
+const map = new L.map("map", mapOptions);
+
+// Layers control
+const baseMaps = {
+  Original: ORIGINAL,
+  Default: DEFAULT,
+  Night: NIGHT,
+  Grey: GREY,
+};
+const overlayMaps = {
+  "Strava Segments": stravaSegments,
+  "Plotted Route": route,
+};
+const layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+// Marker functionality
+map.on("click", clickMap);
+
+// Zoom & Drag functionalities
+map.on("zoomend", segmentQuery);
+map.on("dragend", segmentQuery); // TODO Drag distance by too short dont call
+
+// Map on load
+map.on("load", segmentQuery);
+map.fire("load")
 
 // Event functions
 
@@ -14,8 +62,8 @@ function clickMap(e) {
     .setLatLng(e.latlng)
     .setContent(
       `<div>
-        <code>lat: ${e.latlng.lat.toFixed(2)}, lng: ${e.latlng.lng.toFixed(
-        2
+        <code>lat: ${e.latlng.lat.toFixed(5)}, lng: ${e.latlng.lng.toFixed(
+        5
       )}</code>
         <br />
         <code>Add point as next waypoint?</code>
@@ -33,75 +81,142 @@ function clickMap(e) {
 }
 
 function addMarker(lat, lng) {
-  // Add marker to map
-  const marker = new L.circleMarker([lat, lng], {connectedLines: []});
-  marker.bindPopup(`
-    <div>
-      <code>
-        lat: ${lat.toFixed(2)}, 
-        lng: ${lng.toFixed(2)}
-      </code>
-      <br />
-      <code>Add point as next waypoint?</code>
-      <br />
-      <button id='marker-delete-button' style="margin-top: 5px";>Remove</button>
-    </div>`);
-  marker.on("popupopen", onMarkerPopupOpen);
-  marker.addTo(map);
+  // Create Marker
+  const marker = new L.circleMarker([lat, lng], { connectedLines: [] });
+
+  // Route building logic
+  if (prevMarker != undefined) {
+    const fitStart = prev.size == 0;
+    buildRoute(prevMarker, marker, fitStart, true);
+  }
+
+  // Add "click" event to marker
+  marker.on("click", (e) => clickWaypoint(e, marker));
+
+  // Add marker to routes
+  route.addLayer(marker);
 
   // Style marker
   marker.setStyle(selectPoint);
 
-  // Route building logic
-  if (route.length > 0) {
-    prevMarker = route[route.length - 1];
-    prev.set(marker, prevMarker);
-    next.set(prevMarker, marker);
-    console.log(prevMarker);
+  // Update prevMarker
+  prevMarker = marker;
 
-    // Query path geometry & distance
-    startCoords = `${prevMarker.getLatLng().lat}%2C${
-      prevMarker.getLatLng().lng
-    }`;
-    endCoords = `${lat}%2C${lng}`;
-    fetch(
-      `http://127.0.0.1:8000/map/get_path?start=${startCoords}&end=${endCoords}`,
-      {
-        method: "GET",
-      }
-    )
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`); // TODO: Cannot find route
-        }
-        return response.json();
-      })
-      .then((data) => {
-        // Get Polyline
-        const coordinates = L.Polyline.fromEncoded(data["route_geometry"]).getLatLngs();;
-        const polyline = L.polyline(coordinates).addTo(map);
-
-        // Style polyline
-        polyline.setStyle(selectPolyline);
-
-        // Associated markers with polyline
-        prevMarker.options.connectedLines.push(polyline);
-        marker.options.connectedLines.push(polyline);
-      });
-  }
-
-  // Add to route
-  route.push(marker);
-  console.log(route);
+  console.log(prev);
 }
 
-function onMarkerPopupOpen() {
-  const tempMarker = this;
+function buildRoute(start, end, fitStart, fitEnd) {
+  // Update hashMaps
+  prev.set(end, start);
+  next.set(start, end);
 
+  // Query path geometry & distance
+  const startCoords = `${start.getLatLng().lat}%2C${start.getLatLng().lng}`;
+  const endCoords = `${end.getLatLng().lat}%2C${end.getLatLng().lng}`;
+
+  fetch(
+    `http://192.168.50.37:8000/map/get_path?start=${startCoords}&end=${endCoords}`,
+    {
+      method: "GET",
+    }
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`); // TODO: Cannot find route
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // Coordinates
+      const coordinates = L.Polyline.fromEncoded(
+        data["route_geometry"]
+      ).getLatLngs();
+
+      // Fit points to path geometry
+      if (fitStart) {
+        start.setLatLng(coordinates[0]); // Change start coordinates to fit
+      } else {
+        coordinates.unshift(start.getLatLng()); // Edit path geometry to include start point
+      }
+      if (fitEnd) {
+        end.setLatLng(coordinates[coordinates.length - 1]); // Change end coordinates to fit
+      } else {
+        coordinates.push(end.getLatLng()); // Edit path geometry to include end points
+      }
+
+      // Get polyline
+      const polyline = L.polyline(coordinates, {
+        distance: data["total_distance"],
+      });
+      route.addLayer(polyline);
+
+      // Style polyline
+      polyline.setStyle(selectPolyline);
+
+      // Associated markers with polyline
+      start.options.connectedLines.push(polyline);
+      end.options.connectedLines.push(polyline);
+    });
+}
+
+function clickWaypoint(e, marker) {
+  L.DomEvent.stopPropagation(e); // Stop event propagation
+
+  // Open Pop-up
+  const popup = L.popup()
+    .setLatLng(e.latlng)
+    .setContent(
+      `
+      <div>
+      <code>
+        lat: ${parseFloat(marker.getLatLng().lat).toFixed(5)}, 
+        lng: ${parseFloat(marker.getLatLng().lng).toFixed(5)}
+      </code>
+      <br />
+      <code>Remove waypoint?</code>
+      <br />
+      <button id='marker-delete-button' style="margin-top: 5px">Remove</button>
+    </div>`
+    )
+    .openOn(map);
+
+  // Popup "delete" button
   document
     .getElementById("marker-delete-button")
     .addEventListener("click", () => {
-      map.removeLayer(tempMarker);
+      // Close Popup
+      map.closePopup(popup);
+
+      const prevWaypoint = prev.get(marker);
+      const nextWaypoint = next.get(marker);
+
+      console.log(prevWaypoint);
+      console.log(nextWaypoint);
+      // Join previous and next waypoints together
+      if ((prevWaypoint != undefined) & (nextWaypoint != undefined)) {
+        buildRoute(prevWaypoint, nextWaypoint, false, false);
+      }
+
+      // Update hashMap
+      if (prevWaypoint) {
+        next.set(prevWaypoint, nextWaypoint);
+      }
+      if (nextWaypoint) {
+        prev.set(nextWaypoint, prevWaypoint);
+      }
+      prev.delete(marker);
+      next.delete(marker);
+
+      // Update prevMarker
+      if (prevMarker == marker) {
+        prevMarker = prevWaypoint;
+      }
+
+      // Delete marker and polylines from map
+      map.removeLayer(marker);
+      marker.options.connectedLines.forEach((line) => {
+        line.remove();
+      });
     });
 }
 
@@ -131,82 +246,53 @@ function segmentQuery(e) {
     .then((data) => {
       // Deconstruct Request
       for (let i = 0; i < data["segments"].length; i++) {
-        console.log(data["segments"][i]);
         const dataObj = data["segments"][i];
 
         // Save items permanently and display on the map
         if (!segmentsId.includes(dataObj["id"])) {
           segmentsId.push(dataObj["id"]);
 
-          // Get Start & End Point
-          const start = L.circleMarker(dataObj["start_latlng"], {
-            connectedLines: [],
-          }).addTo(map);
-          const end = L.circleMarker(dataObj["end_latlng"], {
-            connectedLines: [],
-          }); //.addTo(map); // Don't add to Map
-
           // Get Polyline
           const coordinates = L.Polyline.fromEncoded(
             dataObj["points"]
           ).getLatLngs();
-          const polyline = L.polyline(coordinates).addTo(map);
+          const polyline = L.polyline(coordinates, {
+            distance: dataObj["distance"],
+          });
+          stravaSegments.addLayer(polyline);
 
-          // Associate line and point
-          start.options.connectedLines.push(polyline);
-          end.options.connectedLines.push(polyline);
+          // Get Start & End Point
+          const start = L.circleMarker(dataObj["start_latlng"], {
+            connectedLines: [polyline],
+          });
+          const end = L.circleMarker(dataObj["end_latlng"], {
+            connectedLines: [polyline],
+          });
+          stravaSegments.addLayer(start);
 
           // Set Styles
           polyline.setStyle(normalPolyline);
           start.setStyle(normalPoint);
           end.setStyle(normalPoint);
 
-          // Add interactive layer event to polyline
+          // Add "click" event to polyline and start marker
           polyline.on("click", (e) =>
-            clickPolyline(
-              e,
-              polyline,
-              start,
-              end,
-              dataObj["name"],
-              dataObj["distance"]
-            )
+            clickSegment(e, start, end, polyline, dataObj["name"])
           );
           start.on("click", (e) =>
-            clickPolyline(
-              e,
-              polyline,
-              start,
-              end,
-              dataObj["name"],
-              dataObj["distance"]
-            )
+            clickSegment(e, start, end, polyline, dataObj["name"])
           );
-
-          // Add Mouseover event to highlight route
-          polyline.on("mouseover", (e) =>
-            mouseoverPolyline(e, polyline, start)
-          );
-          start.on("mouseover", (e) => mouseoverPolyline(e, polyline, start));
-
-          // Add Mouseout event to reset route style
-          polyline.on("mouseout", (e) => mouseoutPolyline(e, polyline, start));
-          start.on("mouseout", (e) => mouseoutPolyline(e, polyline, start));
         } else {
-          console.log("test");
+          // TODO
         }
       }
     });
 }
 
-function clickPolyline(e, polyline, start, end, name, distance) {
+function clickSegment(e, start, end, polyline, segmentName) {
   L.DomEvent.stopPropagation(e); // Stop event propagation
 
-  // Disable mouseover and mouseout events and change style
-  polyline.off("mouseover");
-  polyline.off("mouseout");
-  start.off("mouseover");
-  start.off("mouseout");
+  // Change style
   polyline.setStyle(highlightPolyline);
   start.setStyle(highlightPoint);
 
@@ -215,8 +301,8 @@ function clickPolyline(e, polyline, start, end, name, distance) {
     .setLatLng(e.latlng)
     .setContent(
       `<div>
-        <p>${name}</p>
-        <p>${distance}</p>
+        <p>Segment Name: ${segmentName}</p>
+        <p>Distance: ${polyline.options.distance} metres</p>
         <button id="polylineButton">Add</button>
       </div>`
     )
@@ -224,11 +310,6 @@ function clickPolyline(e, polyline, start, end, name, distance) {
 
   // Closing Pop-up
   popup.on("remove", () => {
-    console.log("Popup closed");
-    polyline.on("mouseover", (e) => mouseoverPolyline(e, polyline, start));
-    polyline.on("mouseout", (e) => mouseoutPolyline(e, polyline, start));
-    start.on("mouseover", (e) => mouseoverPolyline(e, polyline, start));
-    start.on("mouseout", (e) => mouseoutPolyline(e, polyline, start));
     polyline.setStyle(normalPolyline);
     start.setStyle(normalPoint);
   });
@@ -237,86 +318,115 @@ function clickPolyline(e, polyline, start, end, name, distance) {
   document
     .getElementById("polylineButton")
     .addEventListener("click", function () {
-      console.log("hello");
+      // Close popup
+      map.closePopup(popup);
+
+      // Build route to start point
+      if (prevMarker != undefined) {
+        const fitStart = prev.size == 0;
+        buildRoute(prevMarker, start, fitStart, false);
+      }
+
+      // Update hashMap
+      prev.set(end, start);
+      next.set(start, end);
+
+      // Update prevMarker
+      prevMarker = end;
+
+      // Off polygon "click" event
+      polyline.off("click");
+
+      // Layer management
+      stravaSegments.removeLayer(start);
+      stravaSegments.removeLayer(polyline);
+      route.addLayer(start);
+      route.addLayer(end);
+      route.addLayer(polyline);
+
+      // Add click event to markers
+      start.on("click", (e) =>
+        clickSegmentWaypoint(e, start, end, polyline, segmentName)
+      );
+      end.on("click", (e) =>
+        clickSegmentWaypoint(e, start, end, polyline, segmentName)
+      );
+
+      // Style marker and polyline
+      start.setStyle(selectSegmentPoint);
+      end.setStyle(selectSegmentPoint);
+      polyline.setStyle(selectPolyline);
     });
 }
 
-function mouseoverPolyline(e, polyline, start) {
+function clickSegmentWaypoint(e, start, end, polyline, segmentName) {
+  L.DomEvent.stopPropagation(e); // Stop event propagation
+
+  // Change style
   polyline.setStyle(highlightPolyline);
   start.setStyle(highlightPoint);
+  end.setStyle(highlightPoint);
+
+  // Open Pop-up
+  const popup = L.popup()
+    .setLatLng(e.latlng)
+    .setContent(
+      `<div>
+        <p>Segment Name: ${segmentName}</p>
+        <p>Distance: ${polyline.options.distance} metres</p>
+        <code>Remove this segment?</code>
+        <button id="removeButton">Remove</button>
+      </div>`
+    )
+    .openOn(map);
+
+  // Closing Pop-up
+  popup.on("remove", () => {
+    polyline.setStyle(selectPolyline);
+    start.setStyle(selectSegmentPoint);
+    end.setStyle(selectSegmentPoint);
+  });
+
+  // Logic for removing of segments
+  document
+    .getElementById("removeButton")
+    .addEventListener("click", function () {
+      // Close Popup
+      map.closePopup(popup);
+
+      const prevWaypoint = prev.get(start);
+      const nextWaypoint = next.get(end);
+
+      // Join previous and next waypoints together
+      if ((prevWaypoint != undefined) & (nextWaypoint != undefined)) {
+        buildRoute(prevWaypoint, nextWaypoint, false, false);
+      }
+
+      // Update hashMap
+      if (prevWaypoint) {
+        next.set(prevWaypoint, nextWaypoint);
+      }
+      if (nextWaypoint) {
+        prev.set(nextWaypoint, prevWaypoint);
+      }
+      prev.delete(start);
+      next.delete(start);
+      prev.delete(end);
+      next.delete(end);
+
+      // Update prevMarker
+      if (prevMarker == end) {
+        prevMarker = prevWaypoint;
+      }
+
+      // Delete marker and polylines from map
+      map.removeLayer(start);
+      start.options.connectedLines.forEach((line) => {
+        line.remove();
+      });
+      map.removeLayer(end);
+      end.options.connectedLines.forEach((line) => {
+        line.remove();
+      });
+    });
 }
-
-function mouseoutPolyline(e, polyline, start) {
-  polyline.setStyle(normalPolyline);
-  start.setStyle(normalPoint);
-}
-
-// Creating Map overlay
-var mapOptions = {
-  center: [1.3331189, 103.8145682],
-  zoom: 17,
-};
-var map = new L.map("map", mapOptions);
-var basemap = L.tileLayer(
-  "https://www.onemap.gov.sg/maps/tiles/Grey/{z}/{x}/{y}.png",
-  {
-    detectRetina: true,
-    maxZoom: 19,
-    minZoom: 11,
-    /** DO NOT REMOVE the OneMap attribution below **/
-    attribution:
-      '<img src="https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png" style="height:20px;width:20px;"/>&nbsp;<a href="https://www.onemap.gov.sg/" target="_blank" rel="noopener noreferrer">OneMap</a>&nbsp;&copy;&nbsp;contributors&nbsp;&#124;&nbsp;<a href="https://www.sla.gov.sg/" target="_blank" rel="noopener noreferrer">Singapore Land Authority</a>',
-  }
-);
-map.addLayer(basemap);
-
-// Add map functionalities
-// Marker functionality
-map.on("click", clickMap);
-
-// Zoom & Drag functionalities
-map.on("zoomend", segmentQuery);
-map.on("dragend", segmentQuery); // TODO Drag distance by too short dont call
-
-// Styles
-var normalPolyline = {
-  color: "rgb(252, 76, 2)",
-  weight: 4,
-  opacity: 0.5,
-};
-
-var normalPoint = {
-  color: "rgb(252, 76, 2)",
-  radius: 6,
-  fill: true,
-  fillOpacity: 1,
-  opacity: 0.5,
-};
-
-var highlightPolyline = {
-  color: "red",
-  weight: 4,
-  opacity: 1,
-};
-
-var highlightPoint = {
-  color: "red",
-  radius: 6,
-  fill: true,
-  fillOpacity: 1,
-  opacity: 1,
-};
-
-var selectPolyline = {
-  color: "blue",
-  weight: 4,
-  opacity: 1,
-};
-
-var selectPoint = {
-  color: "blue",
-  radius: 6,
-  fill: true,
-  fillOpacity: 1,
-  opacity: 1,
-};
