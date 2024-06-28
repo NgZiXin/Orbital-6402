@@ -1,37 +1,36 @@
-import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { globalStyles } from "@/styles/global";
 import Header from "./header";
 import { useIsFocused } from "@react-navigation/native";
 
 export default function HomeHeader({ navigation, route }: any) {
-  const isFocused = useIsFocused();
-  React.useEffect(() => {
-    if (isFocused) {
-      console.log(route.name);
-      // ref/state var to store this
-    }
-  }, [isFocused, route.name]);
+  // isFocused fluctuates alot between true and false
+  // due to how expo handles page navigation
+  // however, when its true, we must be either on stats or calendar page
+  const isFocused: boolean = useIsFocused();
+
   return (
     <>
-      <Header
-        navigation={navigation}
-        style={{ position: "relative", top: 21 }}
-      />
+      <Header navigation={navigation} style={styles.originalHeader} />
       <View style={styles.topNavigationWrapper}>
         <TouchableOpacity
           style={styles.topNavigation}
           onPress={() => navigation.navigate("stats")}
         >
-          <Text style={{ ...globalStyles.para, fontSize: 14 }}>
-            Visualization
-          </Text>
+          <Text style={styles.text}>Visualization</Text>
+          {isFocused && route.name == "stats" && (
+            <View style={styles.underline} />
+          )}
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.topNavigation}
           onPress={() => navigation.navigate("calendar")}
         >
-          <Text style={{ ...globalStyles.para, fontSize: 14 }}>Calendar</Text>
+          <Text style={styles.text}>Calendar</Text>
+          {isFocused && route.name == "calendar" && (
+            <View style={styles.underline} />
+          )}
         </TouchableOpacity>
       </View>
     </>
@@ -39,6 +38,11 @@ export default function HomeHeader({ navigation, route }: any) {
 }
 
 const styles = StyleSheet.create({
+  originalHeader: {
+    position: "relative",
+    top: 21,
+  },
+
   topNavigationWrapper: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -49,5 +53,18 @@ const styles = StyleSheet.create({
   topNavigation: {
     width: "48%",
     alignItems: "center",
+  },
+
+  text: {
+    ...globalStyles.para,
+    fontSize: 14,
+  },
+
+  underline: {
+    position: "relative",
+    marginTop: -6,
+    height: 2,
+    backgroundColor: "red",
+    width: "50%",
   },
 });

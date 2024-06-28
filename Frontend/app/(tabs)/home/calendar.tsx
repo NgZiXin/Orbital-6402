@@ -14,7 +14,7 @@ export default function Calendar() {
   return (
     <View style={{ ...globalStyles.container, padding: 12 }}>
       {/* For offset */}
-      <View style={{ marginTop: 35, flex: 1 }}>
+      <View style={{ marginTop: 40, flex: 1 }}>
         <PageHeader topText="Planner" bottomText="Personal Calendar" />
         <View style={{ position: "relative", bottom: 28 }}>
           <Text style={globalStyles.para}>

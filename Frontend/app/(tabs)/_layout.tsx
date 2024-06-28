@@ -11,34 +11,35 @@ export default function TabLayout() {
       height: 95,
       backgroundColor: "#E5E5E5",
     };
+
+    let tabBarStyle = { backgroundColor: "#E5E5E5", height: 60 };
+    let tabBarLabelStyle =
+      Platform.OS == "android"
+        ? {
+            fontFamily: "inter-regular",
+            fontSize: 10,
+            // ensure position type matches
+            position: "relative" as "relative",
+            bottom: 5,
+          }
+        : {
+            fontFamily: "inter-regular",
+            fontSize: 10,
+            position: "relative" as "relative",
+            top: 15,
+          };
+
     return {
-      tabBarActiveTintColor: "red",
-      tabBarInactiveTintColor: "black",
       headerShown: true,
       headerTitle: () => {
         return <Header navigation={navigation} />;
       },
       headerStyle: headerStyle,
-      tabBarStyle: {
-        backgroundColor: "#E5E5E5",
-        height: 60,
-      },
+      tabBarStyle: tabBarStyle,
+      tabBarActiveTintColor: "red",
+      tabBarInactiveTintColor: "black",
       tabBarLabel: "Home",
-      tabBarLabelStyle:
-        Platform.OS == "android"
-          ? {
-              fontFamily: "inter-regular",
-              fontSize: 10,
-              // ensure position type matches
-              position: "relative" as "relative",
-              bottom: 5,
-            }
-          : {
-              fontFamily: "inter-regular",
-              fontSize: 10,
-              position: "relative" as "relative",
-              top: 15,
-            },
+      tabBarLabelStyle: tabBarLabelStyle,
     };
   };
 

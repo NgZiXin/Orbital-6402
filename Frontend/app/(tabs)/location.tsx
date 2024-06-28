@@ -133,7 +133,7 @@ export default function Location() {
   };
 
   return (
-    <ScrollView>
+    <ScrollView showsVerticalScrollIndicator={false}>
       <View style={{ ...globalStyles.container, padding: 12 }}>
         <PageHeader topText="Finder" bottomText="Find Nearest Gym & Park" />
 
@@ -228,6 +228,7 @@ export default function Location() {
         </View>
 
         <PageHeader topText="" bottomText="Explore New Running Routes" />
+
         <View style={styles.runningRouteResult}>
           <View style={globalStyles.cardV2}>
             <View style={{ ...styles.cardInner, height: 170 }}>
