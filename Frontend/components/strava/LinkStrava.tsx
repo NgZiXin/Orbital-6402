@@ -11,9 +11,8 @@ export default function LinkStrava() {
     // hence, we await to wait for the Promise to complete and grab its value
     const token: string | null = await getItem("token");
     const redirect_uri = Linking.createURL(""); // TODO: Bring app back to profile page and not home page
-    const ip = process.env.EXPO_PUBLIC_DOMAIN;
     fetch(
-      `${process.env.EXPO_PUBLIC_DOMAIN}/strava_api/get_access/?redirect_uri=${redirect_uri}/`,
+      `${process.env.EXPO_PUBLIC_DOMAIN}strava_api/get_access/?redirect_uri=${redirect_uri}/`,
       {
         method: "GET",
         headers: {
@@ -42,7 +41,7 @@ export default function LinkStrava() {
               // Handle the queryParams
               if (queryParams && queryParams["code"] && queryParams["scope"]) {
                 fetch(
-                  `${process.env.EXPO_PUBLIC_DOMAIN}/strava_api/get_token/?code=${queryParams["code"]}&scope=${queryParams["scope"]}/`,
+                  `${process.env.EXPO_PUBLIC_DOMAIN}strava_api/get_token/?code=${queryParams["code"]}&scope=${queryParams["scope"]}/`,
                   {
                     method: "GET",
                     headers: {

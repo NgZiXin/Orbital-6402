@@ -34,8 +34,7 @@ export default function EditForm({ submitHandler }: any) {
     };
 
     const token: string | null = await getItem("token");
-    const ip = process.env.EXPO_PUBLIC_DOMAIN;
-    const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}/accounts/data/`, {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}accounts/data/`, {
       // put request to update existing user details
       // of the current user logged in
       method: "PUT",
