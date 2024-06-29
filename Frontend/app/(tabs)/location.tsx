@@ -39,7 +39,7 @@ export default function Location() {
   const getNearestGyms = async (lat: number, lon: number, radius: number) => {
     const ip = process.env.EXPO_PUBLIC_DOMAIN;
     const response = await fetch(
-      `http://${ip}:8000/services/find_gym/?lat=${lat}&lon=${lon}&radius=${radius}`,
+      `${process.env.EXPO_PUBLIC_DOMAIN}/services/find_gym/?lat=${lat}&lon=${lon}&radius=${radius}`,
       {
         method: "GET",
         headers: {

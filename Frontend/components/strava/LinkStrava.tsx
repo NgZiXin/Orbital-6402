@@ -1,5 +1,5 @@
 import { Alert, StyleSheet } from "react-native";
-// import { REACT_APP_DOMAIN } from "@env";
+// import { EXPO_PUBLIC_DOMAIN } from "@env";
 import { getItem } from "../general/asyncStorage";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
@@ -13,7 +13,7 @@ export default function LinkStrava() {
     const redirect_uri = Linking.createURL(""); // TODO: Bring app back to profile page and not home page
     const ip = process.env.EXPO_PUBLIC_DOMAIN;
     fetch(
-      `http://${ip}:8000/strava_api/get_access/?redirect_uri=${redirect_uri}/`,
+      `${process.env.EXPO_PUBLIC_DOMAIN}/strava_api/get_access/?redirect_uri=${redirect_uri}/`,
       {
         method: "GET",
         headers: {
@@ -42,7 +42,7 @@ export default function LinkStrava() {
               // Handle the queryParams
               if (queryParams && queryParams["code"] && queryParams["scope"]) {
                 fetch(
-                  `http://${ip}:8000/strava_api/get_token/?code=${queryParams["code"]}&scope=${queryParams["scope"]}/`,
+                  `${process.env.EXPO_PUBLIC_DOMAIN}/strava_api/get_token/?code=${queryParams["code"]}&scope=${queryParams["scope"]}/`,
                   {
                     method: "GET",
                     headers: {
