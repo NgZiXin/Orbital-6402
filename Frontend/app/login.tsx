@@ -17,6 +17,7 @@ import { setItem } from "../components/general/asyncStorage";
 import UsernameField from "@/components/form/fragments/accountDetails/username";
 import PasswordField from "@/components/form/fragments/accountDetails/password";
 import SubmitButton from "@/components/general/submit";
+import loginValidationSchema from "@/components/form/validationSchema/login";
 
 export default function Login() {
   const navigation: any = useNavigation();
@@ -79,6 +80,7 @@ export default function Login() {
           >
             <Formik
               initialValues={{ username: "", password: "" }}
+              validationSchema={loginValidationSchema}
               // optimizations
               validateOnChange={false}
               validateOnBlur={false}
@@ -98,7 +100,10 @@ export default function Login() {
                       text="Log In"
                     />
                     <SubmitButton
-                      onPressHandler={() => navigation.navigate("sign-up")}
+                      onPressHandler={() => {
+                        formikProps.resetForm();
+                        navigation.navigate("sign-up");
+                      }}
                       text="Sign Up"
                     />
                   </ScrollView>

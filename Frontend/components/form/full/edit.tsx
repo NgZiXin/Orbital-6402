@@ -12,6 +12,7 @@ import WeightField from "../fragments/accountDetails/weight";
 import BirthdayField from "../fragments/accountDetails/birthday";
 
 import SubmitButton from "../../general/submit";
+import signupAndEditValidationSchema from "../validationSchema/signupAndEdit";
 
 export default function EditForm({ submitHandler }: any) {
   interface EditValues {
@@ -66,6 +67,7 @@ export default function EditForm({ submitHandler }: any) {
           birthday: new Date(),
           gender: "",
         }}
+        validationSchema={signupAndEditValidationSchema}
         validateOnChange={false}
         validateOnBlur={false}
         onSubmit={handleSubmit}

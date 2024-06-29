@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 
+import { useState } from "react";
 import { globalStyles } from "../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useNavigation } from "expo-router";
@@ -18,18 +19,19 @@ import HeightField from "@/components/form/fragments/accountDetails/height";
 import WeightField from "@/components/form/fragments/accountDetails/weight";
 import BirthdayField from "@/components/form/fragments/accountDetails/birthday";
 import SubmitButton from "@/components/general/submit";
+import signupAndEditValidationSchema from "@/components/form/validationSchema/signupAndEdit";
+
+interface SignUpValues {
+  username: string;
+  password: string;
+  height: string;
+  weight: string;
+  birthday: Date;
+  gender: string;
+}
 
 export default function SignUp() {
   const navigation: any = useNavigation();
-
-  interface SignUpValues {
-    username: string;
-    password: string;
-    height: string;
-    weight: string;
-    birthday: Date;
-    gender: string;
-  }
 
   const handleSubmit = async (
     values: SignUpValues,
@@ -94,8 +96,8 @@ export default function SignUp() {
             birthday: new Date(),
             gender: "",
           }}
+          validationSchema={signupAndEditValidationSchema}
           validateOnChange={false}
-          validateOnBlur={false}
           onSubmit={handleSubmit}
         >
           {(formikProps) => (
@@ -115,7 +117,10 @@ export default function SignUp() {
                   text="Create Account"
                 />
                 <SubmitButton
-                  onPressHandler={() => navigation.navigate("login")}
+                  onPressHandler={() => {
+                    formikProps.resetForm();
+                    navigation.navigate("login");
+                  }}
                   text="Go Back"
                 />
               </ScrollView>

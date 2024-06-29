@@ -10,14 +10,17 @@ import MuscleGroups from "../fragments/workoutDetails/muscleGroups";
 import HealthConditions from "../fragments/workoutDetails/healthConditions";
 import OtherRemarks from "../fragments/workoutDetails/otherRemarks";
 
-export default function WorkoutForm({ setWorkoutModal }: any) {
+export default function WorkoutForm({
+  setWorkoutModal,
+  workoutModalHeight,
+}: any) {
   const [scroll, setScroll] = useState(true);
   const handleSubmit = () => {
     setWorkoutModal(false);
   };
 
   return (
-    <View style={globalStyles.container}>
+    <>
       <Formik
         initialValues={{
           fitnessLevel: 5,
@@ -37,7 +40,10 @@ export default function WorkoutForm({ setWorkoutModal }: any) {
           >
             <FitnessLevel formikProps={formikProps} setScroll={setScroll} />
             <NumExercises formikProps={formikProps} setScroll={setScroll} />
-            <MuscleGroups formikProps={formikProps} />
+            <MuscleGroups
+              formikProps={formikProps}
+              workoutModalHeight={workoutModalHeight}
+            />
             <HealthConditions formikProps={formikProps} />
             <OtherRemarks formikProps={formikProps} />
             <SubmitButton
@@ -48,6 +54,6 @@ export default function WorkoutForm({ setWorkoutModal }: any) {
           </ScrollView>
         )}
       </Formik>
-    </View>
+    </>
   );
 }

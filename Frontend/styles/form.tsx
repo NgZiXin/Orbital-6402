@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { globalStyles } from "./global";
 
 // common styles across form components and fragments
 export const formStyles = StyleSheet.create({
@@ -10,6 +11,11 @@ export const formStyles = StyleSheet.create({
     marginBottom: 12,
     position: "relative",
     left: 9,
+  },
+
+  errorText: {
+    ...globalStyles.label,
+    color: "red",
   },
 
   sliderLabel: {

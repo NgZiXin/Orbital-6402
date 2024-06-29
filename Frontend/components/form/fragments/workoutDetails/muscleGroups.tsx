@@ -4,7 +4,7 @@ import MuscleGroupModal from "@/components/modal/workoutPage/muscleGroup/muscleG
 import { globalStyles } from "@/styles/global";
 import { formStyles } from "@/styles/form";
 
-export default function MuscleGroups({ formikProps }: any) {
+export default function MuscleGroups({ formikProps, workoutModalHeight }: any) {
   const [selectButton, setSelectButton] = useState(false);
   const [nilButton, setNilButton] = useState(false);
 
@@ -51,6 +51,7 @@ export default function MuscleGroups({ formikProps }: any) {
             setMuscleGroupModal={setMuscleGroupModal}
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
+            workoutModalHeight={workoutModalHeight}
             formikProps={formikProps}
           />
         )}

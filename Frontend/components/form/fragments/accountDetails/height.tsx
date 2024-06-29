@@ -16,6 +16,9 @@ export default function HeightField({ formikProps }: any) {
           value={formikProps.values.height}
           keyboardType="numeric"
         />
+        {formikProps.errors.height && (
+          <Text style={formStyles.errorText}>{formikProps.errors.height}</Text>
+        )}
       </View>
     </>
   );

@@ -8,13 +8,27 @@ export default function GenderField({ formikProps }: any) {
   const [femaleButton, setFemaleButton] = useState(false);
 
   const maleButtonHandler = (formikProps: any) => {
-    formikProps.setFieldValue("gender", "M");
+    // male button is already active
+    if (maleButton) {
+      formikProps.setFieldValue("gender", "");
+    } else {
+      // male button is not yet active
+      formikProps.setFieldValue("gender", "M");
+    }
+
     setMaleButton(!maleButton);
     setFemaleButton(false);
   };
 
   const femaleButtonHandler = (formikProps: any) => {
-    formikProps.setFieldValue("gender", "F");
+    // female button is already active
+    if (femaleButton) {
+      formikProps.setFieldValue("gender", "");
+    } else {
+      // female button is not yet active
+      formikProps.setFieldValue("gender", "F");
+    }
+
     setFemaleButton(!femaleButton);
     setMaleButton(false);
   };
@@ -47,6 +61,9 @@ export default function GenderField({ formikProps }: any) {
             </Text>
           </TouchableOpacity>
         </View>
+        {formikProps.errors.gender && (
+          <Text style={formStyles.errorText}>{formikProps.errors.gender}</Text>
+        )}
       </View>
     </>
   );
