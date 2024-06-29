@@ -1,6 +1,5 @@
 import {
   Modal,
-  ScrollView,
   StyleProp,
   StyleSheet,
   Text,

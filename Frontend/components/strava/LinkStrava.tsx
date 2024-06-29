@@ -1,15 +1,9 @@
-import {
-  Alert,
-  Text,
-  View,
-  StyleSheet,
-  TouchableWithoutFeedback,
-} from "react-native";
-import { globalStyles } from "../../styles/global";
+import { Alert, StyleSheet } from "react-native";
 // import { REACT_APP_DOMAIN } from "@env";
 import { getItem } from "../general/asyncStorage";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
+import SubmitButton from "../general/submit";
 
 export default function LinkStrava() {
   const handleSubmit = async () => {
@@ -80,28 +74,18 @@ export default function LinkStrava() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handleSubmit}>
-      <View style={styles.syncButton}>
-        <Text
-          style={{
-            ...globalStyles.header,
-            letterSpacing: 0,
-            textAlign: "center",
-          }}
-        >
-          Sync with Strava!
-        </Text>
-      </View>
-    </TouchableWithoutFeedback>
+    <SubmitButton
+      onPressHandler={handleSubmit}
+      text="Sync With Strava"
+      style={styles.extra}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  syncButton: {
-    width: "100%",
+  extra: {
+    alignSelf: "center",
+    width: "95%",
     marginTop: "-5%",
-    padding: 5,
-    borderRadius: 15,
-    backgroundColor: "#FFC4C4",
   },
 });
