@@ -7,10 +7,10 @@ GENDER_CHOICES = [
 ]
 
 class CustomUser(AbstractUser):
-    height = models.FloatField()
-    weight = models.FloatField()
-    birthday = models.DateField()
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    height = models.FloatField(null=True)
+    weight = models.FloatField(null=True)
+    birthday = models.DateField(null=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='M')
     
     def __str__(self):
         return self.username
