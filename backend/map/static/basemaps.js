@@ -1,6 +1,6 @@
 // Basemaps
 
-export const ORIGINAL = L.tileLayer(
+const ORIGINAL = L.tileLayer(
   "https://www.onemap.gov.sg/maps/tiles/Original/{z}/{x}/{y}.png",
   {
     detectRetina: true,
@@ -12,7 +12,7 @@ export const ORIGINAL = L.tileLayer(
   }
 );
 
-export const DEFAULT = L.tileLayer(
+const DEFAULT = L.tileLayer(
   "https://www.onemap.gov.sg/maps/tiles/Default/{z}/{x}/{y}.png",
   {
     detectRetina: true,
@@ -24,7 +24,7 @@ export const DEFAULT = L.tileLayer(
   }
 );
 
-export const NIGHT = L.tileLayer(
+const NIGHT = L.tileLayer(
   "https://www.onemap.gov.sg/maps/tiles/Night/{z}/{x}/{y}.png",
   {
     detectRetina: true,
@@ -36,7 +36,7 @@ export const NIGHT = L.tileLayer(
   }
 );
 
-export const GREY = L.tileLayer(
+const GREY = L.tileLayer(
   "https://www.onemap.gov.sg/maps/tiles/Grey/{z}/{x}/{y}.png",
   {
     detectRetina: true,

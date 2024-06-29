@@ -1,11 +1,11 @@
 // Styles
-export const normalPolyline = {
+const normalPolyline = {
   color: "rgb(252, 76, 2)",
   weight: 4,
   opacity: 0.5,
 };
 
-export const normalPoint = {
+const normalPoint = {
   color: "rgb(252, 76, 2)",
   radius: 6,
   fill: true,
@@ -13,13 +13,13 @@ export const normalPoint = {
   opacity: 0.5,
 };
 
-export const highlightPolyline = {
+const highlightPolyline = {
   color: "red",
   weight: 4,
   opacity: 1,
 };
 
-export const highlightPoint = {
+const highlightPoint = {
   color: "red",
   radius: 6,
   fill: true,
@@ -28,13 +28,13 @@ export const highlightPoint = {
   opacity: 1,
 };
 
-export const selectPolyline = {
+const selectPolyline = {
   color: "blue",
   weight: 4,
   opacity: 0.5,
 };
 
-export const selectPoint = {
+const selectPoint = {
   color: "blue",
   radius: 6,
   fill: true,
@@ -42,11 +42,34 @@ export const selectPoint = {
   opacity: 0.5,
 };
 
-export const selectSegmentPoint = {
-  color: "red",
+const selectSegmentPoint = {
+  color: "rgb(252, 76, 2)",
   radius: 6,
   fill: true,
   fillColor: "blue",
   fillOpacity: 1,
   opacity: 0.5,
 };
+
+const startingPoint = {
+  color: "black",
+  radius: 6,
+  fill: true,
+  fillColor: "green",
+  fillOpacity: 1,
+  opacity: 1,
+};
+
+const endingPoint = {
+  color: "black",
+  radius: 6,
+  fill: true,
+  fillColor: "red",
+  fillOpacity: 1,
+  opacity: 1,
+};
+
+const chosenRoute = {
+    color: "black",
+    opacity: 1,
+  };

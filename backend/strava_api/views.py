@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view, permission_classes
 from django.utils import timezone
 from datetime import timedelta
 from backend.settings import CLIENT_ID, CLIENT_SECRET, SCOPE
+from .utils import refresh_token
 
 @api_view(['GET'])
 def strava_get_access(request):
@@ -28,31 +29,9 @@ def strava_get_access(request):
     # Check which if user have authorise Strava before
     if not StravaAccessToken.objects.filter(user=user).exists() or not StravaRefreshToken.objects.filter(user=user).exists():
         return Response({'strava_auth_url': strava_auth_url}, status=status.HTTP_200_OK)
-    strava_access_token = StravaAccessToken.objects.get(user=user)
-    strava_refresh_token = StravaRefreshToken.objects.get(user=user)
     
-    if strava_access_token.expires_at < timezone.now():
-        # Refresh the token
-        token_url = 'https://www.strava.com/oauth/token'
-        payload = {
-            'client_id':CLIENT_ID,
-            'client_secret': CLIENT_SECRET,
-            'grant_type': 'refresh_token',
-            'refresh_token': strava_refresh_token.refresh_token,
-        }
-        token_response = requests.post(token_url, data=payload)
-        
-        # Obtain data
-        token_json = token_response.json()
-
-        # Save user data in tables
-        strava_access_token = StravaAccessToken.objects.get(user=user)
-        strava_access_token.access_token = token_json.get('access_token')
-        strava_access_token.expires_at = timezone.now() + timedelta(seconds=token_json.get('expires_in'))
-        strava_access_token.save()
-        strava_refresh_token = StravaRefreshToken.objects.get(user=user)
-        strava_refresh_token.refresh_token = token_json.get('refresh_token')
-        strava_refresh_token.save()
+    # Happy path refresh token
+    refresh_token(user)
     return Response({'status': 'success'}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -90,38 +69,5 @@ def strava_get_token(request):
 
         return Response({'status': 'success'}, status=status.HTTP_200_OK)
     return Response({'error': 'Invalid Query'}, status=400)
+   
 
-@api_view(['GET'])
-def strava_refresh_token(request):
-    user = request.user
-
-    # Check bad info
-    if not StravaAccessToken.objects.filter(user=user).exists() or not StravaRefreshToken.objects.filter(user=user).exists():
-        return Response({'error': 'Exisitng strava token not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    strava_access_token = StravaAccessToken.objects.get(user=user)
-    strava_refresh_token = StravaRefreshToken.objects.get(user=user)
-    
-    if strava_access_token.expires_at < timezone.now():
-        # Refresh the token
-        token_url = 'https://www.strava.com/oauth/token'
-        payload = {
-            'client_id':CLIENT_ID,
-            'client_secret': CLIENT_SECRET,
-            'grant_type': 'refresh_token',
-            'refresh_token': strava_refresh_token.refresh_token,
-        }
-        token_response = requests.post(token_url, data=payload)
-        
-        # Obtain data
-        token_json = token_response.json()
-
-        # Save user data in tables
-        strava_access_token = StravaAccessToken.objects.get(user=user)
-        strava_access_token.access_token = token_json.get('access_token')
-        strava_access_token.expires_at = timezone.now() + timedelta(seconds=token_json.get('expires_in'))
-        strava_access_token.save()
-        strava_refresh_token = StravaRefreshToken.objects.get(user=user)
-        strava_refresh_token.refresh_token = token_json.get('refresh_token')
-        strava_refresh_token.save()
-    return Response({'status': 'success'}, status=status.HTTP_200_OK)

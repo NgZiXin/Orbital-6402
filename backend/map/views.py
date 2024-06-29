@@ -6,10 +6,19 @@ from rest_framework.response import Response
 from rest_framework import status
 from .utils import get_access_token
 from .serializers import GetPathSerializer
+from strava_api.utils import get_token
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+
+@api_view(['GET'])
 def index(request):
+    user = request.user
+    strava_token =  get_token(user)
     context = {
-         # give Token TODO
+         "strava_token": strava_token,
+         "REACT_APP_DOMAIN": os.environ.get("REACT_APP_DOMAIN"),
     }
     return render(request, "index.html", context)
 
@@ -20,8 +29,6 @@ def get_path(request):
      if serializer.is_valid():
           start = request.GET.get('start') 
           end = request.GET.get('end')
-          print(start)
-          print(end)
 
           # Query path using OneMap Api
           url = f"https://www.onemap.gov.sg/api/public/routingsvc/route?start={start}&end={end}&routeType=walk"

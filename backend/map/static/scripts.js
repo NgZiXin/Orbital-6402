@@ -1,29 +1,20 @@
-import { ORIGINAL, DEFAULT, NIGHT, GREY } from "./basemaps.js";
-import {
-  normalPoint,
-  normalPolyline,
-  highlightPoint,
-  highlightPolyline,
-  selectSegmentPoint,
-  selectPoint,
-  selectPolyline,
-} from "./styles.js";
-
 // Global variables
-const token = "a9026ea1829ce3f7edaab9c99936febcbba0f02d"; // Temp
 const segmentsId = []; // Record all segments that have been added to map
 const next = new Map(); // Store marker's next
 const prev = new Map(); // Store marker's prev
+const routeArr = []; // store added polyline
 let prevMarker = undefined; // Previous point user has marked
 let totalDistance = 0; // Track distance of route
+let orderCount = 0; // Track order count
 
 // Creating map overlays
 const stravaSegments = L.layerGroup([]);
 const route = L.layerGroup([]);
+const final = L.layerGroup([]);
 
 // Configure map
 const mapOptions = {
-  center: [1.28416,103.8533816],
+  center: [1.28416, 103.8533816],
   zoom: 17,
   layers: [ORIGINAL, route, stravaSegments],
 };
@@ -41,18 +32,161 @@ const overlayMaps = {
   "Strava Segments": stravaSegments,
   "Plotted Route": route,
 };
-const layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
+const layerControl = L.control
+  .layers(baseMaps, overlayMaps, { position: "topleft" })
+  .addTo(map);
+
+// Map control to display map info
+L.Control.textbox = L.Control.extend({
+  onAdd: function (map) {
+    this._container = L.DomUtil.create("div");
+    this._container.id = "info_text";
+    this._container.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+    this._container.style.padding = "10px";
+    this._container.style.borderRadius = "5px";
+    this.dist = totalDistance;
+    this._updateContent();
+
+    // Prevent event propagation
+    L.DomEvent.disableClickPropagation(this._container);
+
+    return this._container;
+  },
+
+  onRemove: function (map) {
+    // Do nothing here
+  },
+
+  // Method to update the content
+  updateContent: function (dist) {
+    this.dist = dist; // Store the updated distance
+
+    // Update the HTML content based on the updated distance
+    this._updateContent();
+  },
+
+  // Internal method to update the HTML content
+  _updateContent: function () {
+    if (!this._container) return;
+
+    this._container.innerHTML = `<div>${
+      this.dist < 10000
+        ? `<strong>Total Distance: ${this.dist.toFixed(0)} m</strong>`
+        : `<strong>Total Distance: ${(this.dist / 1000).toFixed(2)} km</strong>`
+    }</div>
+    <br />
+    <button id="generateRouteButton" style="background-color: green; color: white;">Generate Route</button>
+    <button id="resetButton" style="background-color: red; color: white;">Reset</button>`;
+
+    // Add event listener for the button
+    const generatebutton = this._container.querySelector(
+      "#generateRouteButton"
+    );
+    if (generatebutton) {
+      generatebutton.addEventListener(
+        "click",
+        this._generateRouteClick.bind(this)
+      );
+    }
+    // Add event listener for the "Reset" button
+    const resetButton = this._container.querySelector("#resetButton");
+    if (resetButton) {
+      resetButton.addEventListener("click", function () {
+        // Add back all functionalities
+        map.on("click", clickMap);
+        map.on("zoomend", segmentQuery);
+        map.on("dragend", segmentQuery);
+
+        // Reset global variables
+        segmentsId.length = 0;
+        next.clear();
+        prev.clear();
+        routeArr.length = 0;
+        prevMarker = undefined;
+        totalDistance = 0;
+        orderCount = 0;
+
+        // Clear final route
+        map.removeLayer(final);
+
+        // Reset the overlays
+        Object.values(overlayMaps).forEach((overlay) => {
+          overlay.eachLayer((layer) => {
+            overlay.removeLayer(layer);
+          });
+        });
+
+        // Clear layerControl
+        for (const [key, value] of Object.entries(overlayMaps)) {
+          layerControl.removeLayer(value);
+          map.removeLayer(value);
+        }
+
+        // Add back overlays to layerControl & map
+        for (const [key, value] of Object.entries(overlayMaps)) {
+          layerControl.addOverlay(value, key);
+          value.addTo(map);
+        }
+      });
+    }
+  },
+
+  // Finalise route button
+  _generateRouteClick: function () {
+    // Remove all of map functionalities
+    map.off("click", clickMap);
+    map.off("zoomend", segmentQuery);
+    map.off("dragend", segmentQuery);
+
+    // Clear layerControl
+    for (const [key, value] of Object.entries(overlayMaps)) {
+      layerControl.removeLayer(value);
+      map.removeLayer(value);
+    }
+
+    // Compress all polyline in route overlay
+    let coordinates = [];
+    routeArr.sort((p1, p2) => p1.options.order - p2.options.order);
+    routeArr.forEach((polyline) =>
+      polyline.getLatLngs().forEach((latlng) => coordinates.push(latlng))
+    );
+
+    if (coordinates.length > 0) {
+      const polyline = L.polyline(coordinates, { distanceMarkers: true });
+
+      // Get Start & End Point
+      const start = L.circleMarker(coordinates[0]);
+      const end = L.circleMarker(coordinates[coordinates.length - 1]);
+
+      // Set Styles
+      polyline.setStyle(chosenRoute);
+      start.setStyle(startingPoint);
+      end.setStyle(endingPoint);
+
+      // Add to Map
+      final.eachLayer((layer) => final.removeLayer(layer)); // Clear layers in final
+      final.addLayer(polyline);
+      final.addLayer(start);
+      final.addLayer(end);
+      final.addTo(map);
+    }
+  },
+});
+L.control.textbox = function (opts) {
+  return new L.Control.textbox(opts);
+};
+const textboxControl = L.control.textbox({ position: "topright" }).addTo(map);
 
 // Marker functionality
 map.on("click", clickMap);
 
 // Zoom & Drag functionalities
 map.on("zoomend", segmentQuery);
-map.on("dragend", segmentQuery); // TODO Drag distance by too short dont call
+map.on("dragend", segmentQuery);
 
 // Map on load
 map.on("load", segmentQuery);
-map.fire("load")
+map.fire("load");
 
 // Event functions
 
@@ -87,7 +221,8 @@ function addMarker(lat, lng) {
   // Route building logic
   if (prevMarker != undefined) {
     const fitStart = prev.size == 0;
-    buildRoute(prevMarker, marker, fitStart, true);
+    buildRoute(prevMarker, marker, fitStart, true, orderCount);
+    orderCount += 1;
   }
 
   // Add "click" event to marker
@@ -101,21 +236,19 @@ function addMarker(lat, lng) {
 
   // Update prevMarker
   prevMarker = marker;
-
-  console.log(prev);
 }
 
-function buildRoute(start, end, fitStart, fitEnd) {
+function buildRoute(start, end, fitStart, fitEnd, order) {
   // Update hashMaps
   prev.set(end, start);
   next.set(start, end);
 
-  // Query path geometry & distance
+  // Query path geometry
   const startCoords = `${start.getLatLng().lat}%2C${start.getLatLng().lng}`;
   const endCoords = `${end.getLatLng().lat}%2C${end.getLatLng().lng}`;
 
   fetch(
-    `http://192.168.50.37:8000/map/get_path?start=${startCoords}&end=${endCoords}`,
+    `http://${REACT_APP_DOMAIN}:8000/map/get_path?start=${startCoords}&end=${endCoords}`,
     {
       method: "GET",
     }
@@ -145,10 +278,11 @@ function buildRoute(start, end, fitStart, fitEnd) {
       }
 
       // Get polyline
-      const polyline = L.polyline(coordinates, {
-        distance: data["total_distance"],
-      });
+      const polyline = L.polyline(coordinates, { order: order });
+
+      // Add polyline to route
       route.addLayer(polyline);
+      routeArr.push(polyline);
 
       // Style polyline
       polyline.setStyle(selectPolyline);
@@ -156,6 +290,10 @@ function buildRoute(start, end, fitStart, fitEnd) {
       // Associated markers with polyline
       start.options.connectedLines.push(polyline);
       end.options.connectedLines.push(polyline);
+
+      // Update total distance
+      totalDistance += polyline.getDistance();
+      textboxControl.updateContent(totalDistance);
     });
 }
 
@@ -190,11 +328,15 @@ function clickWaypoint(e, marker) {
       const prevWaypoint = prev.get(marker);
       const nextWaypoint = next.get(marker);
 
-      console.log(prevWaypoint);
-      console.log(nextWaypoint);
       // Join previous and next waypoints together
       if ((prevWaypoint != undefined) & (nextWaypoint != undefined)) {
-        buildRoute(prevWaypoint, nextWaypoint, false, false);
+        buildRoute(
+          prevWaypoint,
+          nextWaypoint,
+          false,
+          false,
+          marker.options.connectedLines[0].options.order // Maintain order
+        );
       }
 
       // Update hashMap
@@ -213,9 +355,13 @@ function clickWaypoint(e, marker) {
       }
 
       // Delete marker and polylines from map
-      map.removeLayer(marker);
+      route.removeLayer(marker);
       marker.options.connectedLines.forEach((line) => {
-        line.remove();
+        if (route.hasLayer(line)) {
+          route.removeLayer(line);
+          removeItemOnce(routeArr, line);
+          totalDistance -= line.getDistance();
+        }
       });
     });
 }
@@ -233,7 +379,7 @@ function segmentQuery(e) {
     {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${stravaToken}`,
       },
     }
   )
@@ -256,9 +402,7 @@ function segmentQuery(e) {
           const coordinates = L.Polyline.fromEncoded(
             dataObj["points"]
           ).getLatLngs();
-          const polyline = L.polyline(coordinates, {
-            distance: dataObj["distance"],
-          });
+          const polyline = L.polyline(coordinates, { order: NaN });
           stravaSegments.addLayer(polyline);
 
           // Get Start & End Point
@@ -302,7 +446,7 @@ function clickSegment(e, start, end, polyline, segmentName) {
     .setContent(
       `<div>
         <p>Segment Name: ${segmentName}</p>
-        <p>Distance: ${polyline.options.distance} metres</p>
+        <p>Distance: ${polyline.getDistance()} metres</p>
         <button id="polylineButton">Add</button>
       </div>`
     )
@@ -324,7 +468,8 @@ function clickSegment(e, start, end, polyline, segmentName) {
       // Build route to start point
       if (prevMarker != undefined) {
         const fitStart = prev.size == 0;
-        buildRoute(prevMarker, start, fitStart, false);
+        buildRoute(prevMarker, start, fitStart, false, orderCount);
+        orderCount += 1;
       }
 
       // Update hashMap
@@ -334,8 +479,10 @@ function clickSegment(e, start, end, polyline, segmentName) {
       // Update prevMarker
       prevMarker = end;
 
-      // Off polygon "click" event
+      // Edit polyline
       polyline.off("click");
+      polyline.options.order = orderCount;
+      orderCount += 1;
 
       // Layer management
       stravaSegments.removeLayer(start);
@@ -356,6 +503,10 @@ function clickSegment(e, start, end, polyline, segmentName) {
       start.setStyle(selectSegmentPoint);
       end.setStyle(selectSegmentPoint);
       polyline.setStyle(selectPolyline);
+
+      // Update totalDistance and routeArr
+      routeArr.push(polyline);
+      totalDistance += polyline.getDistance();
     });
 }
 
@@ -373,7 +524,7 @@ function clickSegmentWaypoint(e, start, end, polyline, segmentName) {
     .setContent(
       `<div>
         <p>Segment Name: ${segmentName}</p>
-        <p>Distance: ${polyline.options.distance} metres</p>
+        <p>Distance: ${polyline.getDistance()} metres</p>
         <code>Remove this segment?</code>
         <button id="removeButton">Remove</button>
       </div>`
@@ -399,7 +550,13 @@ function clickSegmentWaypoint(e, start, end, polyline, segmentName) {
 
       // Join previous and next waypoints together
       if ((prevWaypoint != undefined) & (nextWaypoint != undefined)) {
-        buildRoute(prevWaypoint, nextWaypoint, false, false);
+        buildRoute(
+          prevWaypoint,
+          nextWaypoint,
+          false,
+          false,
+          start.options.connectedLines[0].options.order
+        );
       }
 
       // Update hashMap
@@ -422,11 +579,19 @@ function clickSegmentWaypoint(e, start, end, polyline, segmentName) {
       // Delete marker and polylines from map
       map.removeLayer(start);
       start.options.connectedLines.forEach((line) => {
-        line.remove();
+        if (route.hasLayer(line)) {
+          route.removeLayer(line);
+          removeItemOnce(routeArr, line);
+          totalDistance -= line.getDistance();
+        }
       });
       map.removeLayer(end);
       end.options.connectedLines.forEach((line) => {
-        line.remove();
+        if (route.hasLayer(line)) {
+          route.removeLayer(line);
+          removeItemOnce(routeArr, line);
+          totalDistance -= line.getDistance();
+        }
       });
     });
 }
