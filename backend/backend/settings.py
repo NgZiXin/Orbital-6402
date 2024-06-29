@@ -37,7 +37,6 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     f'{os.environ.get("REACT_APP_DOMAIN")}',
     '192.168.50.37', # Temp solution
-    '192.168.18.5',
     "*",
 ]
 
