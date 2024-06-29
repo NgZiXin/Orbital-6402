@@ -15,6 +15,7 @@ https://dev.to/giftedstan/heroku-how-to-deploy-a-django-app-with-postgres-in-5-m
 
 from pathlib import Path
 import os
+import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -33,10 +34,6 @@ SECRET_KEY = 'django-insecure-_k(659qxkqlal0+w%8$9n3q*=t6^yr8ea=7^g&622lvh^n1src
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    f'{os.environ.get("HOST")}',
-    '127.0.0.1',
-    f'{os.environ.get("REACT_APP_DOMAIN")}',
-    '192.168.50.37', # Temp solution
     "*",
 ]
 
@@ -49,6 +46,7 @@ INSTALLED_APPS = [
     'strava_api',
     'rest_framework.authtoken',
     'map',
+    'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -60,6 +58,7 @@ AUTH_USER_MODEL = 'accounts.CustomUser'  # Set the custom user model
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -92,6 +91,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# Development (Comment out if in deployment)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -102,6 +102,10 @@ DATABASES = {
         'PORT': f'{os.environ.get("DATABASE_PORT")}',
     }
 }
+
+# Deployment (Comment out if in development)
+# db_from_env = dj_database_url.config(conn_max_age=600)
+# DATABASES['default'].update(db_from_env)
 
 
 # Password validation
@@ -135,11 +139,15 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript, Images) - Run python manage.py collectstatic for deployment
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -160,4 +168,3 @@ REST_FRAMEWORK = {
 CLIENT_ID = 127101
 CLIENT_SECRET = "f932fe12177be89ecb888b112fe991ac9371fbc7"
 SCOPE = "read,read_all,profile:read_all,profile:write,activity:read_all,activity:write"
-REDIRECT_URI = "http://127.0.0.1:8000/strava_api/get_token" # Change to Front-end App

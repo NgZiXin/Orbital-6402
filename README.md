@@ -45,7 +45,7 @@ To learn more about Expo, do look at the following resources:
    ```
    # API Endpoint
    # Local device's IP address
-   REACT_APP_DOMAIN='your device ip address'
+   EXPO_PUBLIC_DOMAIN='your device ip address'
 
    # DB Config
    DATABASE_NAME='postgres database name'
@@ -58,7 +58,7 @@ To learn more about Expo, do look at the following resources:
    ```
    # API Endpoint
    # Local device's IP address
-   REACT_APP_DOMAIN='100.100.10.10'
+   EXPO_PUBLIC_DOMAIN='100.100.10.10'
 
    # DB Config
    DATABASE_NAME='orbital'

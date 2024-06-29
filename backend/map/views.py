@@ -18,7 +18,7 @@ def index(request):
     strava_token =  get_token(user)
     context = {
          "strava_token": strava_token,
-         "REACT_APP_DOMAIN": os.environ.get("REACT_APP_DOMAIN"),
+         "EXPO_PUBLIC_DOMAIN": os.environ.get("EXPO_PUBLIC_DOMAIN"),
     }
     return render(request, "index.html", context)
 

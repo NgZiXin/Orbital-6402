@@ -248,7 +248,7 @@ function buildRoute(start, end, fitStart, fitEnd, order) {
   const endCoords = `${end.getLatLng().lat}%2C${end.getLatLng().lng}`;
 
   fetch(
-    `http://${REACT_APP_DOMAIN}:8000/map/get_path?start=${startCoords}&end=${endCoords}`,
+    `${EXPO_PUBLIC_DOMAIN}/map/get_path?start=${startCoords}&end=${endCoords}`,
     {
       method: "GET",
     }

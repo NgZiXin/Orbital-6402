@@ -1,16 +1,12 @@
 from rest_framework import serializers
 from .models import CustomUser
-from strava_api.serializers import StravaAccessTokenSerializer, StravaRefreshTokenSerializer
 from django.contrib.auth.hashers import make_password
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    # Display additional info
-    strava_access_token = StravaAccessTokenSerializer(read_only=True)
-    strava_refresh_token = StravaRefreshTokenSerializer(read_only=True)
-
+    
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'password', 'height', 'weight', 'birthday', 'gender', 'strava_access_token', 'strava_refresh_token']
+        fields = ['id', 'username', 'password', 'height', 'weight', 'birthday', 'gender']
         extra_kwargs = {
             'password': {'write_only': True},
         }
