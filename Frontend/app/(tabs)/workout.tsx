@@ -37,16 +37,7 @@ export default function Workout() {
         </TouchableOpacity>
       </View>
 
-      <View
-        style={{
-          height: "50%",
-          borderWidth: 2,
-          borderColor: "#FFC4C4",
-          marginTop: -19,
-        }}
-      >
-        <Table />
-      </View>
+      <Table />
 
       {/* <View
         style={{

@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   },
 
   stravaWrapper: {
-    marginTop: "38%",
+    marginTop: 145,
     width: "100%",
     flexDirection: "column",
     alignItems: "center",

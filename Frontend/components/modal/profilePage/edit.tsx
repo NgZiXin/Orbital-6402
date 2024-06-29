@@ -29,7 +29,7 @@ export default function EditModal({ triggerUpdate }: any) {
       {editModal == true && (
         <Modal animationType="fade" visible={editModal} transparent={true}>
           <View style={modalStyles.modalWrapper}>
-            <View style={{ ...modalStyles.modalContent, height: "75%" }}>
+            <View style={{ ...modalStyles.modalContent, height: 620 }}>
               <KeyboardAvoidingView
                 style={globalStyles.container}
                 keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}

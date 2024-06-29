@@ -8,7 +8,6 @@ import React, {
 
 import {
   FlatList,
-  SectionList,
   StyleSheet,
   View,
   Text,
@@ -135,27 +134,36 @@ export default function Table() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <FlatList
-        data={tableData}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={renderHeader(columns)}
-        renderItem={renderRows}
-      />
-
-      {validationModal && (
-        <ValidationModal
-          setValidationModal={setValidationModal}
-          topText="Delete Confirmation"
-          bottomText="Are you sure you want to delete this exercise"
-          handleDelete={handleDelete}
+    <View style={styles.tableWrapper}>
+      <View style={{ flex: 1 }}>
+        <FlatList
+          data={tableData}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={renderHeader(columns)}
+          renderItem={renderRows}
         />
-      )}
+
+        {validationModal && (
+          <ValidationModal
+            setValidationModal={setValidationModal}
+            topText="Delete Confirmation"
+            bottomText="Are you sure you want to delete this exercise"
+            handleDelete={handleDelete}
+          />
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  tableWrapper: {
+    height: 310,
+    borderWidth: 2,
+    borderColor: "#FFC4C4",
+    marginTop: -19,
+  },
+
   headerLabel: {
     ...globalStyles.label,
     fontFamily: "inter-semibold",

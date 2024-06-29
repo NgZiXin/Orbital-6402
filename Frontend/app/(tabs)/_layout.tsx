@@ -60,6 +60,13 @@ export default function TabLayout() {
         />
 
         <Tabs.Screen
+          name="runningRoute"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
           name="home"
           options={{
             tabBarIcon: ({ focused }) => (

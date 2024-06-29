@@ -68,8 +68,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: "#FFC4C4",
     alignSelf: "flex-end",
-    position: "relative",
-    top: 12,
+    marginTop: 5,
+    marginBottom: 7,
   },
 
   buttonText: {

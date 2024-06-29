@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
 
   underline: {
     position: "relative",
-    marginTop: -6,
+    marginTop: -7,
     height: 2,
     backgroundColor: "red",
     width: "50%",

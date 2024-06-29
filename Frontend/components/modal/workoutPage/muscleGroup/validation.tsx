@@ -79,11 +79,7 @@ export default function ValidationModal({
               {/* For the workout form */}
               {handleDelete === undefined && (
                 <TouchableOpacity
-                  style={
-                    bottomText.startsWith("M")
-                      ? styles.shortTextOkButton
-                      : styles.longTextOkButton
-                  }
+                  style={styles.okButton}
                   onPress={() => setValidationModal(false)}
                 >
                   <Text style={styles.buttonText}>Ok</Text>
@@ -104,22 +100,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFC4C4",
   },
 
-  shortTextOkButton: {
+  okButton: {
     width: "40%",
     borderRadius: 15,
     backgroundColor: "#FFC4C4",
     alignSelf: "flex-end",
-    position: "relative",
-    top: 12,
-  },
-
-  longTextOkButton: {
-    width: "40%",
-    borderRadius: 15,
-    backgroundColor: "#FFC4C4",
-    alignSelf: "flex-end",
-    position: "relative",
-    bottom: 10,
+    marginTop: 5,
+    marginBottom: 7,
   },
 
   buttonText: {

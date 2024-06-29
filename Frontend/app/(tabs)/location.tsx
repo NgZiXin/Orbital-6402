@@ -15,6 +15,8 @@ import {
 import CustomTextInput from "@/components/general/customTextInput";
 import { globalStyles } from "../../styles/global";
 import PageHeader from "@/components/general/pageHeader";
+import SubmitButton from "@/components/general/submit";
+import { useNavigation } from "expo-router";
 
 interface GymInfo {
   name: string;
@@ -25,6 +27,8 @@ interface GymInfo {
 }
 
 export default function Location() {
+  const navigation: any = useNavigation();
+
   const [search, setSearch] = useState("");
   const [gymData, setGymData] = useState<GymInfo[]>([]);
   const [message, setMessage] = useState<string>("Result will be shown here");
@@ -133,8 +137,11 @@ export default function Location() {
   };
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={{ ...globalStyles.container, padding: 12 }}>
+    <ScrollView
+      style={globalStyles.container}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={{ padding: 12 }}>
         <PageHeader topText="Finder" bottomText="Find Nearest Gym & Park" />
 
         <View style={[styles.searchWrapper, styles.extra]}>
@@ -227,17 +234,15 @@ export default function Location() {
           </View>
         </View>
 
-        <PageHeader topText="" bottomText="Explore New Running Routes" />
-
-        <View style={styles.runningRouteResult}>
-          <View style={globalStyles.cardV2}>
-            <View style={{ ...styles.cardInner, height: 170 }}>
-              <Text style={globalStyles.para}>
-                Result will be shown <Text style={{ color: "red" }}>here</Text>
-              </Text>
-            </View>
-          </View>
-        </View>
+        <PageHeader topText="" bottomText="Explore Running Routes" />
+        <Text style={styles.runningRoute}>
+          Click on the button below to explore various cool running routes!
+        </Text>
+        <SubmitButton
+          text="View Routes"
+          onPressHandler={() => navigation.navigate("runningRoute")}
+          style={{ marginTop: "-1%" }}
+        />
       </View>
     </ScrollView>
   );
@@ -289,9 +294,10 @@ const styles = StyleSheet.create({
     padding: 7,
   },
 
-  runningRouteResult: {
+  runningRoute: {
+    ...globalStyles.para,
     position: "relative",
-    bottom: 15,
+    bottom: 20,
   },
 
   imageWrapper: {

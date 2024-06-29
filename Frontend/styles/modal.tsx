@@ -13,7 +13,7 @@ export const modalStyles = StyleSheet.create({
     backgroundColor: "white",
     padding: 15,
     width: "85%",
-    height: 200,
+    height: "auto",
     borderRadius: 10,
   },
 

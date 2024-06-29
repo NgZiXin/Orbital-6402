@@ -17,6 +17,7 @@ export default function HomeLayout() {
       },
 
       headerStyle: headerStyle,
+      // workaround for tab bar not hiding
       tabBarStyle: { position: "absolute", left: -100, top: -100 },
     };
   };

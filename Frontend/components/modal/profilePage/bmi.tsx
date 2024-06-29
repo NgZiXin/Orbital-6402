@@ -41,7 +41,10 @@ export default function BmiModal() {
                 <Text style={globalStyles.para}>
                   BMI is an estimate of body fat based on height and weight. It
                   can help determine whether a person is at an unhealthy or
-                  healthy weight. However, it is not without its limitations.
+                  healthy weight.
+                </Text>
+                <Text style={globalStyles.para}>
+                  However, it is not without its limitations.
                 </Text>
                 <TouchableOpacity
                   onPress={() =>
