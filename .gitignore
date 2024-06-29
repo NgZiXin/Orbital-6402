@@ -10,13 +10,9 @@ npm-debug.*
 *.orig.*
 web-build/
 venv/
-.env
+.env # Cannot ignore for deployment
 .vscode
 *.pyc
-
-# Deployment files
-Procfile
-runtime.txt
 
 # macOS
 .DS_Store

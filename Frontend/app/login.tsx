@@ -32,7 +32,7 @@ export default function Login() {
   ) => {
     try {
       const ip = process.env.EXPO_PUBLIC_DOMAIN;
-      const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}/accounts/login/`, {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}accounts/login/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -32,7 +32,7 @@ export default function Profile() {
     // hence, we await to wait for the Promise to complete and grab its value
     const token: string | null = await getItem("token");
     const ip = process.env.EXPO_PUBLIC_DOMAIN;
-    const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}/accounts/data`, {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}accounts/data`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

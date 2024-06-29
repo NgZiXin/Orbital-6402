@@ -22,7 +22,7 @@ export default function runningRoute() {
       javaScriptEnabled={true}
       startInLoadingState={true}
       source={{
-        uri: `${process.env.EXPO_PUBLIC_DOMAIN}/map`,
+        uri: `${process.env.EXPO_PUBLIC_DOMAIN}map`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Token ${token}`,

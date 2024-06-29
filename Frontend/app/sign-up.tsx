@@ -44,7 +44,7 @@ export default function SignUp() {
       };
 
       const ip = process.env.EXPO_PUBLIC_DOMAIN;
-      const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}/accounts/`, {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}accounts/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
