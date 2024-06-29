@@ -10,9 +10,11 @@ npm-debug.*
 *.orig.*
 web-build/
 venv/
-.env # Cannot ignore for deployment
 .vscode
 *.pyc
+
+# Comment out if deploying
+.env
 
 # macOS
 .DS_Store
