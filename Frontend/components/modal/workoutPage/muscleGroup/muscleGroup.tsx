@@ -18,6 +18,7 @@ import MultiSelectFooter from "./helper/footer";
 import GuideModal from "./guide";
 import SubmitButton from "@/components/general/submit";
 import ValidationModal from "./validation";
+import CustomChips from "./helper/customChips";
 
 export default function MuscleGroupModal({
   setMuscleGroupModal,
@@ -61,25 +62,6 @@ export default function MuscleGroupModal({
     });
 
     return temp.length;
-  }
-
-  function renderChips(props: any) {
-    return (
-      <View
-        style={{
-          padding: 12,
-          borderColor: "#bbb",
-          borderWidth: 1,
-          borderRadius: 8,
-          height: workoutModalHeight * 0.41,
-        }}
-      >
-        <Text style={styles.boxText}>
-          Custom render chip function, chips will be displayed within this box!
-          TODO
-        </Text>
-      </View>
-    );
   }
 
   function handleSubmit() {
@@ -152,7 +134,12 @@ export default function MuscleGroupModal({
                   selectedItems={selectedItems}
                   onSelectedItemsChange={selectValidation}
                   renderSelectText={renderSelectText}
-                  customChipsRenderer={renderChips}
+                  customChipsRenderer={(props: any) => (
+                    <CustomChips
+                      {...props}
+                      workoutModalHeight={workoutModalHeight}
+                    />
+                  )}
                   parentChipsRemoveChildren={true}
                   showsVerticalScrollIndicator={false}
                   colors={styles.colors}

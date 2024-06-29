@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import type { TextProps, GestureResponderEvent } from 'react-native';
 
 export namespace ExpoRouter {
-  type StaticRoutes = `/` | `/(tabs)` | `/..\components\form\validationSchema\login` | `/..\components\form\validationSchema\signupAndEdit` | `/_sitemap` | `/calendar` | `/forum` | `/home` | `/location` | `/login` | `/profile` | `/runningRoute` | `/sign-up` | `/stats` | `/workout`;
+  type StaticRoutes = `/` | `/(tabs)` | `/..\components\modal\workoutPage\muscleGroup\helper\customChips` | `/_sitemap` | `/calendar` | `/forum` | `/home` | `/location` | `/login` | `/profile` | `/runningRoute` | `/sign-up` | `/stats` | `/workout`;
   type DynamicRoutes<T extends string> = never;
   type DynamicRouteTemplate = never;
 

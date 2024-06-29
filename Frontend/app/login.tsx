@@ -54,8 +54,10 @@ export default function Login() {
       // Handle successful login (navigate to profile page)
       actions.resetForm();
       navigation.navigate("(tabs)");
-    } catch (error) {
+    } catch (error: any) {
       console.error("There was a problem with the fetch operation:", error);
+      const errorMessage = error.message;
+      console.error(errorMessage);
       Alert.alert(
         "Login Failed",
         "Please check your information and try again."

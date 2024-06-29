@@ -55,9 +55,14 @@ export default function SignUp() {
       });
 
       if (!response.ok) {
-        console.log(body);
-        console.log(response);
-        throw new Error("Network response was not ok");
+        const errorResponse = await response.json();
+        console.error(errorResponse);
+        if (errorResponse.error) {
+          // Handle specific username error
+          Alert.alert("Signup Failed", errorResponse.error);
+        } else {
+          throw new Error("Network response was not ok");
+        }
       }
 
       const data = await response.json();
@@ -67,6 +72,7 @@ export default function SignUp() {
       navigation.navigate("login");
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
+      console.error(error);
       Alert.alert(
         "Signup Failed",
         "Please check your information and try again."
