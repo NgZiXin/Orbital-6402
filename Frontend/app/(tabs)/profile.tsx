@@ -1,250 +1,110 @@
-import {
-  Platform,
-  Linking,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Modal,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-} from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import Card from "../../utility/card";
+import { ScrollView, StyleSheet, Text, View, Image } from "react-native";
 import { globalStyles } from "../../styles/global";
-import { TouchableWithoutFeedback, Keyboard } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
-import EditForm from "../../utility/edit";
-import { Link } from "expo-router";
-import { getItem } from "../../utility/asyncStorage";
-import { REACT_APP_DOMAIN } from "@env";
-import LinkStrava from "../../components/LinkStrava";
+import { useState, useEffect } from "react";
+import { getItem } from "../../components/general/asyncStorage";
+import LinkStrava from "../../components/strava/LinkStrava";
+
+import EditModal from "@/components/modal/profilePage/edit";
+import LogoutModal from "@/components/modal/profilePage/logout";
+import BmiModal from "@/components/modal/profilePage/bmi";
+import SyncModal from "@/components/modal/profilePage/sync";
 
 export default function Profile() {
-  // state variables to track modal state
-  const [editModal, setEditModal] = useState(false);
-  const [logoutModal, setLogoutModal] = useState(false);
-  const [bmiModal, setBMIModal] = useState(false);
-  const [syncModal, setSyncModal] = useState(false);
+  const [userDetails, setUserDetails] = useState<string[]>([]);
+  const [age, setAge] = useState<number>(0);
+  const [bmi, setBMI] = useState<number>(0.0);
+  const [maxHR, setMaxHR] = useState<number>(0);
 
-  // state variable to track user profile details
-  const [userDetails, setUserDetails] = useState<[string, any][]>([]);
+  // boolFlag1: interacts with edit
+  // boolFlag2: interacts with processing
+  const [boolFlag1, setBoolFlag1] = useState<boolean>(true);
+  const [boolFlag2, setBoolFlag2] = useState<boolean>(true);
 
-  const submitHandler = () => {
-    setEditModal(false);
+  // this function is called after closing the edit modal
+  // it triggers getUserDetails()
+  const triggerUpdate = () => {
+    setBoolFlag1((prev) => !prev);
   };
 
   const getUserDetails = async () => {
     // getItem('token') returns a Promise
     // hence, we await to wait for the Promise to complete and grab its value
     const token: string | null = await getItem("token");
-
-    const response = await fetch(
-      `http://${REACT_APP_DOMAIN}:8000/accounts/data`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
-        },
-      }
-    );
+    const ip = process.env.EXPO_PUBLIC_DOMAIN;
+    const response = await fetch(`http://${ip}:8000/accounts/data`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
 
-    const data = await response.json();
-    const arrVersion = Object.entries(data);
-    setUserDetails(arrVersion);
+    const dataObj = await response.json();
+    const valuesArray: string[] = Object.values(dataObj).map(String);
+    setUserDetails(valuesArray);
   };
 
-  // trigger
-  getUserDetails();
+  // getUserDetails() fetches the user data of the current user that's logged in
+  // via the auth token stored under asyncStorage
+  // the fetched user data is then stored under userDetails
+  useEffect(() => {
+    getUserDetails();
+  }, [boolFlag1]);
 
-  // converting birthday from 'YYYY-MM-DD' to 'DD-MM-YYYY' format
-  // technical note: once the userDetails is populated, a re-rendered is triggered
-  // this part comes before the display below
-  // ensuring display is always correct
-  if (userDetails.length > 0) {
-    const initialBirthday: string = userDetails[4][1];
-    const [year, month, day] = initialBirthday.split("-");
-    const updatedBirthday: string = `${day}-${month}-${year}`;
-    userDetails[4][1] = updatedBirthday;
-  }
+  // when userDetail changes, effect function is invoked
+  // it does a bunch of processing
+  // then, it flips a boolean flag, triggering a ('final') re-render
+  // in the mount - edit - submit - close process
+  useEffect(() => {
+    if (userDetails.length > 0) {
+      // Conversion part
+      // Change bday from YYYY-MM-DD to DD-MM-YYYY
+      const initialBirthday = userDetails[4];
+      const [year, month, day] = initialBirthday.split("-");
+      const updatedBirthday = `${day}-${month}-${year}`;
+      userDetails[4] = updatedBirthday;
 
-  function renderEditModal() {
-    return (
-      <Modal animationType="fade" visible={editModal} transparent={true}>
-        <View style={styles.modalWrapper}>
-          <View style={{ ...styles.modalContent, height: "79%" }}>
-            <KeyboardAvoidingView
-              style={globalStyles.container}
-              keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-              behavior={Platform.OS === "ios" ? "padding" : undefined}
-            >
-              <View style={{ width: "100%", height: "100%" }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={globalStyles.header}>Edit Account Details</Text>
-                  <TouchableOpacity onPress={() => setEditModal(false)}>
-                    <Ionicons name="close-circle-outline" size={25}></Ionicons>
-                  </TouchableOpacity>
-                </View>
-                <EditForm submitHandler={submitHandler} />
-              </View>
-            </KeyboardAvoidingView>
-          </View>
-        </View>
-      </Modal>
-    );
-  }
+      // Calculate age part
+      const birthDate = new Date(initialBirthday);
+      const currentDate = new Date();
 
-  function renderLogoutModal() {
-    return (
-      <Modal animationType="fade" visible={logoutModal} transparent={true}>
-        <View style={styles.modalWrapper}>
-          <View style={styles.modalContent}>
-            <View
-              style={{
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <Text style={globalStyles.header}>Confirmation</Text>
-              <Text style={globalStyles.para}>
-                Are you sure you want to log out / change accounts?
-              </Text>
-              <View
-                style={{
-                  width: "100%",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-around",
-                }}
-              >
-                <Link
-                  href="./profile"
-                  style={styles.commonButton}
-                  onPress={() => setLogoutModal(false)}
-                >
-                  No
-                </Link>
-                <Link
-                  href="../login"
-                  style={styles.commonButton}
-                  onPress={() => setLogoutModal(false)}
-                >
-                  Yes
-                </Link>
-              </View>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    );
-  }
+      let userAge = currentDate.getFullYear() - birthDate.getFullYear();
+      const monthDiff = currentDate.getMonth() - birthDate.getMonth();
 
-  function renderBMIModal() {
-    return (
-      <Modal animationType="fade" visible={bmiModal} transparent={true}>
-        <View style={styles.modalWrapper}>
-          <View style={styles.modalContent}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={globalStyles.header}>Body Mass Index (BMI)</Text>
-              <TouchableOpacity onPress={() => setBMIModal(false)}>
-                <Ionicons name="close-circle-outline" size={25}></Ionicons>
-              </TouchableOpacity>
-            </View>
+      // If current month is before birth month OR in the same month but birth day is ahead of current day
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())
+      ) {
+        userAge--;
+      }
 
-            <ScrollView>
-              <Text
-                style={{
-                  ...globalStyles.para,
-                  position: "relative",
-                  bottom: 10,
-                }}
-              >
-                BMI is an estimate of body fat based on height and weight. It
-                can help determine whether a person is at an unhealthy or
-                healthy weight. However, it is not without its limitations.
-              </Text>
-              <TouchableOpacity
-                onPress={() =>
-                  Linking.openURL(
-                    "https://www.healthline.com/health/body-mass-index#Body-Mass-Index-for-Adults"
-                  )
-                }
-              >
-                <Text style={{ ...globalStyles.para, color: "red" }}>
-                  Click me to learn more!
-                </Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-    );
-  }
+      // Calculate BMI part
+      // Formula: BMI = Weight (kg) / Height (m) square
+      const userWeight = Number(userDetails[3]);
+      const userHeight = Number(userDetails[2]);
+      const userBMI = (userWeight * 1.0) / userHeight ** 2;
 
-  function renderSyncModal() {
-    return (
-      <Modal animationType="fade" visible={syncModal} transparent={true}>
-        <View style={styles.modalWrapper}>
-          <View style={styles.modalContent}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={globalStyles.header}>Strava Sync</Text>
-              <TouchableOpacity onPress={() => setSyncModal(false)}>
-                <Ionicons name="close-circle-outline" size={25}></Ionicons>
-              </TouchableOpacity>
-            </View>
+      // Calculate Max HR part
+      // Formula: 220 - age
+      const userMaxHR = 220 - userAge;
 
-            <ScrollView>
-              <Text
-                style={{
-                  ...globalStyles.para,
-                  position: "relative",
-                  bottom: 10,
-                }}
-              >
-                Log in to your Strava account, and go to the settings page. Use
-                the authorization code displayed below to sync with your Strava
-                account!
-              </Text>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-    );
-  }
+      setAge(userAge);
+      setBMI(Math.round((userBMI + Number.EPSILON) * 100) / 100);
+      setMaxHR(userMaxHR);
+
+      setBoolFlag2(!boolFlag2);
+    }
+  }, [userDetails]);
 
   return (
     <View style={globalStyles.container}>
-      {renderEditModal()}
-      {renderLogoutModal()}
-      {renderBMIModal()}
-      {renderSyncModal()}
-
-      <ScrollView style={styles.scroll}>
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.bgWrapper}>
           <Image
             source={require("../../assets/images/bg-image.jpg")}
@@ -254,20 +114,20 @@ export default function Profile() {
 
         <View style={styles.profileWrapper}>
           {/* 
-                        When userDetails is populated 
-                        After the async getUserDetails function finishes
-                        Then only, is this component rendered
-                        This same idea is repeated multiple times below! 
-                    */}
+            When userDetails is populated 
+            After the async getUserDetails function finishes
+            Then only, is this component rendered
+            This same idea is repeated multiple times below! 
+          */}
           {/* Gender is found at index 5 of the array */}
-          {userDetails.length > 0 && userDetails[5][1] == "F" && (
+          {userDetails.length > 0 && userDetails[5] == "F" && (
             <Image
               source={require("../../assets/images/female-pfp.jpg")}
               style={styles.pfp}
             />
           )}
 
-          {userDetails.length > 0 && userDetails[5][1] == "M" && (
+          {userDetails.length > 0 && userDetails[5] == "M" && (
             <Image
               source={require("../../assets/images/male-pfp.png")}
               style={styles.pfp}
@@ -278,87 +138,79 @@ export default function Profile() {
             <View style={{ height: "15%", marginBottom: -8 }}>
               <Text style={styles.userName}>
                 {/* Username is found at index 1 of the array */}
-                {userDetails[1][1] + " (" + userDetails[5][1] + ")"}
+                {userDetails[1] + " (" + userDetails[5] + ")"}
               </Text>
 
               {/* Change name to two parter in future */}
               {/* <Text>Tom </Text>  
-                            <Text style={{color: 'red'}}>Hanks</Text> */}
+              <Text style={{color: 'red'}}>Hanks</Text> */}
             </View>
           )}
 
           <View style={styles.iconWrapper}>
-            <TouchableOpacity onPress={() => setEditModal(true)}>
-              <Ionicons name="create-outline" size={25} style={styles.icon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setLogoutModal(true)}>
-              <Ionicons
-                name="log-out-outline"
-                size={25}
-                style={{ ...styles.icon, marginBottom: -2 }}
-              />
-            </TouchableOpacity>
+            <EditModal triggerUpdate={triggerUpdate} />
+            <LogoutModal />
           </View>
 
           <View style={styles.detailsWrapper}>
             <View style={styles.merged}>
-              <Card>
+              <View style={globalStyles.cardV1}>
                 {userDetails.length > 0 && (
-                  <View style={styles.cardWrapper}>
+                  <View style={styles.cardInner}>
                     <Text style={styles.header}>Height:</Text>
                     {/* Height is found at index 2 of the array */}
-                    <Text style={styles.para}>{userDetails[2][1] + "m"}</Text>
+                    <Text style={styles.para}>{userDetails[2] + "m"}</Text>
                   </View>
                 )}
-              </Card>
-              <Card>
+              </View>
+              <View style={globalStyles.cardV1}>
                 {userDetails.length > 0 && (
-                  <View style={styles.cardWrapper}>
+                  <View style={styles.cardInner}>
                     <Text style={styles.header}>Weight:</Text>
                     {/* Weight is found at index 3 of the array */}
-                    <Text style={styles.para}>{userDetails[3][1] + "kg"}</Text>
+                    <Text style={styles.para}>{userDetails[3] + "kg"}</Text>
                   </View>
                 )}
-              </Card>
-              <Card>
+              </View>
+              <View style={globalStyles.cardV1}>
                 {userDetails.length > 0 && (
-                  <View style={styles.cardWrapper}>
+                  <View style={styles.cardInner}>
                     <Text style={styles.header}>Birthday:</Text>
                     {/* Birthday is found at index 4 of the array */}
-                    <Text style={styles.para}>{userDetails[4][1]}</Text>
+                    <Text style={styles.para}>{userDetails[4]}</Text>
                   </View>
                 )}
-              </Card>
+              </View>
             </View>
 
             <View style={styles.merged}>
-              <Card>
-                <View style={styles.cardWrapper}>
-                  <Text style={styles.header}>Age:</Text>
-                  <Text style={styles.para}>22</Text>
-                </View>
-              </Card>
-              <Card>
-                <View style={styles.cardWrapper}>
-                  <View style={styles.infoWrapper}>
-                    <Text style={styles.header}>BMI: </Text>
-                    <TouchableOpacity onPress={() => setBMIModal(true)}>
-                      <Ionicons
-                        name="information-circle-outline"
-                        size={18}
-                        color="red"
-                      />
-                    </TouchableOpacity>
+              <View style={globalStyles.cardV1}>
+                {userDetails.length > 0 && (
+                  <View style={styles.cardInner}>
+                    <Text style={styles.header}>Age:</Text>
+                    <Text style={styles.para}>{age}</Text>
                   </View>
-                  <Text style={styles.para}>22.9</Text>
-                </View>
-              </Card>
-              <Card>
-                <View style={styles.cardWrapper}>
-                  <Text style={styles.header}>Max HR:</Text>
-                  <Text style={styles.para}>198bpm</Text>
-                </View>
-              </Card>
+                )}
+              </View>
+              <View style={globalStyles.cardV1}>
+                {userDetails.length > 0 && (
+                  <View style={styles.cardInner}>
+                    <View style={styles.infoWrapper}>
+                      <Text style={styles.header}>BMI: </Text>
+                      <BmiModal />
+                    </View>
+                    <Text style={styles.para}>{bmi}</Text>
+                  </View>
+                )}
+              </View>
+              <View style={globalStyles.cardV1}>
+                {userDetails.length > 0 && (
+                  <View style={styles.cardInner}>
+                    <Text style={styles.header}>Max HR:</Text>
+                    <Text style={styles.para}>{maxHR + "bpm"}</Text>
+                  </View>
+                )}
+              </View>
             </View>
           </View>
         </View>
@@ -369,25 +221,18 @@ export default function Profile() {
               <Text style={styles.userName}>Strava </Text>
               <Text style={{ ...styles.userName, ...styles.accent }}>Sync</Text>
             </Text>
-            <TouchableOpacity onPress={() => setSyncModal(true)}>
-              <Ionicons
-                name="information-circle-outline"
-                size={20}
-                color="red"
-                style={{ position: "relative", left: 5, top: 1.8 }}
-              />
-            </TouchableOpacity>
+            <SyncModal />
           </View>
 
           <View style={styles.authCode}>
-            <Card>
+            <View style={globalStyles.cardV1}>
               <View style={{ padding: 10 }}>
                 <Text style={globalStyles.para}>
                   This will display the authCode when the sync button is
                   pressed!
                 </Text>
               </View>
-            </Card>
+            </View>
           </View>
           <SafeAreaView style={{ width: "100%" }}>
             <LinkStrava />
@@ -399,31 +244,6 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
-  modalWrapper: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-
-  modalContent: {
-    backgroundColor: "white",
-    padding: 15,
-    width: "80%",
-    height: 200,
-    borderRadius: 10,
-  },
-
-  commonButton: {
-    width: "45%",
-    textAlign: "center",
-    borderRadius: 15,
-    backgroundColor: "#FFC4C4",
-    ...globalStyles.header,
-    fontSize: 12,
-    paddingVertical: 8,
-  },
-
   scroll: {
     flex: 1,
     // why tf does this work??
@@ -477,10 +297,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  icon: {
-    paddingHorizontal: 15,
-  },
-
   detailsWrapper: {
     marginTop: "-37%",
     width: "100%",
@@ -504,7 +320,7 @@ const styles = StyleSheet.create({
     top: -16,
   },
 
-  cardWrapper: {
+  cardInner: {
     height: "75%",
     paddingHorizontal: 10,
   },

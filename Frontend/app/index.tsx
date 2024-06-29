@@ -1,9 +1,8 @@
-import { registerRootComponent } from 'expo';
-import RootLayout from './_layout';
-import * as SplashScreen from 'expo-splash-screen';
+import { Redirect } from "expo-router";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-// Register the root component of your app
-registerRootComponent(() => <RootLayout />);
+// Expo router first routes to this page (entry point)
+// This page then redirects to login page
+const Index = () => {
+  return <Redirect href="/login" />;
+};
+export default Index;

@@ -1,10 +1,20 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { useState } from 'react';
-import { Image, Dimensions, Alert, Text, TextInput, View, StyleSheet, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
-import { globalStyles } from '../../styles/global';
-import { REACT_APP_DOMAIN } from '@env';
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useState } from "react";
+import {
+  Image,
+  Alert,
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+
+import CustomTextInput from "@/components/general/customTextInput";
+import { globalStyles } from "../../styles/global";
+import PageHeader from "@/components/general/pageHeader";
 
 interface GymInfo {
   name: string;
@@ -14,18 +24,18 @@ interface GymInfo {
   image: string;
 }
 
-export default function TabTwoScreen() {
+export default function Location() {
   const [search, setSearch] = useState("");
   const [gymData, setGymData] = useState<GymInfo[]>([]);
-  const [message, setMessage] = useState<string>(
-    "Result of the search will be displayed here!"
-  );
+  const [message, setMessage] = useState<string>("Result will be shown here");
+
   const [gym, setGym] = useState(false);
   const [park, setPark] = useState(false);
 
   const getNearestGyms = async (lat: number, lon: number, radius: number) => {
+    const ip = process.env.EXPO_PUBLIC_DOMAIN;
     const response = await fetch(
-      `http://${REACT_APP_DOMAIN}:8000/services/find_gym/?lat=${lat}&lon=${lon}&radius=${radius}`,
+      `http://${ip}:8000/services/find_gym/?lat=${lat}&lon=${lon}&radius=${radius}`,
       {
         method: "GET",
         headers: {
@@ -97,17 +107,25 @@ export default function TabTwoScreen() {
 
   const renderItem = (item: GymInfo, index: number) => {
     return (
-      <View style={styles.card} key={index}>
-        <View style={styles.cardWrapper}>
-          <Text
-            style={styles.headerText}
-          >{index + 1 + ")  " + item.name}</Text>
+      <View style={globalStyles.cardV1} key={index}>
+        <View style={styles.cardInner}>
+          <Text style={{ ...globalStyles.header, fontFamily: "inter-bold" }}>
+            {index + 1 + ")  " + item.name}
+          </Text>
           <View style={styles.imageWrapper}>
             <Image style={styles.banner} source={{ uri: item.image }} />
           </View>
           <View style={{ flexDirection: "row" }}>
-            <Text style={styles.headerText}>Distance Away:</Text>
-            <Text style={{ paddingVertical: 5}}>{item.distance + " km"}</Text>
+            <Text
+              style={{ ...globalStyles.para, fontFamily: "inter-semibold" }}
+            >
+              Distance Away:{" "}
+            </Text>
+            <Text
+              style={{ ...globalStyles.para, fontFamily: "inter-semibold" }}
+            >
+              {item.distance + " km"}
+            </Text>
           </View>
         </View>
       </View>
@@ -115,134 +133,121 @@ export default function TabTwoScreen() {
   };
 
   return (
-    <View style={{ ...globalStyles.container, padding: 12 }}>
-      <KeyboardAvoidingView style={{ flex: 1 }}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          {/* Main working container */}
-          <ScrollView style={{ flex: 1 }}>
-            <View style={styles.firstHeader}>
-              <Text
-                style={{
-                  ...globalStyles.para,
-                  color: "red",
-                  fontFamily: "inter-bold",
-                }}
-              >
-                Finder
-              </Text>
-              <Text
-                style={{
-                  ...globalStyles.header,
-                  fontFamily: "inter-bold",
-                  position: "relative",
-                  bottom: 20,
-                }}
-              >
-                Find Nearest Workout Facility & Park
-              </Text>
-            </View>
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View style={{ ...globalStyles.container, padding: 12 }}>
+        <PageHeader topText="Finder" bottomText="Find Nearest Gym & Park" />
 
-            <View style={[styles.searchWrapper, styles.extra]}>
-              <TextInput
-                style={{ borderRadius: 7, width: "90%" }}
-                placeholder="Your Location (Postal Code)"
-                onChangeText={(newText) => setSearch(newText)}
-                value={search}
-              />
+        <View style={[styles.searchWrapper, styles.extra]}>
+          <CustomTextInput
+            style={{ borderRadius: 7, width: "90%" }}
+            placeholder="Your Location (Postal Code)"
+            onChangeText={(newText: string) => setSearch(newText)}
+            value={search}
+          />
 
-              <TouchableOpacity onPress={searchHandler}>
-                <Ionicons
-                  name="search-outline"
-                  size={20}
-                  style={{
-                    position: "relative",
-                    left: 5,
-                    top: 1,
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
+          <TouchableOpacity onPress={searchHandler}>
+            <Ionicons
+              name="search-outline"
+              size={20}
+              style={{
+                position: "relative",
+                left: 5,
+                top: 1,
+              }}
+            />
+          </TouchableOpacity>
+        </View>
 
-            <View style={styles.buttonsWrapper}>
-              <TouchableOpacity
-                onPress={gymHandler}
-                style={[
-                  styles.button,
-                  gym ? styles.highlightedButton : undefined,
-                ]}
-              >
-                <Text
-                  style={{
-                    ...globalStyles.para,
-                    position: "relative",
-                    right: 3,
-                  }}
-                >
-                  Gym
-                </Text>
-                <MaterialIcons
-                  name="sports-gymnastics"
-                  size={20}
-                  style={{
-                    position: "relative",
-                    left: 2,
-                    top: 10,
-                  }}
-                />
-              </TouchableOpacity>
+        <View style={styles.buttonsWrapper}>
+          <TouchableOpacity
+            onPress={gymHandler}
+            style={[styles.button, gym ? styles.highlightedButton : undefined]}
+          >
+            <Text
+              style={{
+                ...globalStyles.para,
+                position: "relative",
+                right: 3,
+              }}
+            >
+              Gym
+            </Text>
+            <MaterialIcons
+              name="sports-gymnastics"
+              size={20}
+              style={{
+                position: "relative",
+                left: 2,
+                top: 10,
+              }}
+            />
+          </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={parkHandler}
-                style={[
-                  styles.button,
-                  { marginLeft: 10 },
-                  park ? styles.highlightedButton : undefined,
-                ]}
-                disabled // TODO
-              >
-                <Text style={globalStyles.para}>Park</Text>
-                <MaterialCommunityIcons
-                  name="tree-outline"
-                  size={20}
-                  style={{
-                    position: "relative",
-                    left: 5,
-                    top: 10,
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
+          <TouchableOpacity
+            onPress={parkHandler}
+            style={[
+              styles.button,
+              { marginLeft: 10 },
+              park ? styles.highlightedButton : undefined,
+            ]}
+            disabled // TODO
+          >
+            <Text style={globalStyles.para}>Park</Text>
+            <MaterialCommunityIcons
+              name="tree-outline"
+              size={20}
+              style={{
+                position: "relative",
+                left: 5,
+                top: 10,
+              }}
+            />
+          </TouchableOpacity>
+        </View>
 
-            <View style={styles.firstResultWrapper}>
-              <Text
-                style={{ ...globalStyles.header, fontFamily: "inter-bold" }}
-              >
-                Results:
-              </Text>
+        <View
+          style={{
+            ...globalStyles.cardV2,
+            position: "relative",
+            bottom: 10,
+            marginBottom: 38,
+          }}
+        >
+          <View
+            style={[
+              styles.cardInner,
+              gymData.length == 0 ? { height: 170 } : undefined,
+            ]}
+          >
+            {/* Before search, searching, failed search */}
+            {gymData.length == 0 && (
               <Text style={globalStyles.para}>{message}</Text>
-              {gymData.length > 0 && <>{gymData.map(renderItem)}</>}
+            )}
+            {gymData.length > 0 && <>{gymData.map(renderItem)}</>}
+          </View>
+        </View>
+
+        <PageHeader topText="" bottomText="Explore New Running Routes" />
+
+        <View style={styles.runningRouteResult}>
+          <View style={globalStyles.cardV2}>
+            <View style={{ ...styles.cardInner, height: 170 }}>
+              <Text style={globalStyles.para}>
+                Result will be shown <Text style={{ color: "red" }}>here</Text>
+              </Text>
             </View>
-          </ScrollView>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </View>
+          </View>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
-const { width } = Dimensions.get("window");
-const borderWidth = 1; // Assuming 1 pixel border width
-const shadowWidth = 2; // Assuming 2 pixels shadow width
-const cardWidth = width - 4 - 2 * borderWidth - 2 * shadowWidth; // Assuming you want a percentage width
-
 const styles = StyleSheet.create({
-  firstHeader: {
-    width: "100%",
-  },
-
   searchWrapper: {
     width: "100%",
     position: "relative",
-    bottom: 23,
+    bottom: 17,
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
@@ -260,7 +265,7 @@ const styles = StyleSheet.create({
     position: "relative",
     bottom: 8,
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 30,
     // fixed height
     // so that when height slightly changes onActiveState
     // elements below do not shift down
@@ -280,26 +285,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
 
-  firstResultWrapper: {
-    position: "relative",
-    bottom: 7,
-  },
-
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 7,
-    elevation: 3,
-    shadowOffset: { width: 0, height: 1 },
-    shadowColor: "#333",
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    margin: 5,
-  },
-
-  cardWrapper: {
-    height: "auto",
-    width: "100%",
+  cardInner: {
     padding: 7,
+  },
+
+  runningRouteResult: {
+    position: "relative",
+    bottom: 15,
   },
 
   imageWrapper: {
@@ -312,11 +304,5 @@ const styles = StyleSheet.create({
     height: null,
     width: null,
     resizeMode: "cover",
-  },
-
-  headerText: {
-    paddingVertical: 5,
-    paddingRight: 5,
-    fontWeight: "bold",
   },
 });

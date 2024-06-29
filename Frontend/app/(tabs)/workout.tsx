@@ -1,102 +1,102 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { globalStyles } from "@/styles/global";
+import PageHeader from "@/components/general/pageHeader";
+import WorkoutModal from "@/components/modal/workoutPage/workout";
+import Table from "@/components/general/table/table";
+import { Ionicons } from "@expo/vector-icons";
 
-export default function TabTwoScreen() {
+export default function Workout() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText> library
-          to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <View style={{ ...globalStyles.container, padding: 12 }}>
+      <PageHeader topText="AI-Based" bottomText="Workout Recommendation" />
+      <View style={{ position: "relative", bottom: 28 }}>
+        <Text style={globalStyles.para}>
+          Click on the button below and fill up the form to get your workout
+          recommendation!
+        </Text>
+      </View>
+
+      <WorkoutModal />
+      <View style={styles.secondaryHeader}>
+        <PageHeader topText="" bottomText="Suggested Workout" />
+        <TouchableOpacity>
+          <Ionicons
+            size={25}
+            name="reload-outline"
+            style={{ position: "relative", right: 30, bottom: 18 }}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <View
+        style={{
+          height: "50%",
+          borderWidth: 2,
+          borderColor: "#FFC4C4",
+          marginTop: -19,
+        }}
+      >
+        <Table />
+      </View>
+
+      {/* <View
+        style={{
+          marginTop: 19.5,
+          marginBottom: 7,
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      ></View> */}
+
+      {/* Conditionally render this as whats shown when loading */}
+      {/* <View style={styles.workoutPlan}>
+        <View style={globalStyles.cardV2}>
+            <View style={{ ...styles.cardInner, height: 170 }}>
+              <Text style={globalStyles.para}>
+                Result will be shown <Text style={{ color: "red" }}>here</Text>
+              </Text>
+            </View>
+          </View>
+      </View> */}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  secondaryHeader: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+
+  workoutPlan: {
+    position: "relative",
+    bottom: 15,
+  },
+
+  cardInner: {
+    height: "auto",
+    width: "100%",
+    padding: 7,
+  },
+
+  buttonText: {
+    ...globalStyles.header,
+    fontSize: 12,
+    textAlign: "center",
+  },
+
+  commonButton: {
+    width: "48%",
+    borderRadius: 10,
+    backgroundColor: "#FFC4C4",
   },
 });
