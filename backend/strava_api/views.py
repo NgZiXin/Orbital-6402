@@ -16,6 +16,7 @@ def strava_get_access(request):
     
     # TODO: Use Serializer
     redirect_uri = request.GET.get('redirect_uri')
+    print(redirect_uri)
     if not redirect_uri:
         return Response({'error': 'redirect_uri is required'}, status=400)
     
