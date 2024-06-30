@@ -109,6 +109,9 @@ L.Control.textbox = L.Control.extend({
         // Clear final route
         map.removeLayer(final);
 
+        // Reset textbox
+        textboxControl.updateContent(totalDistance);
+
         // Reset the overlays
         Object.values(overlayMaps).forEach((overlay) => {
           overlay.eachLayer((layer) => {

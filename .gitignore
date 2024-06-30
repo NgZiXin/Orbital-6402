@@ -12,9 +12,7 @@ web-build/
 venv/
 .vscode
 *.pyc
-
-# Comment out if deploying
-.env 
+.env
 
 # macOS
 .DS_Store

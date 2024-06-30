@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { WebView } from "react-native-webview";
 import { useState } from "react";
 import {
   Image,
@@ -30,36 +31,15 @@ export default function Location() {
   const navigation: any = useNavigation();
 
   const [search, setSearch] = useState("");
-  const [gymData, setGymData] = useState<GymInfo[]>([]);
-  const [message, setMessage] = useState<string>("Result will be shown here");
-
-  const [gym, setGym] = useState(false);
-  const [park, setPark] = useState(false);
-
-  const getNearestGyms = async (lat: number, lon: number, radius: number) => {
-    const response = await fetch(
-      `${process.env.EXPO_PUBLIC_DOMAIN}services/find_gym/?lat=${lat}&lon=${lon}&radius=${radius}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      // TODO: Handle Error Response
-      throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    return data;
-  };
+  const [query, setQuery] = useState<String | null>(null);
+  const [webviewUri, setWebviewUri] = useState(
+    `${process.env.EXPO_PUBLIC_DOMAIN}/services/`
+  );
 
   const searchHandler = () => {
-    if (!gym && !park) {
+    if (!query) {
       Alert.alert("Choose Gym or Park!");
-    } else if (gym) {
+    } else {
       // Fetching data from the URL
       fetch(
         `https://www.onemap.gov.sg/api/common/elastic/search?searchVal=${search}&returnGeom=Y&getAddrDetails=Y&pageNum=1`
@@ -71,25 +51,9 @@ export default function Location() {
           return response.json();
         })
         .then((data) => {
-          if (data["results"].length == 0) {
-            Alert.alert("User Error", "Invalid Postal Code / Address input");
-          } else {
-            setMessage(
-              `Searching for gym(s) around ${data["results"][0]["SEARCHVAL"]}`
-            );
-            getNearestGyms(
-              data["results"][0]["LATITUDE"],
-              data["results"][0]["LONGITUDE"],
-              1000
-            ).then((res: GymInfo[]) => {
-              if (res.length == 0) {
-                setMessage(
-                  `No gym found within a 1km radius from ${data["results"][0]["SEARCHVAL"]}`
-                );
-              }
-              setGymData(res);
-            });
-          }
+          setWebviewUri(
+            `${process.env.EXPO_PUBLIC_DOMAIN}/services/?type=${query}&lat=${data["results"][0]["LATITUDE"]}&lon=${data["results"][0]["LONGITUDE"]}&radius=3000`
+          );
         })
         .catch((error) => {
           // Logging any errors
@@ -99,13 +63,11 @@ export default function Location() {
   };
 
   const gymHandler = () => {
-    setGym(!gym);
-    setPark(false);
+    setQuery("gym");
   };
 
   const parkHandler = () => {
-    setPark(!park);
-    setGym(false);
+    setQuery("park");
   };
 
   const renderItem = (item: GymInfo, index: number) => {
@@ -167,7 +129,10 @@ export default function Location() {
         <View style={styles.buttonsWrapper}>
           <TouchableOpacity
             onPress={gymHandler}
-            style={[styles.button, gym ? styles.highlightedButton : undefined]}
+            style={[
+              styles.button,
+              query == "gym" ? styles.highlightedButton : undefined,
+            ]}
           >
             <Text
               style={{
@@ -194,9 +159,8 @@ export default function Location() {
             style={[
               styles.button,
               { marginLeft: 10 },
-              park ? styles.highlightedButton : undefined,
+              query == "park" ? styles.highlightedButton : undefined,
             ]}
-            disabled // TODO
           >
             <Text style={globalStyles.para}>Park</Text>
             <MaterialCommunityIcons
@@ -219,17 +183,14 @@ export default function Location() {
             marginBottom: 38,
           }}
         >
-          <View
-            style={[
-              styles.cardInner,
-              gymData.length == 0 ? { height: 170 } : undefined,
-            ]}
-          >
-            {/* Before search, searching, failed search */}
-            {gymData.length == 0 && (
-              <Text style={globalStyles.para}>{message}</Text>
-            )}
-            {gymData.length > 0 && <>{gymData.map(renderItem)}</>}
+          <View style={[styles.cardInner, { height: 250 }]}>
+            <WebView
+              javaScriptEnabled={true}
+              startInLoadingState={true}
+              source={{
+                uri: webviewUri,
+              }}
+            />
           </View>
         </View>
 

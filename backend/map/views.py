@@ -7,21 +7,16 @@ from rest_framework import status
 from .utils import get_access_token
 from .serializers import GetPathSerializer
 from strava_api.utils import get_token
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
 def index(request):
-#     user = request.user
-    strava_token =  ""#get_token(user)
+    user = request.user
+    strava_token = get_token(user)
     context = {
          "strava_token": strava_token,
-         "url": request.build_absolute_uri
+         "url": request.build_absolute_uri(request.path)
     }
-    return render(request, "index.html", context)
+    return render(request, "routes.html", context)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
