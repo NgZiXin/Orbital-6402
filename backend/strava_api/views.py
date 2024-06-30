@@ -56,5 +56,8 @@ def strava_get_token(request):
 
         return Response({'status': 'success'}, status=status.HTTP_200_OK)
     return Response({'error': 'Invalid Query'}, status=400)
+
+# def strava_get_stats(request):
+     
    
 
