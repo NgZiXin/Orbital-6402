@@ -10,7 +10,7 @@ const SCOPE =
 
 export default function LinkStrava() {
   // Create deepl link url
-  const redirect_uri = Linking.createURL("myapp");
+  const redirect_uri = Linking.createURL("");
 
   const handleSubmit = async () => {
     // getItem('token') returns a Promise
