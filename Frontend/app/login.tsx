@@ -40,14 +40,16 @@ export default function Login() {
     actions: FormikHelpers<LoginValues>
   ): Promise<void> => {
     try {
-      const ip = process.env.EXPO_PUBLIC_DOMAIN;
-      const response = await fetch(`http://${ip}:8000/accounts/login/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_DOMAIN}accounts/login/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
 
       // Case where backend raises an error
       if (!response.ok) {

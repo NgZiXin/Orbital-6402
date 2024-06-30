@@ -39,7 +39,7 @@ export default function WeekToggleModal({
 
             <View>
               <Text style={globalStyles.para}>
-                You cannot toggle to a date beyond today!
+                You cannot toggle to a date beyond this week!
               </Text>
 
               <TouchableOpacity
