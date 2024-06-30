@@ -11,7 +11,6 @@ export default function LinkStrava() {
     // hence, we await to wait for the Promise to complete and grab its value
     const token: string | null = await getItem("token");
     const redirect_uri = Linking.createURL("myapp.com"); // TODO: Bring app back to profile page and not home page
-    const ip = process.env.EXPO_PUBLIC_DOMAIN;
     fetch(
       `${process.env.EXPO_PUBLIC_DOMAIN}strava_api/get_access/?redirect_uri=${redirect_uri}/`,
       {

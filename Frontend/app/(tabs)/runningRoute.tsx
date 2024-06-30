@@ -3,8 +3,6 @@ import { StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { getItem } from "@/components/general/asyncStorage";
 
-const ip = process.env.EXPO_PUBLIC_DOMAIN;
-
 export default function runningRoute() {
   const [token, setToken] = useState<string | null>(null);
   useEffect(() => {

@@ -43,7 +43,7 @@ export default function SignUp() {
         birthday: values.birthday.toISOString().split("T")[0], // Convert date to 'YYYY-MM-DD' format
       };
 
-      const ip = process.env.EXPO_PUBLIC_DOMAIN;
+      
       const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}accounts/`, {
         method: "POST",
         headers: {
