@@ -46,12 +46,12 @@ To learn more about Expo, do look at the following resources:
 
 2. Create `.env` file under `Frontend` folder
 
-3. Add the following attribute into the .env file. You may find your ip address by running `ipconfig` in your terminal 
+3. Add the following attribute into the .env file. You may find your ip address by running `ipconfig` in your terminal or checking your phone settings 
    
    ```
    # API Endpoint
    # Local device's IP address
-   EXPO_PUBLIC_DOMAIN='<your ip address here>'
+   EXPO_PUBLIC_DOMAIN='your device ip address'
    ```
 
 4. Start the app 
