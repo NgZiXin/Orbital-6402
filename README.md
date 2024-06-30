@@ -80,9 +80,9 @@ To learn more about Expo, do look at the following resources:
    DATABASE_HOST='postgres host' 
    DATABASE_PORT='postgres port'
 
-   # One Map API Config 
-   ONEMAP_EMAIL= ''
-   ONEMAP_EMAIL_PASSWORD = ''
+   # OneMap API Config 
+   ONEMAP_EMAIL= 'onemap account email'
+   ONEMAP_EMAIL_PASSWORD = 'onemap account password'
    ```
 
    An example of an `.env` file:
