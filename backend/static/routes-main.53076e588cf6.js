@@ -109,6 +109,9 @@ L.Control.textbox = L.Control.extend({
         // Clear final route
         map.removeLayer(final);
 
+        // Reset textbox
+        textboxControl.updateContent(totalDistance);
+
         // Reset the overlays
         Object.values(overlayMaps).forEach((overlay) => {
           overlay.eachLayer((layer) => {
@@ -248,7 +251,7 @@ function buildRoute(start, end, fitStart, fitEnd, order) {
   const endCoords = `${end.getLatLng().lat}%2C${end.getLatLng().lng}`;
 
   fetch(
-    `${EXPO_PUBLIC_DOMAIN}map/get_path?start=${startCoords}&end=${endCoords}`,
+    `${url}get_path?start=${startCoords}&end=${endCoords}`,
     {
       method: "GET",
     }
