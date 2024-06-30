@@ -37,9 +37,9 @@ To learn more about Expo, do look at the following resources:
 1. Navigate into `Frontend` folder. 
 > Note that all the following commands and creations are to be done in this subfolder.
 
-```bash
-   cd ./Frontend
-```
+   ```bash
+      cd ./Frontend
+   ```
 
 2. Install dependencies in the `Frontend` folder.
 
@@ -49,9 +49,9 @@ To learn more about Expo, do look at the following resources:
 
 3. Create `.env` file under `Frontend` folder
 
-```bash
-   touch .env
-```
+   ```bash
+      touch .env
+   ```
 
 4. Add the following attribute into the .env file. 
 > If it is your first time developing mobile application, the most straight-forward way to access your back-end sever during development is to connect to localhost over the same Wifi network. You can refer to this [webpage](https://prowe214.medium.com/tip-how-to-view-localhost-web-apps-on-your-phone-ad6b2c883a7c) for more infomation.  
@@ -82,27 +82,28 @@ To learn more about Expo, do look at the following resources:
 2. Navigate into `./backend` folder. 
 > Note that all the following commands and creations are to be done in this subfolder.
 
-```bash
-   cd ./backend
-```
+   ```bash
+      cd ./backend
+   ```
 
 3. Create a virtual environment in the `backend` folder.
 > This command will create a `venv` subfolder.
 
-```bash
-   python -m venv venv
-```
+   ```bash
+      python -m venv venv
+   ```
 
 4. Activate the virtual environment
 
-```bash
-   venv\Scripts\activate
-```
+   ```bash
+      venv\Scripts\activate
+   ```
+
 5. Install all dependencies
 
-```bash
-   pip install -r ./requirements.txt
-```
+   ```bash
+      pip install -r ./requirements.txt
+   ```
 
 6. Create `.env` file under the ./backend folder
 
