@@ -35,7 +35,7 @@ To learn more about Expo, do look at the following resources:
 ### Setting up the Front-end:
 
 1. Navigate into `Frontend` folder. 
-> Note that all the following commands and creations are to be done in this subfolder.
+   > Note that all the following commands and creations are to be done in this subfolder.
 
    ```bash
       cd ./Frontend
@@ -54,7 +54,7 @@ To learn more about Expo, do look at the following resources:
    ```
 
 4. Add the following attribute into the .env file. 
-> If it is your first time developing mobile application, the most straight-forward way to access your back-end sever during development is to connect to localhost over the same Wifi network. You can refer to this [webpage](https://prowe214.medium.com/tip-how-to-view-localhost-web-apps-on-your-phone-ad6b2c883a7c) for more infomation.  
+   > If it is your first time developing mobile application, the most straight-forward way to access your back-end sever during development is to connect to localhost over the same Wifi network. You can refer to this [webpage](https://prowe214.medium.com/tip-how-to-view-localhost-web-apps-on-your-phone-ad6b2c883a7c) for more infomation.  
 
    ```
       # API Endpoint
@@ -80,14 +80,14 @@ To learn more about Expo, do look at the following resources:
 1. Before setting up the back-end, you will need a [OneMap account](https://www.onemap.gov.sg/apidocs/register), [Strava account](https://www.strava.com/register/free) and a local [Postgres database](https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04) set up.
 
 2. Navigate into `./backend` folder. 
-> Note that all the following commands and creations are to be done in this subfolder.
+   > Note that all the following commands and creations are to be done in this subfolder.
 
    ```bash
       cd ./backend
    ```
 
 3. Create a virtual environment in the `backend` folder.
-> This command will create a `venv` subfolder.
+   > This command will create a `venv` subfolder.
 
    ```bash
       python -m venv venv
