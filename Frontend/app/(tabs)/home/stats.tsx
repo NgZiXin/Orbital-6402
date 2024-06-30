@@ -140,7 +140,10 @@ export default function Stats() {
     <View style={globalStyles.container}>
       {/* paddingHorizontal: 10, then each wrapper: paddingHorizontal: 2 */}
       {/* to prevent scrollview from cutting elements off horizontally */}
-      <ScrollView style={{ marginTop: 57, padding: 12, paddingHorizontal: 10 }}>
+      <ScrollView
+        style={{ marginTop: 57, padding: 12, paddingHorizontal: 10 }}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={{ paddingHorizontal: 2 }}>
           <PageHeader
             topText="Summary"
@@ -213,6 +216,7 @@ export default function Stats() {
                   size={35}
                   style={styles.statsIcon}
                 />
+
                 <ProgressBar
                   leftLabel="20.7km"
                   rightLabel="30km"
@@ -263,17 +267,16 @@ export default function Stats() {
             // handle x-axis
             disableScroll
             initialSpacing={0}
-            adjustToWidth={true}
+            spacing={20}
+            barWidth={(screenWidth - 24 - 120) / 7} // maths
             xAxisLength={screenWidth - 25}
             parentWidth={screenWidth - 24}
-            // handle bars
-            barWidth={screenWidth / 12 + 0.8}
-            barBorderRadius={7}
             //styling
             frontColor="#FBB3B3"
             xAxisLabelTextStyle={globalStyles.label}
             barBorderBottomLeftRadius={0}
             barBorderBottomRightRadius={0}
+            barBorderRadius={7}
           />
         </View>
 
@@ -299,7 +302,7 @@ export default function Stats() {
 const styles = StyleSheet.create({
   statsWrapper: {
     marginTop: "-7%",
-    height: 400,
+    height: 385,
     paddingHorizontal: 2,
   },
 
@@ -336,6 +339,7 @@ const styles = StyleSheet.create({
   statsCell: {
     ...globalStyles.cardV2,
     width: "48%",
+    height: "100%",
     padding: 15,
   },
 
@@ -344,24 +348,23 @@ const styles = StyleSheet.create({
   },
 
   highlightedText: {
-    textDecorationLine: "underline",
+    fontSize: 13.5,
   },
 
   statsIcon: {
     position: "relative",
     left: "77%",
-    top: "4.5%",
-    marginBottom: "-5%",
+    top: "5.5%",
   },
 
   iconExtra: {
-    top: "5.5%",
+    top: "6.5%",
   },
 
   buttonsWrapper: {
     flexDirection: "row",
     marginTop: "4.5%",
-    marginBottom: "12%",
+    marginBottom: "15%",
     paddingHorizontal: 2,
   },
 

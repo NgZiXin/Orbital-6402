@@ -1,6 +1,6 @@
 import {
-  Alert,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -18,11 +18,13 @@ import MultiSelectFooter from "./helper/footer";
 import GuideModal from "./guide";
 import SubmitButton from "@/components/general/submit";
 import ValidationModal from "./validation";
+import CustomChips from "./helper/customChips";
 
 export default function MuscleGroupModal({
   setMuscleGroupModal,
   selectedItems,
   setSelectedItems,
+  workoutModalHeight,
   formikProps,
 }: any) {
   const [validationModal, setValidationModal] = useState(false);
@@ -62,25 +64,6 @@ export default function MuscleGroupModal({
     return temp.length;
   }
 
-  function renderChips(props: any) {
-    return (
-      <View
-        style={{
-          padding: 12,
-          borderColor: "#bbb",
-          borderWidth: 1,
-          borderRadius: 8,
-          height: "65%",
-        }}
-      >
-        <Text style={styles.boxText}>
-          Custom render chip function, chips will be displayed within this box!
-          TODO
-        </Text>
-      </View>
-    );
-  }
-
   function handleSubmit() {
     const numMain = getCount();
     if (numMain < 1) {
@@ -105,92 +88,100 @@ export default function MuscleGroupModal({
             backgroundColor: "rgba(0, 0, 0, 0)",
           }}
         >
-          <View style={{ ...modalStyles.modalContent, height: "75%" }}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={globalStyles.header}>Plan Your Workout</Text>
-
-              <TouchableOpacity onPress={() => setMuscleGroupModal(false)}>
-                <Ionicons name="close-circle-outline" size={25}></Ionicons>
-              </TouchableOpacity>
-            </View>
-            <Text
-              style={{
-                ...globalStyles.para,
-                position: "relative",
-                bottom: 5,
-              }}
-            >
-              Click on the button below to start planning. Read the guide if you
-              are uncertain of something.
-            </Text>
-
-            <View style={{ marginTop: 7 }}>
-              {/* @ts-ignore */}
-              <SectionedMultiSelect
-                items={muscleGroupsList}
-                IconRenderer={Icon}
-                uniqueKey="id"
-                subKey="children"
-                modalAnimationType="fade"
-                showDropDowns={true}
-                hideSearch={true}
-                headerComponent={<MultiSelectHeader />}
-                stickyFooterComponent={
-                  <MultiSelectFooter getCount={getCount} />
-                }
-                selectedIconComponent={CustomTickIcon}
-                selectedItems={selectedItems}
-                onSelectedItemsChange={selectValidation}
-                renderSelectText={renderSelectText}
-                customChipsRenderer={renderChips}
-                parentChipsRemoveChildren={true}
-                showsVerticalScrollIndicator={false}
-                colors={styles.colors}
-                styles={{
-                  backdrop: styles.backdrop,
-                  selectToggle: styles.box,
-                  selectToggleText: styles.boxText,
-                  chipContainer: styles.chipContainer,
-                  chipText: styles.chipText,
-                  item: { marginVertical: 5 },
-                  itemText: {
-                    fontWeight: "normal",
-                    fontFamily: "inter-semibold",
-                    fontSize: 16,
-                  },
-                  subItemText: {
-                    fontWeight: "normal",
-                    fontFamily: "inter-regular",
-                    fontSize: 12,
-                  },
-                  confirmText: {
-                    fontWeight: "normal",
-                    fontFamily: "inter-regular",
-                    fontSize: 16,
-                  },
+          <View
+            style={{ ...modalStyles.modalContent, height: workoutModalHeight }}
+          >
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
                 }}
+              >
+                <Text style={globalStyles.header}>Plan Your Workout</Text>
+
+                <TouchableOpacity onPress={() => setMuscleGroupModal(false)}>
+                  <Ionicons name="close-circle-outline" size={25}></Ionicons>
+                </TouchableOpacity>
+              </View>
+              <Text
+                style={{
+                  ...globalStyles.para,
+                  position: "relative",
+                  bottom: 5,
+                }}
+              >
+                Click on the button below to start planning. Read the guide if
+                you are uncertain of something.
+              </Text>
+
+              <View style={{ marginTop: 7 }}>
+                {/* @ts-ignore */}
+                <SectionedMultiSelect
+                  items={muscleGroupsList}
+                  IconRenderer={Icon}
+                  uniqueKey="id"
+                  subKey="children"
+                  modalAnimationType="fade"
+                  showDropDowns={true}
+                  hideSearch={true}
+                  headerComponent={<MultiSelectHeader />}
+                  stickyFooterComponent={
+                    <MultiSelectFooter getCount={getCount} />
+                  }
+                  selectedIconComponent={CustomTickIcon}
+                  selectedItems={selectedItems}
+                  onSelectedItemsChange={selectValidation}
+                  renderSelectText={renderSelectText}
+                  customChipsRenderer={(props: any) => (
+                    <CustomChips
+                      {...props}
+                      workoutModalHeight={workoutModalHeight}
+                    />
+                  )}
+                  parentChipsRemoveChildren={true}
+                  showsVerticalScrollIndicator={false}
+                  colors={styles.colors}
+                  styles={{
+                    backdrop: styles.backdrop,
+                    selectToggle: styles.box,
+                    selectToggleText: styles.boxText,
+                    chipContainer: styles.chipContainer,
+                    chipText: styles.chipText,
+                    item: { marginVertical: 5 },
+                    itemText: {
+                      fontWeight: "normal",
+                      fontFamily: "inter-semibold",
+                      fontSize: 16,
+                    },
+                    subItemText: {
+                      fontWeight: "normal",
+                      fontFamily: "inter-regular",
+                      fontSize: 12,
+                    },
+                    confirmText: {
+                      fontWeight: "normal",
+                      fontFamily: "inter-regular",
+                      fontSize: 16,
+                    },
+                  }}
+                />
+              </View>
+              <GuideModal />
+              <SubmitButton
+                onPressHandler={handleSubmit}
+                text="Submit Workout"
               />
-            </View>
-            <GuideModal />
-            <SubmitButton
-              onPressHandler={handleSubmit}
-              text="Submit Workout"
-              style={{ position: "relative", bottom: "24%" }}
-            />
-            {validationModal && (
-              <ValidationModal
-                setValidationModal={setValidationModal}
-                topText="Workout Validation"
-                bottomText={validationMessage.current}
-                style={{ backgroundColor: "rgba(0, 0, 0, 0.35)" }}
-              />
-            )}
+              {validationModal && (
+                <ValidationModal
+                  setValidationModal={setValidationModal}
+                  topText="Workout Validation"
+                  bottomText={validationMessage.current}
+                  style={{ backgroundColor: "rgba(0, 0, 0, 0.35)" }}
+                />
+              )}
+            </ScrollView>
           </View>
         </View>
       </Modal>

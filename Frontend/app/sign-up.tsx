@@ -18,25 +18,29 @@ import HeightField from "@/components/form/fragments/accountDetails/height";
 import WeightField from "@/components/form/fragments/accountDetails/weight";
 import BirthdayField from "@/components/form/fragments/accountDetails/birthday";
 import SubmitButton from "@/components/general/submit";
+import signupAndEditValidationSchema from "@/components/form/validationSchema/signupAndEdit";
+
+interface ErrorResponse {
+  username: string[];
+}
+
+interface SignUpValues {
+  username: string;
+  password: string;
+  height: string;
+  weight: string;
+  birthday: Date;
+  gender: string;
+}
 
 export default function SignUp() {
   const navigation: any = useNavigation();
 
-  interface SignUpValues {
-    username: string;
-    password: string;
-    height: string;
-    weight: string;
-    birthday: Date;
-    gender: string;
-  }
-
   const handleSubmit = async (
     values: SignUpValues,
     actions: FormikHelpers<SignUpValues>
-  ) => {
+  ): Promise<void> => {
     try {
-      console.log(values.birthday);
       // Custom serialization
       const body = {
         ...values,
@@ -51,23 +55,33 @@ export default function SignUp() {
         body: JSON.stringify(body),
       });
 
+      // Case where backend raises an error
       if (!response.ok) {
-        console.log(body);
-        console.log(response);
-        throw new Error("Network response was not ok");
+        const errorResponse: ErrorResponse = await response.json();
+        if (errorResponse.username) {
+          Alert.alert("Signup Failed", "That username already exists");
+          return;
+        } else {
+          Alert.alert("Signup Failed", "Network error, please try again");
+          return;
+        }
       }
-
-      const data = await response.json();
 
       // Handle successful signup (navigate to login screen)
       actions.resetForm();
       navigation.navigate("login");
-    } catch (error) {
-      console.error("There was a problem with the fetch operation:", error);
-      Alert.alert(
-        "Signup Failed",
-        "Please check your information and try again."
-      );
+    } catch (error: any) {
+      const errorMessage = error.message;
+      if (errorMessage.includes("similar")) {
+        Alert.alert("Signup Failed", "Password is too similar to the username");
+      } else if (errorMessage.includes("commonly used")) {
+        Alert.alert(
+          "Signup Failed",
+          "Password cannot be a commonly used password"
+        );
+      } else {
+        Alert.alert("Signup Failed", "Please try again");
+      }
     }
   };
 
@@ -93,8 +107,8 @@ export default function SignUp() {
             birthday: new Date(),
             gender: "",
           }}
+          validationSchema={signupAndEditValidationSchema}
           validateOnChange={false}
-          validateOnBlur={false}
           onSubmit={handleSubmit}
         >
           {(formikProps) => (
@@ -114,7 +128,10 @@ export default function SignUp() {
                   text="Create Account"
                 />
                 <SubmitButton
-                  onPressHandler={() => navigation.navigate("login")}
+                  onPressHandler={() => {
+                    formikProps.resetForm();
+                    navigation.navigate("login");
+                  }}
                   text="Go Back"
                 />
               </ScrollView>

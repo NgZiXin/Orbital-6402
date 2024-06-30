@@ -13,7 +13,6 @@ export default function GuideModal() {
       <SubmitButton
         onPressHandler={() => setGuideModal(true)}
         text="Read Guide"
-        style={{ position: "relative", bottom: "23%" }}
       />
 
       {guideModal == true && (

@@ -14,6 +14,11 @@ export default function UsernameField({ formikProps }: any) {
           onChangeText={formikProps.handleChange("username")}
           value={formikProps.values.username}
         />
+        {formikProps.errors.username && (
+          <Text style={formStyles.errorText}>
+            {formikProps.errors.username}
+          </Text>
+        )}
       </View>
     </>
   );

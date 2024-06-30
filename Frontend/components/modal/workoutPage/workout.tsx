@@ -9,13 +9,21 @@ import {
 
 import { modalStyles } from "../../../styles/modal";
 import { globalStyles } from "../../../styles/global";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SubmitButton from "@/components/general/submit";
 import WorkoutForm from "@/components/form/full/workout";
 
 export default function WorkoutModal() {
   const [workoutModal, setWorkoutModal] = useState<boolean>(false);
+  const [modalHeight, setModalHeight] = useState<number>(0);
+
+  const handleLayout = (event: any) => {
+    event.persist(); // Persist the event
+    const { height } = event.nativeEvent.layout;
+    setModalHeight(height);
+  };
+
   return (
     <>
       <SubmitButton
@@ -30,38 +38,37 @@ export default function WorkoutModal() {
             <View
               style={{
                 ...modalStyles.modalContent,
-                height: "75%",
                 paddingLeft: 6,
               }}
+              // keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+              // behavior={Platform.OS === "ios" ? "padding" : undefined}
+              onLayout={handleLayout}
             >
-              <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
               >
-                <View
+                <Text
                   style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
+                    ...globalStyles.header,
+                    position: "relative",
+                    left: 9,
                   }}
                 >
-                  <Text
-                    style={{
-                      ...globalStyles.header,
-                      position: "relative",
-                      left: 9,
-                    }}
-                  >
-                    Workout Planner
-                  </Text>
-                  <TouchableOpacity onPress={() => setWorkoutModal(false)}>
-                    <Ionicons name="close-circle-outline" size={25}></Ionicons>
-                  </TouchableOpacity>
-                </View>
+                  Workout Planner
+                </Text>
+                <TouchableOpacity onPress={() => setWorkoutModal(false)}>
+                  <Ionicons name="close-circle-outline" size={25}></Ionicons>
+                </TouchableOpacity>
+              </View>
 
-                <WorkoutForm setWorkoutModal={setWorkoutModal} />
-              </KeyboardAvoidingView>
+              <WorkoutForm
+                setWorkoutModal={setWorkoutModal}
+                workoutModalHeight={modalHeight}
+              />
             </View>
           </View>
         </Modal>
