@@ -44,7 +44,7 @@ To learn more about Expo, do look at the following resources:
 2. Install dependencies in the `Frontend` folder.
 
    ```bash
-   npm install
+      npm install
    ```
 
 3. Create `.env` file under `Frontend` folder
@@ -57,20 +57,20 @@ To learn more about Expo, do look at the following resources:
 > If it is your first time developing mobile application, the most straight-forward way to access your back-end sever during development is to connect to localhost over the same Wifi network. You can refer to this [webpage](https://prowe214.medium.com/tip-how-to-view-localhost-web-apps-on-your-phone-ad6b2c883a7c) for more infomation.  
 
    ```
-   # API Endpoint
-   EXPO_PUBLIC_DOMAIN='your back-end domain'
+      # API Endpoint
+      EXPO_PUBLIC_DOMAIN='your back-end domain'
    ```
 
    An example of an `.env` file:
    ```
-   # API Endpoint
-   EXPO_PUBLIC_DOMAIN='http://191.300.50.50:8000/'
+      # API Endpoint
+      EXPO_PUBLIC_DOMAIN='http://191.300.50.50:8000/'
    ```
 
 4. Start the app 
 
    ```bash
-   npx expo start --tunnel
+      npx expo start --tunnel
    ```
 
 5. Scan the QR Code displayed on the terminal. Alternatively, view the app on an emulator. <br>
@@ -108,50 +108,50 @@ To learn more about Expo, do look at the following resources:
 6. Create `.env` file under the ./backend folder
 
    ```bash
-   touch .env
+      touch .env
    ```
 
 7. Add the following attributes into the .env file. 
 
    ```
-   # DB Config
-   DATABASE_NAME='your postgres database name'
-   DATABASE_USER='your postgres user'
-   DATABASE_PASSWORD='your postgres database password'
-   DATABASE_HOST='your postgres host' 
-   DATABASE_PORT='your postgres port'
+      # DB Config
+      DATABASE_NAME='your postgres database name'
+      DATABASE_USER='your postgres user'
+      DATABASE_PASSWORD='your postgres database password'
+      DATABASE_HOST='your postgres host' 
+      DATABASE_PORT='your postgres port'
 
-   # OneMap API Config 
-   ONEMAP_EMAIL= 'your onemap account email'
-   ONEMAP_EMAIL_PASSWORD = 'your onemap account password'
-   ```
+      # OneMap API Config 
+      ONEMAP_EMAIL= 'your onemap account email'
+      ONEMAP_EMAIL_PASSWORD = 'your onemap account password'
+      ```
 
-   An example of an `.env` file:
-   ```
-   # DB Config
-   DATABASE_NAME='orbital'
-   DATABASE_USER='Tom'
-   DATABASE_PASSWORD='12345'
-   DATABASE_HOST='localhost' 
-   DATABASE_PORT='5432'
+      An example of an `.env` file:
+      ```
+      # DB Config
+      DATABASE_NAME='orbital'
+      DATABASE_USER='Tom'
+      DATABASE_PASSWORD='12345'
+      DATABASE_HOST='localhost' 
+      DATABASE_PORT='5432'
 
-   # One Map API Config 
-   ONEMAP_EMAIL= 'tom@gmail.com'
-   ONEMAP_EMAIL_PASSWORD = 'tom123' 
+      # One Map API Config 
+      ONEMAP_EMAIL= 'tom@gmail.com'
+      ONEMAP_EMAIL_PASSWORD = 'tom123' 
    ```
 
    
 8. Apply the migrations:
 
    ```bash
-    python manage.py migrate
+      python manage.py migrate
    ```
 
    
 9. You can now run the backend development server:
 
    ```bash
-    python manage.py runserver 0.0.0.0:8000
+      python manage.py runserver 0.0.0.0:8000
    ```
 
 10. Whitelist metro's domain in Strava's callback domain field.
