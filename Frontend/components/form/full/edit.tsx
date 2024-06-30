@@ -39,32 +39,20 @@ export default function EditForm({ submitHandler }: any) {
         birthday: values.birthday.toISOString().split("T")[0], // Convert date to 'YYYY-MM-DD' format
       };
 
-<<<<<<< HEAD
-    const token: string | null = await getItem("token");
-    const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}accounts/data/`, {
-      // put request to update existing user details
-      // of the current user logged in
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Token ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
-=======
       const token: string | null = await getItem("token");
-      const ip = process.env.EXPO_PUBLIC_DOMAIN;
-      const response = await fetch(`http://${ip}:8000/accounts/data/`, {
-        // put request to update existing user details
-        // of the current user logged in
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
->>>>>>> frontend-skeleton
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_DOMAIN}accounts/data/`,
+        {
+          // put request to update existing user details
+          // of the current user logged in
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`,
+          },
+          body: JSON.stringify(body),
+        }
+      );
 
       // Case where backend raises an error
       if (!response.ok) {
