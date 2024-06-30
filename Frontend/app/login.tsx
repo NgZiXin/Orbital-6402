@@ -19,18 +19,26 @@ import PasswordField from "@/components/form/fragments/accountDetails/password";
 import SubmitButton from "@/components/general/submit";
 import loginValidationSchema from "@/components/form/validationSchema/login";
 
+interface ErrorResponse {
+  non_field_errors: string[];
+}
+
+interface SuccessResponse {
+  token: string;
+}
+
+interface LoginValues {
+  username: string;
+  password: string;
+}
+
 export default function Login() {
   const navigation: any = useNavigation();
-
-  interface LoginValues {
-    username: string;
-    password: string;
-  }
 
   const handleSubmit = async (
     values: LoginValues,
     actions: FormikHelpers<LoginValues>
-  ) => {
+  ): Promise<void> => {
     try {
       const ip = process.env.EXPO_PUBLIC_DOMAIN;
       const response = await fetch(`http://${ip}:8000/accounts/login/`, {
@@ -41,11 +49,20 @@ export default function Login() {
         body: JSON.stringify(values),
       });
 
+      // Case where backend raises an error
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        const errorResponse: ErrorResponse = await response.json();
+
+        if (errorResponse.non_field_errors) {
+          Alert.alert("Login Failed", "Incorrect user credentials provided");
+          return;
+        } else {
+          Alert.alert("Login Failed", "Network error, please try again");
+          return;
+        }
       }
 
-      const data = await response.json();
+      const data: SuccessResponse = await response.json();
       const token: string = data["token"];
 
       // stores the user (session-based) token string
@@ -55,13 +72,7 @@ export default function Login() {
       actions.resetForm();
       navigation.navigate("(tabs)");
     } catch (error: any) {
-      console.error("There was a problem with the fetch operation:", error);
-      const errorMessage = error.message;
-      console.error(errorMessage);
-      Alert.alert(
-        "Login Failed",
-        "Please check your information and try again."
-      );
+      console.error(error.message);
     }
   };
 
