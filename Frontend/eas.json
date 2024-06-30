@@ -11,7 +11,10 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_DOMAIN": "https://orbital6402-10c3fb14bb01.herokuapp.com/"
+      }
     },
     "production": {
       "env": {
