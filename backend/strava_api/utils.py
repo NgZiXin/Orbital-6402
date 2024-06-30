@@ -2,7 +2,7 @@ import requests
 from .models import StravaAccessToken, StravaRefreshToken
 from django.utils import timezone
 from datetime import timedelta
-from backend.settings import CLIENT_ID, CLIENT_SECRET
+import os
 
 def refresh_token(user):
     # Check if no token
@@ -15,8 +15,8 @@ def refresh_token(user):
     # Refresh the token
     token_url = 'https://www.strava.com/oauth/token'
     payload = {
-        'client_id':CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
+        'client_id':os.environ.get("STRAVA_CLIENT_ID"),
+        'client_secret': os.environ.get("STRAVA_CLIENT_SECRET"),
         'grant_type': 'refresh_token',
         'refresh_token': strava_refresh_token.refresh_token,
     }

@@ -13,12 +13,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def index(request):
-    user = request.user
-    strava_token =  get_token(user)
+#     user = request.user
+    strava_token =  ""#get_token(user)
     context = {
          "strava_token": strava_token,
-         "EXPO_PUBLIC_DOMAIN": os.environ.get("EXPO_PUBLIC_DOMAIN"),
+         "url": request.build_absolute_uri
     }
     return render(request, "index.html", context)
 

@@ -163,7 +163,5 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Details About Requesting Access & Token
-CLIENT_ID = 127101
-CLIENT_SECRET = "f932fe12177be89ecb888b112fe991ac9371fbc7"
+# Details About Strava App
 SCOPE = "read,read_all,profile:read_all,profile:write,activity:read_all,activity:write"

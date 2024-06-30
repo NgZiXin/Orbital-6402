@@ -7,32 +7,19 @@ from .serializers import StravaGetTokenSerializer
 from rest_framework.decorators import api_view, permission_classes
 from django.utils import timezone
 from datetime import timedelta
-from backend.settings import CLIENT_ID, CLIENT_SECRET, SCOPE
 from .utils import refresh_token
+import os
 
 @api_view(['GET'])
-def strava_get_access(request):
+def strava_check_auth(request):
     user = request.user
-    
-    # TODO: Use Serializer
-    redirect_uri = request.GET.get('redirect_uri')
-    if not redirect_uri:
-        return Response({'error': 'redirect_uri is required'}, status=400)
-    
-    strava_auth_url = (
-        f"https://www.strava.com/oauth/authorize?client_id={CLIENT_ID}"
-        f"&redirect_uri={redirect_uri}" # Make sure to update Strava callback domain
-        "&response_type=code"
-        f"&scope={SCOPE}"
-    )
+    response = {"CLIENT_ID":  os.environ.get("STRAVA_CLIENT_ID"), "status": "Failed" }
+    if StravaAccessToken.objects.filter(user=user).exists() or StravaRefreshToken.objects.filter(user=user).exists():
+            refresh_token(user)
+            response["status"] = "Success"
+            return Response(response, status=status.HTTP_200_OK)
+    return Response(response, status=status.HTTP_200_OK)
 
-    # Check which if user have authorise Strava before
-    if not StravaAccessToken.objects.filter(user=user).exists() or not StravaRefreshToken.objects.filter(user=user).exists():
-        return Response({'strava_auth_url': strava_auth_url}, status=status.HTTP_200_OK)
-    
-    # Happy path refresh token
-    refresh_token(user)
-    return Response({'status': 'success'}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def strava_get_token(request):
@@ -42,8 +29,8 @@ def strava_get_token(request):
         token_response = requests.post(
             'https://www.strava.com/oauth/token',
             data={
-                'client_id': CLIENT_ID,
-                'client_secret': CLIENT_SECRET,
+                'client_id': os.environ.get("STRAVA_CLIENT_ID"),
+                'client_secret': os.environ.get("STRAVA_CLIENT_SECRET"),
                 'code': code,
                 'grant_type': 'authorization_code',
             }
