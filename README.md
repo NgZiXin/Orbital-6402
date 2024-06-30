@@ -60,8 +60,7 @@ To learn more about Expo, do look at the following resources:
    npx expo start --tunnel --clear 
    ```
 
-5. Scan the QR Code displayed on the terminal. Alternatively, view the app on an emulator. 
-
+5. Scan the QR Code displayed on the terminal. Alternatively, view the app on an emulator. <br>
 
 ### Setting up the Back-end:
 
@@ -90,7 +89,7 @@ To learn more about Expo, do look at the following resources:
    ```
    # API Endpoint
    # Local device's IP address
-   EXPO_PUBLIC_DOMAIN='100.100.10.10'
+   REACT_APP_DOMAIN='100.100.10.10'
 
    # DB Config
    DATABASE_NAME='orbital'
