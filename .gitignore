@@ -12,8 +12,6 @@ web-build/
 venv/
 .vscode
 *.pyc
-
-# Comment out if deploying
 .env
 
 # macOS

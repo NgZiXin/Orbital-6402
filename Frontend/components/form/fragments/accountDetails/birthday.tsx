@@ -1,13 +1,15 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "../../../../styles/global";
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomTextInput from "@/components/general/customTextInput";
 import { formStyles } from "@/styles/form";
 
+const todayDate: Date = new Date();
+
 export default function BirthdayField({ formikProps }: any) {
-  const datePlaceholder = new Date();
-  const [showPicker, setShowPicker] = useState(false);
+  const [showPicker, setShowPicker] = useState<boolean>(false);
+  const [selected, setSelected] = useState<boolean>(false);
 
   return (
     <>
@@ -24,23 +26,37 @@ export default function BirthdayField({ formikProps }: any) {
               // closing the picker first before setting the field value
               // magically resolves the buggy/flashy DTP!!
               setShowPicker(false);
-              formikProps.setFieldValue("birthday", selectedDate || new Date());
+              setSelected(true);
+              formikProps.setFieldValue("birthday", selectedDate || todayDate);
             }}
-            maximumDate={new Date()}
+            maximumDate={todayDate}
           />
         )}
 
         <Pressable onPress={() => setShowPicker(true)}>
           <CustomTextInput
-            style={globalStyles.input}
-            placeholder={datePlaceholder.toDateString()}
+            style={selected ? styles.selected : globalStyles.input}
+            placeholder={todayDate.toDateString()}
             onChangeText={formikProps.handleChange("birthday")}
             value={formikProps.values.birthday.toLocaleDateString()}
             editable={false}
             onPressIn={() => setShowPicker(true)}
           />
         </Pressable>
+
+        {formikProps.errors.birthday && (
+          <Text style={formStyles.errorText}>
+            {formikProps.errors.birthday}
+          </Text>
+        )}
       </View>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  selected: {
+    ...globalStyles.input,
+    color: "black",
+  },
+});

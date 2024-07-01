@@ -53,6 +53,11 @@ export default function PasswordField({ formikProps }: any) {
             </TouchableOpacity>
           )}
         </View>
+        {formikProps.errors.password && (
+          <Text style={formStyles.errorText}>
+            {formikProps.errors.password}
+          </Text>
+        )}
       </View>
     </>
   );

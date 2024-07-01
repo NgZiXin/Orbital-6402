@@ -15,6 +15,9 @@ export default function WeightField({ formikProps }: any) {
           value={formikProps.values.weight}
           keyboardType="numeric"
         />
+        {formikProps.errors.weight && (
+          <Text style={formStyles.errorText}>{formikProps.errors.weight}</Text>
+        )}
       </View>
     </>
   );

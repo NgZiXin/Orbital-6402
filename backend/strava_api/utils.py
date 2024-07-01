@@ -2,7 +2,8 @@ import requests
 from .models import StravaAccessToken, StravaRefreshToken
 from django.utils import timezone
 from datetime import timedelta
-from backend.settings import CLIENT_ID, CLIENT_SECRET
+import pytz
+import os
 
 def refresh_token(user):
     # Check if no token
@@ -15,8 +16,8 @@ def refresh_token(user):
     # Refresh the token
     token_url = 'https://www.strava.com/oauth/token'
     payload = {
-        'client_id':CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
+        'client_id':os.environ.get("STRAVA_CLIENT_ID"),
+        'client_secret': os.environ.get("STRAVA_CLIENT_SECRET"),
         'grant_type': 'refresh_token',
         'refresh_token': strava_refresh_token.refresh_token,
     }
@@ -45,3 +46,36 @@ def get_token(user):
         strava_access_token = StravaAccessToken.objects.get(user=user)
     
     return strava_access_token.access_token
+
+def fetchStats(after, before, page, access_token):
+     # Returns an array
+    response = requests.get(
+        "https://www.strava.com/api/v3/athlete/activities",
+        params={
+            "before": before,
+            "after": after,
+            "page": page,
+            "per_page": "30"
+        },
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+    # Check if the response is okay
+    if response.status_code == 200:
+        return response.json()
+    else:
+        # Raise an exception with the status code and error message
+        response.raise_for_status()
+
+def datetime_to_utc_timestamp(datetime_field):
+    # Ensure the datetime is timezone-aware
+    if datetime_field.tzinfo is None:
+        datetime_field = timezone.make_aware(datetime_field, timezone=pytz.utc)
+    
+    # Convert to UTC if it's not already
+    datetime_utc = datetime_field.astimezone(pytz.utc)
+    
+    # Get the Unix timestamp
+    timestamp = int(datetime_utc.timestamp())
+    return timestamp

@@ -17,33 +17,54 @@ import { setItem } from "../components/general/asyncStorage";
 import UsernameField from "@/components/form/fragments/accountDetails/username";
 import PasswordField from "@/components/form/fragments/accountDetails/password";
 import SubmitButton from "@/components/general/submit";
+import loginValidationSchema from "@/components/form/validationSchema/login";
+
+interface ErrorResponse {
+  non_field_errors: string[];
+}
+
+interface SuccessResponse {
+  token: string;
+}
+
+interface LoginValues {
+  username: string;
+  password: string;
+}
 
 export default function Login() {
   const navigation: any = useNavigation();
 
-  interface LoginValues {
-    username: string;
-    password: string;
-  }
-
   const handleSubmit = async (
     values: LoginValues,
     actions: FormikHelpers<LoginValues>
-  ) => {
+  ): Promise<void> => {
     try {
-      const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}accounts/login/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_DOMAIN}accounts/login/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
 
+      // Case where backend raises an error
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        const errorResponse: ErrorResponse = await response.json();
+
+        if (errorResponse.non_field_errors) {
+          Alert.alert("Login Failed", "Incorrect user credentials provided");
+          return;
+        } else {
+          Alert.alert("Login Failed", "Network error, please try again");
+          return;
+        }
       }
 
-      const data = await response.json();
+      const data: SuccessResponse = await response.json();
       const token: string = data["token"];
 
       // stores the user (session-based) token string
@@ -52,12 +73,8 @@ export default function Login() {
       // Handle successful login (navigate to profile page)
       actions.resetForm();
       navigation.navigate("(tabs)");
-    } catch (error) {
-      console.error("There was a problem with the fetch operation:", error);
-      Alert.alert(
-        "Login Failed",
-        "Please check your information and try again."
-      );
+    } catch (error: any) {
+      console.error(error.message);
     }
   };
 
@@ -78,6 +95,7 @@ export default function Login() {
           >
             <Formik
               initialValues={{ username: "", password: "" }}
+              validationSchema={loginValidationSchema}
               // optimizations
               validateOnChange={false}
               validateOnBlur={false}
@@ -97,7 +115,10 @@ export default function Login() {
                       text="Log In"
                     />
                     <SubmitButton
-                      onPressHandler={() => navigation.navigate("sign-up")}
+                      onPressHandler={() => {
+                        formikProps.resetForm();
+                        navigation.navigate("sign-up");
+                      }}
                       text="Sign Up"
                     />
                   </ScrollView>
