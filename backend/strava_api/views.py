@@ -67,11 +67,11 @@ def strava_get_stats(request):
         start_date = parse_datetime(request.GET.get('start_date'))
         end_date = parse_datetime(request.GET.get('end_date'))
         
-        intervals = []
+        intervals = [0 for _ in range(7)]
         current_date = start_date
-        while current_date < end_date:
+        for i in range(7):
             next_date = current_date + timedelta(hours=24)
-            intervals.append(next_date)
+            intervals[i] = next_date
             current_date = next_date
         
         # Store weekly results
@@ -81,8 +81,8 @@ def strava_get_stats(request):
         total_duration = 0
 
         # Store daily results
-        distance_daily = [0 for _ in range(len(intervals))] 
-        duration_daily = [0 for _ in range(len(intervals))] 
+        distance_daily = [0 for _ in range(7)] 
+        duration_daily = [0 for _ in range(7)] 
 
         # Populate all_results
         access_token = get_token(request.user)
@@ -109,7 +109,7 @@ def strava_get_stats(request):
 
             # find its basket for daily results
             key = 0
-            while(key < len(intervals)):
+            while(key < 7):
                 if (start_date_singapore < intervals[key]):
                     break
                 key += 1
@@ -132,7 +132,7 @@ def strava_get_stats(request):
             "distance_daily" : distance_daily,
             "duration_daily" : duration_daily,
         }
-
+        
         return Response(result, status=status.HTTP_200_OK)
     return Response({'error': 'Invalid Query'}, status=400)
 

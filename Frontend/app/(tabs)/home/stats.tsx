@@ -113,9 +113,10 @@ export default function Stats() {
     const endDate: Date = new Date(yearE, monthE - 1, dayE);
 
     const token: string | null = await getItem("token");
-
     const response = await fetch(
-      `${process.env.EXPO_PUBLIC_DOMAIN}strava_api/get_stats/?start_date=${startDate}&end_date=${endDate}`,
+      `${
+        process.env.EXPO_PUBLIC_DOMAIN
+      }strava_api/get_stats/?start_date=${startDate.toISOString()}&end_date=${endDate.toISOString()}`,
       {
         method: "GET",
         headers: {
@@ -130,9 +131,7 @@ export default function Stats() {
       setIsLoggedIn(false);
       return;
     }
-
     // valid response
-    setIsLoggedIn(true);
     const weekDetailsObject: WeekDetails = await response.json();
     const weekDetailsValues = Object.values(weekDetailsObject);
 
@@ -150,7 +149,7 @@ export default function Stats() {
     setWeekValues(weeklyValues);
 
     // calculate progress values for weekly stats
-    const progressValuesResult: number[] = weekValues.map((num, index) =>
+    const progressValuesResult: number[] = weeklyValues.map((num, index) =>
       calculateProgress(num, weekGoalValues[index])
     );
     setProgressValues(progressValuesResult);
@@ -174,11 +173,11 @@ export default function Stats() {
 
     // update the dataSkeleton
     const updatedDataSkeleton = dataSkeleton.map((item: any, index: number) => {
-      const distanceThisDay: number = dayValues[0][index];
-      const durationThisDay: number = dayValues[1][index];
+      const distanceThisDay: number = parseFloat(dailyValues[0][index].toFixed(1));
+      const durationThisDay: number = parseFloat(dailyValues[1][index].toFixed(1));
       return {
         ...item,
-        value: dailyDistanceValue,
+        value: distanceThisDay,
         onPress: () => {
           setDailyDistanceValue(distanceThisDay);
           setDailyDurationValue(durationThisDay);
@@ -187,6 +186,7 @@ export default function Stats() {
     });
 
     setDataSkeleton(updatedDataSkeleton);
+    setIsLoggedIn(true);
   }
 
   // store selectedWeek as a string array
@@ -213,14 +213,17 @@ export default function Stats() {
   function handleGoForward(): void {
     const currentEnd: string = selectedWeek[1];
 
+    const [day0, month0, year0]: number[] = currentEnd.split("/").map(Number);
+    const newStart: Date = new Date(year0, month0 - 1, day0);
+
+    const [day1, month1, year1]: number[] = initialEnd.split("/").map(Number);
+    const initStart: Date = new Date(year1, month1 - 1, day1);
+
     // prevent you from going beyond this week
-    if (currentEnd === initialEnd) {
+    if (newStart >= initStart) {
       setWeekToggleModal(true);
       return;
     }
-
-    const [day, month, year]: number[] = currentEnd.split("/").map(Number);
-    const newStart: Date = new Date(year, month - 1, day);
 
     const newEnd: Date = new Date(newStart);
     newEnd.setDate(newEnd.getDate() + 7);
@@ -253,171 +256,174 @@ export default function Stats() {
           />
         </View>
         {isLoggedIn && (
-          <>
-            <View style={styles.statsWrapper}>
-              <View style={styles.weekToggle}>
-                <TouchableOpacity onPress={handleGoBack}>
-                  <Ionicons
-                    name="arrow-back-circle-outline"
-                    size={25}
-                    style={styles.leftArrow}
-                  />
-                </TouchableOpacity>
-
-                <Text style={globalStyles.para}>
-                  {selectedWeek[0] + " - " + selectedWeek[1]}
-                </Text>
-
-                <TouchableOpacity onPress={handleGoForward}>
-                  <Ionicons
-                    name="arrow-forward-circle-outline"
-                    size={25}
-                    style={styles.rightArrow}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.stats}>
-                <View style={styles.statsHalf}>
-                  <View style={[styles.statsCell, styles.statsCellExtra]}>
-                    <Text style={globalStyles.label}>Workout Count</Text>
-                    <Text style={globalStyles.label}>
-                      <Text style={styles.highlightedText}>
-                        {progressValues[0] + "%"}
-                      </Text>
-                      progress
-                    </Text>
+            <>
+              <View style={styles.statsWrapper}>
+                <View style={styles.weekToggle}>
+                  <TouchableOpacity onPress={handleGoBack}>
                     <Ionicons
-                      name="bicycle-outline"
-                      size={35}
-                      style={styles.statsIcon}
+                      name="arrow-back-circle-outline"
+                      size={25}
+                      style={styles.leftArrow}
                     />
-                    <ProgressBar
-                      leftLabel={weekValues[0]}
-                      rightLabel={weekGoalValues[0]}
-                      progress={progressValues[0]}
+                  </TouchableOpacity>
+
+                  <Text style={globalStyles.para}>
+                    {selectedWeek[0] + " - " + selectedWeek[1]}
+                  </Text>
+
+                  <TouchableOpacity onPress={handleGoForward}>
+                    <Ionicons
+                      name="arrow-forward-circle-outline"
+                      size={25}
+                      style={styles.rightArrow}
                     />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.stats}>
+                  <View style={styles.statsHalf}>
+                    <View style={[styles.statsCell, styles.statsCellExtra]}>
+                      <Text style={globalStyles.label}>Workout Count</Text>
+                      <Text style={globalStyles.label}>
+                        <Text style={styles.highlightedText}>
+                          {progressValues[0] + "%"}
+                        </Text>
+                        progress
+                      </Text>
+                      <Ionicons
+                        name="bicycle-outline"
+                        size={35}
+                        style={styles.statsIcon}
+                      />
+                      <ProgressBar
+                        leftLabel={weekValues[0]}
+                        rightLabel={weekGoalValues[0]}
+                        progress={progressValues[0]}
+                      />
+                    </View>
+                    <View style={styles.statsCell}>
+                      <Text style={globalStyles.label}>Exercise Duration</Text>
+                      <Text style={globalStyles.label}>
+                        <Text style={styles.highlightedText}>
+                          {progressValues[3] + "%"}
+                        </Text>
+                        progress
+                      </Text>
+                      <Ionicons
+                        name="time-outline"
+                        size={35}
+                        style={styles.statsIcon}
+                      />
+                      <ProgressBar
+                        leftLabel={weekValues[3]}
+                        rightLabel={weekGoalValues[3]}
+                        progress={progressValues[3]}
+                      />
+                    </View>
                   </View>
-                  <View style={styles.statsCell}>
-                    <Text style={globalStyles.label}>Exercise Duration</Text>
-                    <Text style={globalStyles.label}>
-                      <Text style={styles.highlightedText}>
-                        {progressValues[3] + "%"}
+                  <View style={styles.statsHalf}>
+                    <View style={[styles.statsCell, styles.statsCellExtra]}>
+                      <Text style={globalStyles.label}>Total Distance</Text>
+                      <Text style={globalStyles.label}>
+                        <Text style={styles.highlightedText}>
+                          {progressValues[2] + "%"}
+                        </Text>{" "}
+                        progress
                       </Text>
-                      progress
-                    </Text>
-                    <Ionicons
-                      name="time-outline"
-                      size={35}
-                      style={styles.statsIcon}
-                    />
-                    <ProgressBar
-                      leftLabel={weekValues[3]}
-                      rightLabel={weekGoalValues[3]}
-                      progress={progressValues[3]}
-                    />
+                      <Ionicons
+                        name="flame-outline"
+                        size={35}
+                        style={styles.statsIcon}
+                      />
+
+                      <ProgressBar
+                        leftLabel={weekValues[2]}
+                        rightLabel={weekGoalValues[2]}
+                        progress={progressValues[2]}
+                      />
+                    </View>
+                    <View style={styles.statsCell}>
+                      <Text style={globalStyles.label}>Achievements</Text>
+                      <Text style={globalStyles.label}>
+                        <Text style={styles.highlightedText}>
+                          {progressValues[1] + "%"}
+                        </Text>{" "}
+                        progress
+                      </Text>
+                      <Ionicons
+                        name="rocket-outline"
+                        size={35}
+                        style={[styles.statsIcon, styles.iconExtra]}
+                      />
+                      <ProgressBar
+                        leftLabel={weekValues[1]}
+                        rightLabel={weekGoalValues[1]}
+                        progress={progressValues[1]}
+                      />
+                    </View>
                   </View>
                 </View>
-                <View style={styles.statsHalf}>
-                  <View style={[styles.statsCell, styles.statsCellExtra]}>
-                    <Text style={globalStyles.label}>Total Distance</Text>
-                    <Text style={globalStyles.label}>
-                      <Text style={styles.highlightedText}>
-                        {progressValues[2] + "%"}
-                      </Text>{" "}
-                      progress
-                    </Text>
-                    <Ionicons
-                      name="flame-outline"
-                      size={35}
-                      style={styles.statsIcon}
-                    />
+              </View>
 
-                    <ProgressBar
-                      leftLabel={weekValues[2]}
-                      rightLabel={weekGoalValues[2]}
-                      progress={progressValues[2]}
-                    />
-                  </View>
-                  <View style={styles.statsCell}>
-                    <Text style={globalStyles.label}>Achievements</Text>
-                    <Text style={globalStyles.label}>
-                      <Text style={styles.highlightedText}>
-                        {progressValues[1] + "%"}
-                      </Text>{" "}
-                      progress
-                    </Text>
-                    <Ionicons
-                      name="rocket-outline"
-                      size={35}
-                      style={[styles.statsIcon, styles.iconExtra]}
-                    />
-                    <ProgressBar
-                      leftLabel={weekValues[1]}
-                      rightLabel={weekGoalValues[1]}
-                      progress={progressValues[1]}
-                    />
-                  </View>
+              <View style={styles.buttonsWrapper}>
+                <TouchableOpacity
+                  onPress={handleSetGoals}
+                  style={styles.button}
+                >
+                  <Text style={globalStyles.para}>Set Goals</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleViewAll}
+                  style={[styles.button, styles.buttonExtra]}
+                >
+                  <Text style={globalStyles.para}>View All</Text>
+                </TouchableOpacity>
+              </View>
+
+              <PageHeader topText="" bottomText="Weekly Mileage" />
+              <View style={styles.barChartWrapper}>
+                <BarChart
+                  // general
+                  data={dataSkeleton}
+                  width={screenWidth - 24} // since padding of 12
+                  hideRules
+                  hideOrigin
+                  // handle y-axis
+                  showYAxisIndices={false}
+                  hideYAxisText
+                  yAxisThickness={0}
+                  yAxisLabelWidth={0}
+                  // handle x-axis
+                  disableScroll
+                  initialSpacing={0}
+                  spacing={20}
+                  barWidth={(screenWidth - 24 - 120) / 7} // maths
+                  xAxisLength={screenWidth - 25}
+                  parentWidth={screenWidth - 24}
+                  //styling
+                  frontColor="#FBB3B3"
+                  xAxisLabelTextStyle={globalStyles.label}
+                  barBorderBottomLeftRadius={0}
+                  barBorderBottomRightRadius={0}
+                  barBorderRadius={7}
+                />
+              </View>
+
+              <View style={styles.selectedDayStatsWrapper}>
+                <View style={styles.selectedDayStatCell1}>
+                  <Text style={styles.topText}>{dailyDistanceValue}</Text>
+                  <Text style={styles.bottomText}>Distance (km)</Text>
+                </View>
+                <View>
+                  <Text style={styles.topText}>{dailyDurationValue}</Text>
+                  <Text style={styles.bottomText}>Duration (hr:min)</Text>
                 </View>
               </View>
-            </View>
 
-            <View style={styles.buttonsWrapper}>
-              <TouchableOpacity onPress={handleSetGoals} style={styles.button}>
-                <Text style={globalStyles.para}>Set Goals</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleViewAll}
-                style={[styles.button, styles.buttonExtra]}
-              >
-                <Text style={globalStyles.para}>View All</Text>
-              </TouchableOpacity>
-            </View>
-
-            <PageHeader topText="" bottomText="Weekly Mileage" />
-            <View style={styles.barChartWrapper}>
-              <BarChart
-                // general
-                data={dataSkeleton}
-                width={screenWidth - 24} // since padding of 12
-                hideRules
-                hideOrigin
-                // handle y-axis
-                showYAxisIndices={false}
-                hideYAxisText
-                yAxisThickness={0}
-                yAxisLabelWidth={0}
-                // handle x-axis
-                disableScroll
-                initialSpacing={0}
-                spacing={20}
-                barWidth={(screenWidth - 24 - 120) / 7} // maths
-                xAxisLength={screenWidth - 25}
-                parentWidth={screenWidth - 24}
-                //styling
-                frontColor="#FBB3B3"
-                xAxisLabelTextStyle={globalStyles.label}
-                barBorderBottomLeftRadius={0}
-                barBorderBottomRightRadius={0}
-                barBorderRadius={7}
-              />
-            </View>
-
-            <View style={styles.selectedDayStatsWrapper}>
-              <View style={styles.selectedDayStatCell1}>
-                <Text style={styles.topText}>{dailyDistanceValue}</Text>
-                <Text style={styles.bottomText}>Distance (km)</Text>
-              </View>
-              <View>
-                <Text style={styles.topText}>{dailyDurationValue}</Text>
-                <Text style={styles.bottomText}>Duration (hr:min)</Text>
-              </View>
-            </View>
-
-            {weekToggleModal && (
-              <WeekToggleModal setWeekToggleModal={setWeekToggleModal} />
-            )}
-          </>
-        )}
+              {weekToggleModal && (
+                <WeekToggleModal setWeekToggleModal={setWeekToggleModal} />
+              )}
+            </>
+          )}
 
         {!isLoggedIn && (
           <View
