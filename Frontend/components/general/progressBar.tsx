@@ -2,9 +2,9 @@ import { DimensionValue, StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "@/styles/global";
 
 interface ProgressBarProps {
-  leftLabel: string;
-  rightLabel: string;
-  progress: DimensionValue;
+  leftLabel: number;
+  rightLabel: number;
+  progress: number;
 }
 
 export default function ProgressBar({
@@ -12,6 +12,8 @@ export default function ProgressBar({
   rightLabel,
   progress,
 }: ProgressBarProps) {
+  const updatedProgress = progress > 100 ? 100 : progress;
+  const stringVersion: DimensionValue = `${updatedProgress}%`;
   return (
     <>
       <View style={styles.labels}>
@@ -19,7 +21,7 @@ export default function ProgressBar({
         <Text style={globalStyles.para}>{rightLabel}</Text>
       </View>
       <View style={styles.backgroundBar}>
-        <View style={[styles.progressBar, { width: progress }]}></View>
+        <View style={[styles.progressBar, { width: stringVersion }]}></View>
       </View>
     </>
   );
