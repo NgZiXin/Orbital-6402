@@ -33,7 +33,7 @@ export default function Location() {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState<String | null>(null);
   const [webviewUri, setWebviewUri] = useState(
-    `${process.env.EXPO_PUBLIC_DOMAIN}/services/`
+    `${process.env.EXPO_PUBLIC_DOMAIN}services/`
   );
 
   const searchHandler = () => {
