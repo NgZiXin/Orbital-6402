@@ -1,5 +1,4 @@
 import { Alert, StyleSheet } from "react-native";
-// import { EXPO_PUBLIC_DOMAIN } from "@env";
 import { getItem } from "../general/asyncStorage";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
@@ -10,7 +9,7 @@ const SCOPE =
 
 export default function LinkStrava() {
   // Create deepl link url
-  const redirect_uri = Linking.createURL("com.orbital");
+  const redirect_uri = Linking.createURL("profile");
 
   const handleSubmit = async () => {
     // getItem('token') returns a Promise
