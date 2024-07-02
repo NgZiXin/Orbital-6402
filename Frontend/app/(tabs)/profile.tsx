@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
 import { getItem } from "../../components/general/asyncStorage";
 import LinkStrava from "../../components/strava/LinkStrava";
-
+import LoadingScreen from "@/components/general/loadingScreen";
 import EditModal from "@/components/modal/profilePage/edit";
 import LogoutModal from "@/components/modal/profilePage/logout";
 import BmiModal from "@/components/modal/profilePage/bmi";
@@ -31,13 +31,16 @@ export default function Profile() {
     // getItem('token') returns a Promise
     // hence, we await to wait for the Promise to complete and grab its value
     const token: string | null = await getItem("token");
-    const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}accounts/data`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Token ${token}`,
-      },
-    });
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_DOMAIN}accounts/data`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -115,7 +118,7 @@ export default function Profile() {
     }
   }, [userDetails]);
 
-  return (
+  return userDetails.length > 0 ? (
     <ScrollView
       style={globalStyles.container}
       showsVerticalScrollIndicator={false}
@@ -135,22 +138,22 @@ export default function Profile() {
             This same idea is repeated multiple times below! 
           */}
         {/* Gender is found at index 5 of the array */}
-        {userDetails.length > 0 && userDetails[5] == "F" && (
+        {userDetails[5] == "F" && (
           <Image
             source={require("../../assets/images/female-pfp.jpg")}
             style={styles.pfp}
           />
         )}
 
-        {userDetails.length > 0 && userDetails[5] == "M" && (
+        {userDetails[5] == "M" && (
           <Image
             source={require("../../assets/images/male-pfp.png")}
             style={styles.pfp}
           />
         )}
 
-        {userDetails.length > 0 && (
-          <View style={{ height: "15%", marginBottom: -8 }}>
+
+          <View style={{ height: "15%"}}>
             <Text style={styles.userName}>
               {/* Username is found at index 1 of the array */}
               {userDetails[1] + " (" + userDetails[5] + ")"}
@@ -160,7 +163,7 @@ export default function Profile() {
             {/* <Text>Tom </Text>  
               <Text style={{color: 'red'}}>Hanks</Text> */}
           </View>
-        )}
+
 
         <View style={styles.iconWrapper}>
           <EditModal triggerUpdate={triggerUpdate} />
@@ -239,20 +242,13 @@ export default function Profile() {
           <SyncModal />
         </View>
 
-        <View style={styles.authCode}>
-          <View style={globalStyles.cardV1}>
-            <View style={{ padding: 10 }}>
-              <Text style={globalStyles.para}>
-                This will display the authCode when the sync button is pressed!
-              </Text>
-            </View>
-          </View>
-        </View>
         <SafeAreaView style={{ width: "100%" }}>
           <LinkStrava />
         </SafeAreaView>
       </View>
     </ScrollView>
+  ) : (
+    <LoadingScreen />
   );
 }
 
@@ -291,7 +287,7 @@ const styles = StyleSheet.create({
     fontFamily: "inter-bold",
     fontSize: 16,
     marginTop: 10,
-    paddingBottom: 5,
+    paddingBottom: 2,
   },
 
   iconWrapper: {
@@ -336,7 +332,7 @@ const styles = StyleSheet.create({
   },
 
   stravaWrapper: {
-    marginTop: 145,
+    marginTop: 120,
     width: "100%",
     flexDirection: "column",
     alignItems: "center",
