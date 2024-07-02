@@ -178,7 +178,7 @@ export default function Location() {
             ...globalStyles.cardV2,
             position: "relative",
             bottom: 10,
-            marginBottom: 38,
+            marginBottom: 27,
           }}
         >
           <View style={[styles.cardInner, { height: 250 }]}>
@@ -199,7 +199,7 @@ export default function Location() {
         <SubmitButton
           text="View Routes"
           onPressHandler={() => navigation.navigate("runningRoute")}
-          style={{ marginTop: "-1%" }}
+          style={{ marginTop: "-6%" }}
         />
       </View>
     </View>
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   runningRoute: {
     ...globalStyles.para,
     position: "relative",
-    bottom: 20,
+    bottom: 30,
   },
 
   imageWrapper: {
