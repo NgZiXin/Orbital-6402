@@ -9,7 +9,6 @@ import {
   Text,
   View,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
 } from "react-native";
 
@@ -52,7 +51,7 @@ export default function Location() {
         })
         .then((data) => {
           setWebviewUri(
-            `${process.env.EXPO_PUBLIC_DOMAIN}/services/?type=${query}&lat=${data["results"][0]["LATITUDE"]}&lon=${data["results"][0]["LONGITUDE"]}&radius=3000`
+            `${process.env.EXPO_PUBLIC_DOMAIN}services/?type=${query}&lat=${data["results"][0]["LATITUDE"]}&lon=${data["results"][0]["LONGITUDE"]}&radius=3000`
           );
         })
         .catch((error) => {
@@ -98,9 +97,8 @@ export default function Location() {
   };
 
   return (
-    <ScrollView
+    <View
       style={globalStyles.container}
-      showsVerticalScrollIndicator={false}
     >
       <View style={{ padding: 12 }}>
         <PageHeader topText="Finder" bottomText="Find Nearest Gym & Park" />
@@ -204,7 +202,7 @@ export default function Location() {
           style={{ marginTop: "-1%" }}
         />
       </View>
-    </ScrollView>
+    </View>
   );
 }
 

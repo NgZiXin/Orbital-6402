@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { View, ActivityIndicator } from "react-native";
+import LoadingScreen from "@/components/general/loadingScreen";
 import { getItem } from "@/components/general/asyncStorage";
 
 // Expo router first routes to this page (entry point)
@@ -14,11 +14,7 @@ const Index = () => {
       item ? router.replace("/profile") : router.replace("/login");
     });
   }, []);
-  
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ActivityIndicator size="large" color="#0000ff" />
-    </View>
-  );
+
+  return <LoadingScreen />;
 };
 export default Index;
