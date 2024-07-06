@@ -21,18 +21,30 @@ const commonStyles = StyleSheet.create({
 const tableStyles = StyleSheet.create({
   nameHeader: {
     ...commonStyles.commonHeaderStyles,
-    flex: 2.3,
+    flex: 3.4,
     borderTopWidth: 0,
     borderLeftWidth: 0,
   },
 
   weightHeader: {
     ...commonStyles.commonHeaderStyles,
+    flex: 1.75,
+    borderTopWidth: 0,
+  },
+
+  setsHeader: {
+    ...commonStyles.commonHeaderStyles,
     flex: 1,
     borderTopWidth: 0,
   },
 
-  amountHeader: {
+  repsHeader: {
+    ...commonStyles.commonHeaderStyles,
+    flex: 1,
+    borderTopWidth: 0,
+  },
+
+  restsHeader: {
     ...commonStyles.commonHeaderStyles,
     flex: 1,
     borderTopWidth: 0,
@@ -45,17 +57,27 @@ const tableStyles = StyleSheet.create({
 
   nameCellWrapper: {
     ...commonStyles.commonCellStyles,
-    flex: 2.3,
+    flex: 3.4,
     flexDirection: "row",
     borderLeftWidth: 0,
   },
 
   weightCellWrapper: {
     ...commonStyles.commonCellStyles,
+    flex: 1.75,
+  },
+
+  setsCellWrapper: {
+    ...commonStyles.commonCellStyles,
     flex: 1,
   },
 
-  amountCellWrapper: {
+  repsCellWrapper: {
+    ...commonStyles.commonCellStyles,
+    flex: 1,
+  },
+
+  restsCellWrapper: {
     ...commonStyles.commonCellStyles,
     flex: 1,
     borderRightWidth: 0,

@@ -1,8 +1,9 @@
+# Helper functions
+
 import requests
 from .models import StravaAccessToken, StravaRefreshToken
 from django.utils import timezone
 from datetime import timedelta
-import pytz
 import os
 
 def refresh_token(user):
@@ -67,15 +68,3 @@ def fetchStats(after, before, page, access_token):
     else:
         # Raise an exception with the status code and error message
         response.raise_for_status()
-
-def datetime_to_utc_timestamp(datetime_field):
-    # Ensure the datetime is timezone-aware
-    if datetime_field.tzinfo is None:
-        datetime_field = timezone.make_aware(datetime_field, timezone=pytz.utc)
-    
-    # Convert to UTC if it's not already
-    datetime_utc = datetime_field.astimezone(pytz.utc)
-    
-    # Get the Unix timestamp
-    timestamp = int(datetime_utc.timestamp())
-    return timestamp

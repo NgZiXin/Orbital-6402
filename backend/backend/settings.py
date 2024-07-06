@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'strava_api',
     'rest_framework.authtoken',
     'map',
+    'workout',
     'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',

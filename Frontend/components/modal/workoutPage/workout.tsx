@@ -14,7 +14,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import SubmitButton from "@/components/general/submit";
 import WorkoutForm from "@/components/form/full/workout";
 
-export default function WorkoutModal() {
+export default function WorkoutModal({setWorkoutData, setMessage}: any) {
   const [workoutModal, setWorkoutModal] = useState<boolean>(false);
   const [modalHeight, setModalHeight] = useState<number>(0);
 
@@ -67,6 +67,8 @@ export default function WorkoutModal() {
 
               <WorkoutForm
                 setWorkoutModal={setWorkoutModal}
+                setWorkoutData={setWorkoutData}
+                setMessage={setMessage}
                 workoutModalHeight={modalHeight}
               />
             </View>

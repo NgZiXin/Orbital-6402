@@ -8,7 +8,8 @@ from rest_framework.decorators import api_view, permission_classes
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from datetime import datetime, timedelta
-from .utils import get_token, refresh_token, fetchStats, datetime_to_utc_timestamp
+from .views_helpers import get_token, refresh_token, fetchStats
+from backend.utils import datetime_to_utc_timestamp
 import pytz
 import os
 

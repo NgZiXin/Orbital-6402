@@ -27,6 +27,7 @@ const baseMaps = {
   Default: DEFAULT,
   Night: NIGHT,
   Grey: GREY,
+  Street: STREET,
 };
 const overlayMaps = {
   "Strava Segments": stravaSegments,

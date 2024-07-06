@@ -13,32 +13,30 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-
-import sampleData from "./data";
+import { WorkoutData } from "@/app/(tabs)/workout";
 import tableStyles from "@/styles/table";
 import { globalStyles } from "@/styles/global";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ValidationModal from "@/components/modal/workoutPage/muscleGroup/validation";
 
-type TableData = {
-  name: string;
-  weight: number;
-  amount: string;
+type TableProps = {
+  workoutData: WorkoutData[];
+  refresh: boolean;
 };
 
-export default function Table() {
+export default function Table({ workoutData, refresh }: TableProps) {
   // returns a memoized array value, that never changes
   // so don't need to keep rebuilding on every render
-  const columns = useMemo(() => ["Name", "Weight", "Amount"], []);
+  const columns = useMemo(() => ["Name", "Weight", "Sets", "Reps", "Rest"], []);
 
-  const [tableData, setTableData] = useState<TableData[]>([]);
+  const [tableData, setTableData] = useState<WorkoutData[]>(workoutData);
   const [validationModal, setValidationModal] = useState<boolean>(false);
   const deleteIndex = useRef<number>(-1);
 
-  // on mount, setTableData based on the sampleData (placeholder for now)
+  // For Refresh
   useEffect(() => {
-    setTableData(sampleData);
-  }, []);
+    setTableData(workoutData);
+  }, [refresh, workoutData]);
 
   // returns a memoized function object, that never changes
   // so don't need to keep rebuilding on every render
@@ -53,7 +51,11 @@ export default function Table() {
                 ? tableStyles.nameHeader
                 : index === 1
                 ? tableStyles.weightHeader
-                : tableStyles.amountHeader
+                : index === 2
+                ? tableStyles.setsHeader
+                : index === 3
+                ? tableStyles.repsHeader
+                : tableStyles.restsHeader
             }
           >
             <Text
@@ -90,7 +92,7 @@ export default function Table() {
               <Ionicons
                 name="close-outline"
                 size={15}
-                style={{ position: "relative", right: 5 }}
+                style={{ position: "relative", right: 7 }}
               />
             </TouchableOpacity>
             <Text style={{ ...globalStyles.label, width: "90%" }}>
@@ -104,16 +106,34 @@ export default function Table() {
               index === lastIndex ? styles.cellsExtra : undefined,
             ]}
           >
-            <Text style={globalStyles.label}>{item.weight}</Text>
+            <Text style={globalStyles.label}>{item.weight} kg</Text>
           </View>
 
           <View
             style={[
-              tableStyles.amountCellWrapper,
+              tableStyles.setsCellWrapper,
               index === lastIndex ? styles.cellsExtra : undefined,
             ]}
           >
-            <Text style={globalStyles.label}>{item.amount}</Text>
+            <Text style={globalStyles.label}>{item.sets}</Text>
+          </View>
+
+          <View
+            style={[
+              tableStyles.repsCellWrapper,
+              index === lastIndex ? styles.cellsExtra : undefined,
+            ]}
+          >
+            <Text style={globalStyles.label}>{item.reps}</Text>
+          </View>
+
+          <View
+            style={[
+              tableStyles.restsCellWrapper,
+              index === lastIndex ? styles.cellsExtra : undefined,
+            ]}
+          >
+            <Text style={globalStyles.label}>{item.rests}s</Text>
           </View>
         </View>
       );
@@ -134,31 +154,33 @@ export default function Table() {
   }
 
   return (
-    <View style={styles.tableWrapper}>
-      <View style={{ flex: 1 }}>
-        <FlatList
-          data={tableData}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={renderHeader(columns)}
-          renderItem={renderRows}
-        />
-
-        {validationModal && (
-          <ValidationModal
-            setValidationModal={setValidationModal}
-            topText="Delete Confirmation"
-            bottomText="Are you sure you want to delete this exercise"
-            handleDelete={handleDelete}
+    <View style={{ flex: 1 }}>
+      <View style={styles.tableWrapper}>
+        
+          <FlatList
+            data={tableData}
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={renderHeader(columns)}
+            renderItem={renderRows}
           />
-        )}
+
+          {validationModal && (
+            <ValidationModal
+              setValidationModal={setValidationModal}
+              topText="Delete Confirmation"
+              bottomText="Are you sure you want to delete this exercise"
+              handleDelete={handleDelete}
+            />
+          )}
+        </View>
       </View>
-    </View>
+    
   );
 }
 
 const styles = StyleSheet.create({
   tableWrapper: {
-    height: 310,
+    maxHeight: 310,
     borderWidth: 2,
     borderColor: "#FFC4C4",
     marginTop: -19,

@@ -4,9 +4,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from .utils import get_access_token
+from .views_helpers import get_access_token
 from .serializers import GetPathSerializer
-from strava_api.utils import get_token
+from strava_api.views_helpers import get_token
 
 @api_view(['GET'])
 def index(request):
