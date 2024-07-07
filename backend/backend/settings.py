@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'map',
     'workout',
+    'user_calendar',
     'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
