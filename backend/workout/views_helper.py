@@ -99,7 +99,7 @@ def query_weight_training(user, fitness_level, num_exercises, main_muscle_groups
                 }
             ],
             temperature=2, # Increase randomness for more varied output
-            max_tokens=1024,
+            max_tokens=5000,
             top_p=1,
             stream=False,
             response_format={"type": "json_object"},
@@ -123,7 +123,17 @@ def query_weight_training(user, fitness_level, num_exercises, main_muscle_groups
         raise(RateLimitError)
 
 
-def query_running_training(user, total_distance="UNKNOWN", average_pace="UNKNOWN", furthest_run="UNKNOWN"):
+def query_run_training(
+        user, 
+        target_distance, 
+        target_duration, 
+        training_weeks, 
+        health_conditions, 
+        other_remarks, 
+        total_distance="UNKNOWN", 
+        average_pace="UNKNOWN", 
+        furthest_run="UNKNOWN"
+    ):
     # Throws Exception 
     try:
         # User data
@@ -135,155 +145,44 @@ def query_running_training(user, total_distance="UNKNOWN", average_pace="UNKNOWN
         schema = {
             "type": "object",
             "properties": {
-                "Monday": {
-                    "type": "array",
-                    "items": {
+                "exercises": {
+                "type": "array",
+                "minItems": training_weeks,
+                "maxItems": training_weeks,
+                "items": {
+                    "type": "object",
+                    "properties": {
+                    "week": {
+                        "type": "number",
+                    },
+                    "detail": {
+                        "type": "array",
+                        "items": {
                         "type": "object",
                         "properties": {
-                            "name": {
-                                "type": "string"
+                            "day": {
+                            "type": "string",
+                            "enum": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
                             },
-                            "description": {
-                                "type": "string"
+                            "desc": {
+                            "type": "string",
                             },
-                            "distance": {
-                                "type": "number"
-                            },
-                            "zone": {
-                                "type": "number"
-                            },
-                        },
-                        "required": ["name", "description", "distance", "zone"]
-                    }
-                },
-                "Tuesday": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "description": {
-                                "type": "string"
-                            },
-                            "distance": {
-                                "type": "number"
+                            "dist": {
+                            "type": "number",
                             },
                             "zone": {
-                                "type": "number"
-                            },
+                            "type": "number",
+                            }
                         },
-                        "required": ["name", "description", "distance", "zone"]
+                        "required": ["day", "desc", "dist", "zone"]
+                        }
                     }
-                },
-                "Wednesday": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "description": {
-                                "type": "string"
-                            },
-                            "distance": {
-                                "type": "number"
-                            },
-                            "zone": {
-                                "type": "number"
-                            },
-                        },
-                        "required": ["name", "description", "distance", "zone"]
-                    }
-                },
-                "Thursday": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "description": {
-                                "type": "string"
-                            },
-                            "distance": {
-                                "type": "number"
-                            },
-                            "zone": {
-                                "type": "number"
-                            },
-                        },
-                        "required": ["name", "description", "distance", "zone"]
-                    }
-                },
-                "Friday": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "description": {
-                                "type": "string"
-                            },
-                            "distance": {
-                                "type": "number"
-                            },
-                            "zone": {
-                                "type": "number"
-                            },
-                        },
-                        "required": ["name", "description", "distance", "zone"]
-                    }
-                },
-                "Saturday": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "description": {
-                                "type": "string"
-                            },
-                            "distance": {
-                                "type": "number"
-                            },
-                            "zone": {
-                                "type": "number"
-                            },
-                        },
-                        "required": ["name", "description", "distance", "zone"]
-                    }
-                },
-                "Sunday": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "description": {
-                                "type": "string"
-                            },
-                            "distance": {
-                                "type": "number"
-                            },
-                            "zone": {
-                                "type": "number"
-                            },
-                        },
-                        "required": ["name", "description", "distance", "zone"]
-                    }
-                },
+                    },
+                    "required": ["week", "detail"]
+                }
+                }
             },
-            "required": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            "required": ["exercises"]
         }
 
         # Ensure JSON schema below matches that of above 
@@ -297,65 +196,52 @@ def query_running_training(user, total_distance="UNKNOWN", average_pace="UNKNOWN
                 {
                     "role": "user",
                     "content": f"""
-                    I am a {weight}kg {age} years-old {gender}. 
-                    In the past 4 weeks, I have ran a total of {total_distance}km, my average pace is {average_pace} per km and my furthest distance clocked is {furthest_run}km.
+                    My profile: {{
+                        Weight: {weight}kg, 
+                        Age: {age} years-old,
+                        Gender: {gender},
+                        Health Condition: {health_conditions},
+                        Other Remarks: {other_remarks},
+                    }}
 
-                    Based on my user profile and my current level of fitness, recommend me a running training plan for next week in JSON format.
+                    My Strava Record (in the past 4 weeks, if any): {{
+                        Total Distance Ran: {total_distance}km
+                        Average Pace: {average_pace} minutes / seconds per km
+                        Furthest Run: {furthest_run}
+                    }}
+                    
+                    My next goal: {{
+                        Target Distance: {target_distance}
+                        Target Finishing Time: {target_duration}
+                    }}
+
+                    Based on my user profile and my current level of fitness, recommend me a running training plan to prepare me for my goal.
+
+                    The recommended training plan must be {training_weeks} weeks long and must be in JSON format.
+
                     The JSON schema should include
                     {{
-                        "Monday": [{{
-                            "name": "string exercise name",
-                            "description": "string exercise description",
-                            "distance": "number estimated distance",
-                            "zone":"number heart rate zone to maintain"
-                        }}],
-                        "Tuesday": [{{
-                            "name": "string exercise name",
-                            "description": "string exercise description",
-                            "distance": "number estimated distance",
-                            "zone":"number heart rate zone to maintain"
-                        }}],
-                        "Wednesday": [{{
-                            "name": "string exercise name",
-                            "description": "string exercise description",
-                            "distance": "number estimated distance",
-                            "zone":"number heart rate zone to maintain"
-                        }}],
-                        "Thursday": [{{
-                            "name": "string exercise name",
-                            "description": "string exercise description",
-                            "distance": "number estimated distance",
-                            "zone":"number heart rate zone to maintain"
-                        }}],
-                        "Friday": [{{
-                            "name": "string exercise name",
-                            "description": "string exercise description",
-                            "distance": "number estimated distance",
-                            "zone":"number heart rate zone to maintain"
-                        }}],
-                        "Saturday": [{{
-                            "name": "string exercise name",
-                            "description": "string exercise description",
-                            "distance": "number estimated distance",
-                            "zone":"number heart rate zone to maintain"
-                        }}],
-                        "Sunday": [{{
-                            "name": "string exercise name",
-                            "description": "string exercise description",
-                            "distance": "number estimated distance",
-                            "zone":"number heart rate zone to maintain"
+                        "exercises": [{{
+                            "week" : "number training week"
+                            "detail" : [{{
+                                "day" : "string (mon, tue, wed, thu, fri, sat, sun) only
+                                "desc": "string short and concise exercise description",
+                                "dist": "number estimated distance",
+                                "zone":"number heart rate zone to maintain"
+                            }}]
                         }}]
                     }}
                     """,
                 }
             ],
             temperature=0.5, # Decrease randomness for my consistent data refecting next week's recommendation
-            max_tokens=1024,
+            max_tokens=5000,
             top_p=1,
             stream=False,
             response_format={"type": "json_object"},
             stop=None
         )
+
         
         # Convert to JSON object
         resp_json = json.loads(resp.choices[0].message.content)
@@ -407,7 +293,7 @@ def query_weight_training_general(user, fitness_level, num_exercises, main_muscl
                 }
             ],
             temperature=0.5, # Reduce Randomness
-            max_tokens=1024,
+            max_tokens=5000,
             top_p=1,
             stream=False,
             stop=None
@@ -421,7 +307,76 @@ def query_weight_training_general(user, fitness_level, num_exercises, main_muscl
     
     except(groq.RateLimitError):
         raise(RateLimitError)
+
+def query_run_training_general(
+        user, 
+        target_distance, 
+        target_duration, 
+        training_weeks, 
+        health_conditions, 
+        other_remarks, 
+        total_distance="UNKNOWN", 
+        average_pace="UNKNOWN", 
+        furthest_run="UNKNOWN"
+    ):
+    # Throws Exception 
+    try:
+        # User data
+        weight = user.weight
+        age = calculate_age(user.birthday)
+        gender = "Male" if user.gender == "M" else "Female"
+
+        # Query without enforcing JSON response
+        resp = client.chat.completions.create(
+            model=model_conversation,
+            messages=[
+                {
+                    "role": "system",
+                    "content": f"You are a gym trainer."
+                },
+                {
+                    "role": "user",
+                    "content": f"""
+                    My profile: {{
+                        Weight: {weight}kg, 
+                        Age: {age} years-old,
+                        Gender: {gender},
+                        Health Condition: {health_conditions},
+                        Other Remarks: {other_remarks},
+                    }}
+
+                    My Strava Record (in the past 4 weeks, if any): {{
+                        Total Distance Ran: {total_distance}km
+                        Average Pace: {average_pace} minutes / seconds per km
+                        Furthest Run: {furthest_run}
+                    }}
+                    
+                    My next goal: {{
+                        Target Distance: {target_distance}
+                        Target Finishing Time: {target_duration}
+                    }}
+
+                    Based on my user profile and my current level of fitness, recommend me a running training plan to prepare me for my goal.
+
+                    The recommended training plan must be {training_weeks} weeks long.
+                    """,
+                }
+            ],
+            temperature=0.5, # Reduce Randomness
+            max_tokens=5000, # Allocate more resources
+            top_p=1,
+            stream=False,
+            stop=None
+        )
+
+        # Create dict for response
+        resp_json = {
+            "message" : resp.choices[0].message.content
+        }
+        return resp_json
     
+    except(groq.RateLimitError):
+        raise(RateLimitError)    
 
 # Utils
 def calculate_age(born):

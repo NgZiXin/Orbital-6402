@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import get_weight_training, get_running_training
+from .views import get_weight_training, get_run_training
 
 urlpatterns = [
     path('get_weight_training/', get_weight_training, name='get_weight_training'),
-    path('get_running_training/', get_running_training, name='get_running_training'),
+    path('get_run_training/', get_run_training, name='get_run_training'),
 ]

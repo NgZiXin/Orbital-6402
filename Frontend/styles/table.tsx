@@ -16,9 +16,16 @@ const commonStyles = StyleSheet.create({
     borderColor: "#D9D9D9",
     height: "auto",
   },
+
 });
 
 const tableStyles = StyleSheet.create({
+  // General
+  rowContainer: {
+    flexDirection: "row",
+  },
+
+  // Weight training table
   nameHeader: {
     ...commonStyles.commonHeaderStyles,
     flex: 3.4,
@@ -51,10 +58,6 @@ const tableStyles = StyleSheet.create({
     borderRightWidth: 0,
   },
 
-  rowContainer: {
-    flexDirection: "row",
-  },
-
   nameCellWrapper: {
     ...commonStyles.commonCellStyles,
     flex: 3.4,
@@ -78,6 +81,82 @@ const tableStyles = StyleSheet.create({
   },
 
   restsCellWrapper: {
+    ...commonStyles.commonCellStyles,
+    flex: 1,
+    borderRightWidth: 0,
+  },
+
+  // Run Training Table
+  weekHeader: {
+    ...commonStyles.commonHeaderStyles,
+    flex: 1,
+    borderTopWidth: 0,
+    borderLeftWidth: 0,
+  },
+
+  detailHeader: {
+    ...commonStyles.commonHeaderStyles,
+    flexDirection: "row",
+    padding: 0,
+    flex: 8,
+  },
+
+  dayHeader: {
+    ...commonStyles.commonHeaderStyles,
+    flex: 1.5,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+  },
+
+  descHeader: {
+    ...commonStyles.commonHeaderStyles,
+    flex: 2.5,
+    borderTopWidth: 0,
+  },
+
+  distHeader: {
+    ...commonStyles.commonHeaderStyles,
+    flex: 1.25,
+    borderTopWidth: 0,
+  },
+
+  zoneHeader: {
+    ...commonStyles.commonHeaderStyles,
+    flex: 1,
+    borderTopWidth: 0,
+    borderRightWidth: 0,
+  },
+
+  weekCellWrapper: {
+    ...commonStyles.commonCellStyles,
+    flex: 1,
+    borderLeftWidth: 0,
+  },
+
+  detailCellWrapper: {
+    ...commonStyles.commonCellStyles,
+    padding: 0,
+    flex: 8,
+  },
+
+  dayCellWrapper: {
+    ...commonStyles.commonCellStyles,
+    flexDirection: "row",
+    flex: 1.5,
+    borderLeftWidth: 0,
+  },
+
+  descCellWrapper: {
+    ...commonStyles.commonCellStyles,
+    flex: 2.5,
+  },
+
+  distCellWrapper: {
+    ...commonStyles.commonCellStyles,
+    flex: 1.25,
+  },
+
+  zoneCellWrapper: {
     ...commonStyles.commonCellStyles,
     flex: 1,
     borderRightWidth: 0,

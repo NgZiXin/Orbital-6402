@@ -1,4 +1,4 @@
-from .views_helper import query_weight_training, query_running_training, query_weight_training_general, RateLimitError, BadResponseError
+from .views_helper import query_weight_training, query_run_training, query_weight_training_general, query_run_training_general, RateLimitError, BadResponseError
 from .serializers import GetWeightTrainingSerializer
 from strava_api.views_helpers import get_token, fetchStats
 from backend.utils import datetime_to_utc_timestamp
@@ -57,7 +57,7 @@ def get_weight_training(request):
     return Response({'error': 'Invalid Query'}, status=400)
 
 @api_view(['GET'])
-def get_running_training(request):
+def get_run_training(request):
     user = request.user
     resp_json = None
     numQueries = 0 # Allow up to a maximum of 3 requeries
@@ -80,30 +80,49 @@ def get_running_training(request):
             except:
                 return Response({'error': 'fetch request failed'}, status=400)
 
-    total_distance = 0
-    total_duration = 0
-    furthest_run = 0
-    average_pace = "0:00"
+    strava_total_distance = 0
+    strava_total_duration = 0
+    strava_furthest_run = 0
+    strava_average_pace = "0:00"
     for i in range(len(all_results)):
             activity = all_results[i]
             if activity.get("sport_type") == "Run":
-                total_distance += activity.get("distance") # In metres
-                total_duration += activity.get("elapsed_time") # In seconds
-                furthest_run = max(furthest_run, activity.get("distance")) # In metres
+                strava_total_distance += activity.get("distance") # In metres
+                strava_total_duration += activity.get("elapsed_time") # In seconds
+                strava_furthest_run = max(strava_furthest_run, activity.get("distance")) # In metres
     
     # Convert data to other units and 2 signficant places
-    total_distance = round(total_distance / 1000, 2) # metres to kilometres
-    furthest_run = round(furthest_run / 1000, 2) # metres to kilometres
-    if total_duration > 0:
-        average_pace_minutes, average_pace_sec = divmod(total_duration / total_distance, 60)
-        average_pace = f"{int(average_pace_minutes)}:{int(average_pace_sec):02d}"  # minutes:seconds per km
+    strava_total_distance = round(strava_total_distance / 1000, 2) # metres to kilometres
+    strava_furthest_run = round(strava_furthest_run / 1000, 2) # metres to kilometres
+    if strava_total_distance > 0:
+        average_pace_minutes, average_pace_sec = divmod(strava_total_duration / strava_total_distance, 60)
+        strava_average_pace = f"{int(average_pace_minutes)}:{int(average_pace_sec):02d}"  # minutes:seconds per km
 
     while numQueries < 3:
         try:
             if access_token:
-                resp_json = query_running_training(user, total_distance, average_pace, furthest_run)
+                # Give AI Strava details
+                resp_json = query_run_training(
+                    user, 
+                    request.GET.get("distance"),
+                    request.GET.get("duration"),
+                    int(request.GET.get("weeks")),
+                    request.GET.get("healthConds"),
+                    request.GET.get("otherRemarks"),
+                    strava_total_distance, 
+                    strava_average_pace, 
+                    strava_furthest_run
+                )
             else:
-                resp_json = query_running_training(user)
+                # Give AI only the user details
+                resp_json = query_run_training(
+                    user,
+                    request.GET.get("distance"),
+                    request.GET.get("duration"),
+                    int(request.GET.get("weeks")),
+                    request.GET.get("healthConds"),
+                    request.GET.get("otherRemarks")
+                )
 
             break
         except(BadResponseError):
@@ -112,6 +131,33 @@ def get_running_training(request):
             # Error, need to wait for rate limits to refresh
             return Response({'error': 'AI is currently overloaded with queries, try again after 5 minutes'}, status=400)
 
-    # TODO, if numQueries == 3, need to query general response
+        if not resp_json:
+            try:
+                if access_token:
+                    # Give AI Strava details
+                    resp_json = query_run_training_general(
+                        user, 
+                        request.GET.get("distance"),
+                        request.GET.get("duration"),
+                        int(request.GET.get("weeks")),
+                        request.GET.get("healthConds"),
+                        request.GET.get("otherRemarks"),
+                        strava_total_distance, 
+                        strava_average_pace, 
+                        strava_furthest_run
+                    )
+                else:
+                    # Give AI only the user details
+                    resp_json = query_run_training_general(
+                        user,
+                        request.GET.get("distance"),
+                        request.GET.get("duration"),
+                        int(request.GET.get("weeks")),
+                        request.GET.get("healthConds"),
+                        request.GET.get("otherRemarks")
+                    )
+            except(RateLimitError):
+                # Error, need to wait for rate limits to refresh
+                return Response({'error': 'AI is currently overloaded with queries, try again after 5 minutes'}, status=400)
 
     return Response(resp_json, status=status.HTTP_200_OK)

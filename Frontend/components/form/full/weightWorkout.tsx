@@ -5,14 +5,15 @@ import { useState } from "react";
 import SubmitButton from "../../general/submit";
 import { getItem } from "@/components/general/asyncStorage";
 import muscleGroupsList from "@/components/modal/workoutPage/muscleGroup/helper/list";
+import { WeightWorkoutData } from "@/app/(tabs)/workout";
 
-import FitnessLevel from "../fragments/workoutDetails/fitnessLevel";
-import NumExercises from "../fragments/workoutDetails/numExercise";
-import MuscleGroups from "../fragments/workoutDetails/muscleGroups";
+import FitnessLevel from "../fragments/workoutDetails/weightWorkoutDetails/fitnessLevel";
+import NumExercises from "../fragments/workoutDetails/weightWorkoutDetails/numExercise";
+import MuscleGroups from "../fragments/workoutDetails/weightWorkoutDetails/muscleGroups";
 import HealthConditions from "../fragments/workoutDetails/healthConditions";
 import OtherRemarks from "../fragments/workoutDetails/otherRemarks";
 
-type WorkoutValues = {
+type WeightWorkoutValues = {
   fitnessLevel: number;
   numExercises: number;
   muscleGroups: string[];
@@ -20,7 +21,7 @@ type WorkoutValues = {
   otherRemarks: string;
 }
 
-const initialValues: WorkoutValues = {
+const initialValues: WeightWorkoutValues = {
   fitnessLevel: 5,
   numExercises: 3,
   muscleGroups: [],
@@ -37,16 +38,17 @@ const getName = (item: string) => {
 
 }
 
-export default function WorkoutForm({
-  setWorkoutModal,
-  setWorkoutData,
+export default function WeightWorkoutForm({
+  setWeightWorkoutModal,
+  setWeightWorkoutData,
   setMessage,
-  workoutModalHeight,
+  clearAll,
+  weightWorkoutModalHeight,
 }: any) {
   const [scroll, setScroll] = useState(true);
   const handleSubmit = async (
-    values: WorkoutValues,
-    actions: FormikHelpers<WorkoutValues>
+    values: WeightWorkoutValues,
+    actions: FormikHelpers<WeightWorkoutValues>
   ): Promise<void> => {
     // Extract Main & Sub muscle groups
     const mainMuscleGroups = values.muscleGroups.filter((item: string) => item.length === 1 ).map(getName).join(", ")
@@ -54,7 +56,6 @@ export default function WorkoutForm({
 
     // Query backend
     const token: string | null = await getItem("token");
-    console.log(`${process.env.EXPO_PUBLIC_DOMAIN}workout/get_gym_training/?fitnessLevel=${values.fitnessLevel}&numExercises=${values.numExercises}&mainMuscleGroups=${mainMuscleGroups}&subMuscleGroups=${subMuscleGroups}&healthConds=${values.healthConds}&otherRemarks=${values.otherRemarks}`)
     const response = await fetch(
       `${process.env.EXPO_PUBLIC_DOMAIN}workout/get_weight_training/?fitnessLevel=${values.fitnessLevel}&numExercises=${values.numExercises}&mainMuscleGroups=${mainMuscleGroups}&subMuscleGroups=${subMuscleGroups}&healthConds=${values.healthConds}&otherRemarks=${values.otherRemarks}`,
       {
@@ -73,19 +74,20 @@ export default function WorkoutForm({
     }
 
     const dataObj = await response.json();
-    
+
+    // Clean up
+    clearAll();
+
     // Response object can only be of two types, either a message or contains workoutData (i.e. proper JSON format)
     if (dataObj["exercises"]) {
       // Display Table
-      setWorkoutData(dataObj["exercises"]);
-      setMessage("");
+      setWeightWorkoutData(dataObj["exercises"]);
     } else {
       // Display AI's conversational output instead
-      setWorkoutData([])
       setMessage(dataObj["message"])
     }
 
-    setWorkoutModal(false);
+    setWeightWorkoutModal(false);
     actions.resetForm();
   };
 
@@ -106,7 +108,7 @@ export default function WorkoutForm({
             <NumExercises formikProps={formikProps} setScroll={setScroll} />
             <MuscleGroups
               formikProps={formikProps}
-              workoutModalHeight={workoutModalHeight}
+              workoutModalHeight={weightWorkoutModalHeight}
             />
             <HealthConditions formikProps={formikProps} />
             <OtherRemarks formikProps={formikProps} />

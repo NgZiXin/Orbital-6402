@@ -7,4 +7,11 @@ class GetWeightTrainingSerializer(serializers.Serializer):
     subMuscleGroups = serializers.CharField(required=True),
     healthConds = serializers.CharField(required=True),
     otherRemarks = serializers.CharField(required=True),
+
+class GetRunTrainingSerializer(serializers.Serializer):
+    distance = serializers.FloatField(required=True),
+    duration = serializers.CharField(required=True),
+    weeks = serializers.IntegerField(required=True),
+    healthConds = serializers.CharField(required=True),
+    otherRemarks = serializers.CharField(required=True),
     

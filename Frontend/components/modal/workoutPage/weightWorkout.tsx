@@ -12,10 +12,10 @@ import { globalStyles } from "../../../styles/global";
 import { useState, useEffect, useRef } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SubmitButton from "@/components/general/submit";
-import WorkoutForm from "@/components/form/full/workout";
+import WeightWorkoutForm from "@/components/form/full/weightWorkout";
 
-export default function WorkoutModal({setWorkoutData, setMessage}: any) {
-  const [workoutModal, setWorkoutModal] = useState<boolean>(false);
+export default function WeightWorkoutModal({setWeightWorkoutData, setMessage, clearAll}: any) {
+  const [weightWorkoutModal, setWeightWorkoutModal] = useState<boolean>(false);
   const [modalHeight, setModalHeight] = useState<number>(0);
 
   const handleLayout = (event: any) => {
@@ -27,13 +27,13 @@ export default function WorkoutModal({setWorkoutData, setMessage}: any) {
   return (
     <>
       <SubmitButton
-        onPressHandler={() => setWorkoutModal(true)}
-        text="Create Workout"
-        style={{ position: "relative", bottom: 25, marginBottom: 19 }}
+        onPressHandler={() => setWeightWorkoutModal(true)}
+        text="Weight Workout"
+        style={{ flex: 1, marginHorizontal: 5 }}
       />
 
-      {workoutModal == true && (
-        <Modal animationType="fade" visible={workoutModal} transparent={true}>
+      {weightWorkoutModal == true && (
+        <Modal animationType="fade" visible={weightWorkoutModal} transparent={true}>
           <View style={modalStyles.modalWrapper}>
             <View
               style={{
@@ -58,18 +58,19 @@ export default function WorkoutModal({setWorkoutData, setMessage}: any) {
                     left: 9,
                   }}
                 >
-                  Workout Planner
+                  Plan for your next gym session:
                 </Text>
-                <TouchableOpacity onPress={() => setWorkoutModal(false)}>
+                <TouchableOpacity onPress={() => setWeightWorkoutModal(false)}>
                   <Ionicons name="close-circle-outline" size={25}></Ionicons>
                 </TouchableOpacity>
               </View>
 
-              <WorkoutForm
-                setWorkoutModal={setWorkoutModal}
-                setWorkoutData={setWorkoutData}
+              <WeightWorkoutForm
+                setWeightWorkoutModal={setWeightWorkoutModal}
+                setWeightWorkoutData={setWeightWorkoutData}
                 setMessage={setMessage}
-                workoutModalHeight={modalHeight}
+                clearAll={clearAll}
+                weightWorkoutModalHeight={modalHeight}
               />
             </View>
           </View>

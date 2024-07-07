@@ -13,30 +13,30 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import { WorkoutData } from "@/app/(tabs)/workout";
+import { WeightWorkoutData } from "@/app/(tabs)/workout";
 import tableStyles from "@/styles/table";
 import { globalStyles } from "@/styles/global";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ValidationModal from "@/components/modal/workoutPage/muscleGroup/validation";
 
 type TableProps = {
-  workoutData: WorkoutData[];
+  weightWorkoutData: WeightWorkoutData[];
   refresh: boolean;
 };
 
-export default function Table({ workoutData, refresh }: TableProps) {
+export default function WeightTable({ weightWorkoutData, refresh }: TableProps) {
   // returns a memoized array value, that never changes
   // so don't need to keep rebuilding on every render
   const columns = useMemo(() => ["Name", "Weight", "Sets", "Reps", "Rest"], []);
 
-  const [tableData, setTableData] = useState<WorkoutData[]>(workoutData);
+  const [tableData, setTableData] = useState<WeightWorkoutData[]>(weightWorkoutData);
   const [validationModal, setValidationModal] = useState<boolean>(false);
   const deleteIndex = useRef<number>(-1);
 
   // For Refresh
   useEffect(() => {
-    setTableData(workoutData);
-  }, [refresh, workoutData]);
+    setTableData(weightWorkoutData);
+  }, [refresh, weightWorkoutData]);
 
   // returns a memoized function object, that never changes
   // so don't need to keep rebuilding on every render

@@ -10,13 +10,15 @@ import {
 
 import { globalStyles } from "@/styles/global";
 import PageHeader from "@/components/general/pageHeader";
-import WorkoutModal from "@/components/modal/workoutPage/workout";
-import Table from "@/components/general/table/table";
+import WeightWorkoutModal from "@/components/modal/workoutPage/weightWorkout";
+import RunWorkoutModal from "@/components/modal/workoutPage/runWorkout";
+import RunTable from "@/components/general/table/runTable";
+import WeightTable from "@/components/general/table/weightTable";
 import TextBox from "@/components/general/textBox/textBox";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 
-export type WorkoutData = {
+export type WeightWorkoutData = {
   name: string;
   weight: number;
   sets: number;
@@ -24,8 +26,21 @@ export type WorkoutData = {
   rests: number;
 };
 
+export type RunWorkoutData = {
+  week: number;
+  detail: RunWorkoutDetailData[];
+}
+
+export type RunWorkoutDetailData = {
+  day: string;
+  desc: string;
+  distance: number;
+  zone: number;
+}
+
 export default function Workout() {
-  const [workoutData, setWorkoutData] = useState<WorkoutData[]>([]);
+  const [weightWorkoutData, setWeightWorkoutData] = useState<WeightWorkoutData[]>([]);
+  const [runWorkoutData, setRunWorkoutData] = useState<RunWorkoutData[]>([]);
   const [message, setMessage] = useState<string>("");
   const [refresh, setRefresh] = useState(false);
 
@@ -33,19 +48,26 @@ export default function Workout() {
     setRefresh(prevRefresh => !prevRefresh);
   };
 
+  const clearAll = () => {
+    setWeightWorkoutData([]);
+    setRunWorkoutData([]);
+    setMessage("");
+  }
+
   return (
     <View style={{ ...globalStyles.container, padding: 12 }}>
       <PageHeader topText="AI-Based" bottomText="Workout Recommendation" />
       <View style={{ position: "relative", bottom: 28 }}>
         <Text style={globalStyles.para}>
-          Click on the button below and fill up the form to get your workout
-          recommendation!
+          Get AI suggested single-session weight workout or running training plan for your next big race!
         </Text>
       </View>
-
-      <WorkoutModal setWorkoutData={setWorkoutData} setMessage={setMessage} />
+      <View style={{ position: "relative", bottom: 25, marginBottom: 19, flexDirection: "row" }}>
+        <WeightWorkoutModal setWeightWorkoutData={setWeightWorkoutData} setMessage={setMessage} clearAll={clearAll}/>
+        <RunWorkoutModal setRunWorkoutData={setRunWorkoutData} setMessage={setMessage} clearAll={clearAll} />
+      </View>
       <View style={styles.secondaryHeader}>
-        <PageHeader topText="" bottomText="Suggested Workout" />
+        <PageHeader topText="" bottomText="Suggested Workout / Regime" />
         <TouchableOpacity onPress={handleRefresh}>
           <Ionicons
             size={25}
@@ -54,8 +76,11 @@ export default function Workout() {
           />
         </TouchableOpacity>
       </View>
-      {workoutData.length > 0 ? <Table workoutData={workoutData} refresh={refresh} /> : <></>}
-      {message ? <TextBox message={message} />: <></>}
+      {/* Either display Weight Workout, Run Workout, AI's message or nothing*/}
+      {weightWorkoutData.length > 0 ? <WeightTable weightWorkoutData={weightWorkoutData} refresh={refresh} /> 
+      : runWorkoutData.length > 0 ? <RunTable runWorkoutData={runWorkoutData} refresh={refresh} />
+      : message ? <TextBox message={message} />
+      : <></>}
       {/* <View
         style={{
           marginTop: 19.5,
