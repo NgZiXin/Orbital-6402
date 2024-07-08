@@ -20,6 +20,7 @@ export default function FitnessLevel({ formikProps, setScroll }: any) {
           maximumValue={10}
           trackHeight={3}
           step={1}
+          value={formikProps.values.fitnessLevel}
           thumbSize={16.5}
           minimumTrackTintColor="#FFC4C4" // Change the color of the filled part
           maximumTrackTintColor="#D0D0D0" // Change the color of the unfilled part
