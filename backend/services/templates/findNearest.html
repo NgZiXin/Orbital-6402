@@ -38,10 +38,10 @@
   </body>
   <script>
     const type = "{{ type }}";
-    const url = "{{ url }}";
+    const landmarks_json = `{{ landmarks_json|safe }}`;
     const initial_lat = "{{ initial_lat }}";
     const initial_lng = "{{ initial_lng }}";
-    const radius = "{{ radius }}";
+    const address = "{{ address }}";
   </script>
   <script src="{% static 'basemaps.js' %}"></script>
   <script src="{% static 'findNearest-main.js' %}"></script>

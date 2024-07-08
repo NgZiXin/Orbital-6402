@@ -41,7 +41,6 @@ const baseMaps = {
   Night: NIGHT,
   Grey: GREY,
 };
-
 const overlayMaps = {};
 if (type == "gym") {
   overlayMaps["Gyms"] = gyms;
@@ -53,70 +52,27 @@ const layerControl = L.control
   .layers(baseMaps, overlayMaps, { position: "topleft" })
   .addTo(map);
 
-const search = () => {
-  if (type == "gym" || type == "park") {
-    let query;
-    let icon;
-    if (type == "gym") {
-      query = `${url}find_gyms/?lat=${initial_lat}&lon=${initial_lng}&radius=${radius}`;
-      icon = redIcon
-    } else {
-      query = `${url}find_parks/?lat=${initial_lat}&lon=${initial_lng}&radius=${radius}`;
-      icon = greenIcon
-    }
+// Add position marker
+const marker = L.marker([initial_lat, initial_lng]);
+const popup = L.popup().setContent(`<code>Your Location: ${address}</code>`);
+marker.bindPopup(popup);
+map.addLayer(marker);
 
-    console.log(query)
-    fetch(query, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        data.forEach((item) => {
+// Add other markers
+const icon = type === "gym" ? redIcon : greenIcon;
+JSON.parse(landmarks_json).forEach((item) => {
+  const marker = L.marker([item.latitude, item.longitude], {icon});
+  const popup = L.popup().setContent(
+    `<code>Name: ${item.name}</code><br /><code>Distance: ${parseFloat(
+      item.distance
+    ).toFixed(2)} km</code>`
+  );
+  marker.bindPopup(popup);
 
-          const marker = L.marker([item.latitude, item.longitude], {icon});
-          const popup = L.popup().setContent(
-            `<code>Name: ${item.name}</code><br /><code>Distance: ${parseFloat(
-              item.distance
-            ).toFixed(2)} km</code>`
-          );
-          marker.bindPopup(popup);
-
-          if (type == "gym") {
-            gyms.addLayer(marker); // Add marker to gyms layer
-            // marker.setStyle({
-            //   color: "red",
-            // });
-          } else {
-            parks.addLayer(marker); // Add marker to parks layer
-            // marker.setStyle({
-            //   color: "green",
-            // });
-          }
-        });
-
-        // Add position marker
-        const marker = L.marker([initial_lat, initial_lng]);
-        // marker.setStyle({
-        //   color: "blue",
-        // });
-        const popup = L.popup().setContent("Your Location");
-        marker.bindPopup(popup);
-        map.addLayer(marker); // Add marker to map
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+  if (type == "gym") {
+    gyms.addLayer(marker); // Add marker to gyms layer
+  } else {
+    parks.addLayer(marker); // Add marker to parks layer
   }
-};
+});
 
-// Fire event
-map.on("load", search);
-map.fire("load");
