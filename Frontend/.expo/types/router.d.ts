@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import type { TextProps, GestureResponderEvent } from 'react-native';
 
 export namespace ExpoRouter {
-  type StaticRoutes = `/` | `/(tabs)` | `/_sitemap` | `/calendar` | `/forum` | `/home` | `/location` | `/login` | `/profile` | `/runningRoute` | `/sampleData` | `/sign-up` | `/stats` | `/workout`;
+  type StaticRoutes = `/` | `/(tabs)` | `/..\components\form\fragments\workoutDetails\healthConditions` | `/..\components\form\fragments\workoutDetails\otherRemarks` | `/..\components\form\fragments\workoutDetails\runWorkoutDetails\distance` | `/..\components\form\fragments\workoutDetails\runWorkoutDetails\duration` | `/..\components\form\fragments\workoutDetails\runWorkoutDetails\week` | `/..\components\form\fragments\workoutDetails\weightWorkoutDetails\fitnessLevel` | `/..\components\form\fragments\workoutDetails\weightWorkoutDetails\muscleGroups` | `/..\components\form\fragments\workoutDetails\weightWorkoutDetails\numExercise` | `/_sitemap` | `/calendar` | `/forum` | `/home` | `/location` | `/login` | `/profile` | `/runningRoute` | `/sampleData` | `/sign-up` | `/stats` | `/workout`;
   type DynamicRoutes<T extends string> = never;
   type DynamicRouteTemplate = never;
 

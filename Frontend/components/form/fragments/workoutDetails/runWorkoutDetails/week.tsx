@@ -1,23 +1,23 @@
 import { Slider } from "@react-native-assets/slider";
 import { Text, View } from "react-native";
-import { globalStyles } from "../../../../styles/global";
+import { globalStyles } from "../../../../../styles/global";
 import { formStyles } from "@/styles/form";
 
-export default function FitnessLevel({ formikProps, setScroll }: any) {
+export default function WeekSlider({ formikProps, setScroll }: any) {
   return (
     <>
       <View style={formStyles.workoutDetailsFormCommon}>
         <View style={formStyles.sliderLabel}>
-          <Text style={globalStyles.label}>Level of Fitness:</Text>
+          <Text style={globalStyles.label}>No. of weeks to Race Day:</Text>
           <Text style={{ ...globalStyles.label, left: 5 }}>
-            {formikProps.values.fitnessLevel}
+            {formikProps.values.weeks}
           </Text>
         </View>
 
         <Slider
           style={formStyles.slider}
           minimumValue={1}
-          maximumValue={10}
+          maximumValue={12}
           trackHeight={3}
           step={1}
           thumbSize={16.5}
@@ -27,7 +27,7 @@ export default function FitnessLevel({ formikProps, setScroll }: any) {
           onSlidingStart={(value) => setScroll(false)}
           onSlidingComplete={(value) => setScroll(true)}
           onValueChange={(value) => {
-            formikProps.setFieldValue("fitnessLevel", value);
+            formikProps.setFieldValue("weeks", value);
           }}
         />
       </View>
