@@ -20,6 +20,7 @@ export default function WeekSlider({ formikProps, setScroll }: any) {
           maximumValue={12}
           trackHeight={3}
           step={1}
+          value={formikProps.values.weeks}
           thumbSize={16.5}
           minimumTrackTintColor="#FFC4C4" // Change the color of the filled part
           maximumTrackTintColor="#D0D0D0" // Change the color of the unfilled part
