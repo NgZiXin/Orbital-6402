@@ -13,6 +13,7 @@ import { globalStyles } from "../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useNavigation } from "expo-router";
 import { setItem } from "../components/general/asyncStorage";
+import { useLoading } from "@/hooks/useLoading";
 
 import UsernameField from "@/components/form/fragments/accountDetails/username";
 import PasswordField from "@/components/form/fragments/accountDetails/password";
@@ -34,47 +35,57 @@ interface LoginValues {
 
 export default function Login() {
   const navigation: any = useNavigation();
+  const { showLoading, hideLoading } = useLoading();
 
   const handleSubmit = async (
     values: LoginValues,
     actions: FormikHelpers<LoginValues>
   ): Promise<void> => {
     try {
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_DOMAIN}accounts/login/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        }
-      );
+      // Loading
+      showLoading();
 
-      // Case where backend raises an error
-      if (!response.ok) {
-        const errorResponse: ErrorResponse = await response.json();
+      try {
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_DOMAIN}accounts/login/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(values),
+          }
+        );
 
-        if (errorResponse.non_field_errors) {
-          Alert.alert("Login Failed", "Incorrect user credentials provided");
-          return;
-        } else {
-          Alert.alert("Login Failed", "Network error, please try again");
-          return;
+        // Case where backend raises an error
+        if (!response.ok) {
+          const errorResponse: ErrorResponse = await response.json();
+
+          if (errorResponse.non_field_errors) {
+            Alert.alert("Login Failed", "Incorrect user credentials provided");
+            return;
+          } else {
+            Alert.alert("Login Failed", "Network error, please try again");
+            return;
+          }
         }
+
+        const data: SuccessResponse = await response.json();
+        const token: string = data["token"];
+
+        // stores the user (session-based) token string
+        setItem("token", token);
+
+        // Handle successful login (navigate to profile page)
+        actions.resetForm();
+        navigation.navigate("(tabs)");
+      } catch (error: any) {
+        console.error(error.message);
       }
-
-      const data: SuccessResponse = await response.json();
-      const token: string = data["token"];
-
-      // stores the user (session-based) token string
-      setItem("token", token);
-
-      // Handle successful login (navigate to profile page)
-      actions.resetForm();
-      navigation.navigate("(tabs)");
-    } catch (error: any) {
-      console.error(error.message);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      hideLoading(); // Hide loading spinner after fetch completes
     }
   };
 

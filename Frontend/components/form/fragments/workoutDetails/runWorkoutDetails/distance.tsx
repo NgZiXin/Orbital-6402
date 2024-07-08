@@ -10,7 +10,7 @@ export default function DistanceField({ formikProps }: any) {
         <Text style={globalStyles.label}>Target Distance (in km):</Text>
         <CustomTextInput
           style={globalStyles.input}
-          placeholder={formikProps.values.distance}
+          placeholder={formikProps.values.distance.toString()}
           onChangeText={formikProps.handleChange("distance")}
           value={formikProps.values.distance}
           keyboardType="distance"

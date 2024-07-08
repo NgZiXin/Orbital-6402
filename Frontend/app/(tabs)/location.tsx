@@ -32,7 +32,7 @@ export default function Location() {
         ) : (
           <></>
         )}
-        <View style={{ marginTop: 20 }}>
+        <View style={{ marginTop: 50 }}>
           <PageHeader topText="" bottomText="Explore Running Routes" />
           <Text style={styles.routesText}>
             {
