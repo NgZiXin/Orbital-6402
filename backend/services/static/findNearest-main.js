@@ -25,11 +25,19 @@ const redIcon = new L.Icon({
 const parks = L.layerGroup([]);
 const gyms = L.layerGroup([]);
 
+// Set map boundaries
+const bounds = L.latLngBounds(
+  L.latLng(1.144, 103.535),
+  L.latLng(1.494, 104.502)
+);
+
 // Configure map
 const mapOptions = {
   center: [initial_lat, initial_lng],
   zoom: 13,
   layers: [ORIGINAL, parks, gyms],
+  maxBounds: bounds,
+  maxBoundsViscosity: 1.0,
 };
 
 const map = new L.map("map", mapOptions);

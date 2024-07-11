@@ -1,39 +1,28 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
 from .models import Calendar
 from .serializers import CalendarSerializer
 
-@api_view(['GET', 'POST'])
-def calendar_list(request):
-    user = request.user
-    
-    if request.method == 'GET':
-        calendars = Calendar.objects.filter(user=user)
-        serializer = CalendarSerializer(calendars, many=True)
-        return Response(serializer.data)
-    
-    elif request.method == 'POST':
-        data = request.data.copy()
-        data['user'] = user.id  # Associate the calendar entry with the authenticated user
-        serializer = CalendarSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CalendarList(generics.ListCreateAPIView):
+    serializer_class = CalendarSerializer
+    permission_classes = [IsAuthenticated]
 
-@api_view(['GET', 'DELETE'])
-def calendar_detail(request, pk):
-    user = request.user
-    try:
-        calendar = Calendar.objects.get(pk=pk, user=user)
-    except Calendar.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    def get_queryset(self):
+        user = self.request.user
+        return Calendar.objects.filter(user=user)
 
-    if request.method == 'GET':
-        serializer = CalendarSerializer(calendar)
-        return Response(serializer.data)
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
-    elif request.method == 'DELETE':
-        calendar.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class CalendarDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CalendarSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        # Filter calendar entriess by user ensures user can only update or destroy their own entries
+        user = self.request.user
+        return Calendar.objects.filter(user=user)
+

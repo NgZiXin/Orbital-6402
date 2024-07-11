@@ -1,10 +1,9 @@
-import requests
-import os
+import requests, os
 from datetime import datetime
 from backend.utils import convert_unix_to_singapore_time
 from .models import OneMapApi
 
-def get_access_token():
+def get_onemap_api():
     obj = OneMapApi.objects.first()
 
     if not obj or obj.expiry_date < datetime.now(obj.expiry_date.tzinfo):
@@ -33,4 +32,4 @@ def get_access_token():
             obj.expiry_date=convert_unix_to_singapore_time(float(response_json.get("expiry_timestamp")))
             obj.save()
 
-    return obj.access_token
+    return obj

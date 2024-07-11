@@ -1,8 +1,7 @@
-from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .serializers import WebviewSerializer
-from .views_helper import geoCode, find_nearest_gyms, find_nearest_parks # Helper functions
-from .views_helper import InvalidSearchError, NoNearbyGymFound, NoNearbyParkFound # Custom exceptions
+from .location import Location
+from .exceptions import InvalidSearchError, NoNearbyGymFound, NoNearbyParkFound 
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import render
 import simplejson as json
@@ -19,21 +18,21 @@ def index(request):
     serializer = WebviewSerializer(data=request.GET)
     if serializer.is_valid():
         try:
-            lat, lon, address = geoCode(request.GET.get('address'))
+            radius = int(request.GET.get('radius')) * 1000 # Convert to km
+            location = Location(request.GET.get('address'), radius)
         except(InvalidSearchError):
             context = { "message" : "Invalid Search. Please refine your search."}
             return render(request, "error.html", context )
         
         # Get nearest gym / park
         type = request.GET.get('type')
-        radius = int(request.GET.get('radius')) * 1000 # Convert to km
         landmarks_json = ""
         try:
             landmarks = []
             if type ==  "gym":
-                landmarks = find_nearest_gyms(lat, lon, radius)
+                landmarks = location.find_nearest_gyms()
             else:
-                landmarks = find_nearest_parks(lat, lon, radius)
+                landmarks = location.find_nearest_parks()
             landmarks_json = json.dumps([landmark.__dict__ for landmark in landmarks])
         except(NoNearbyParkFound):
             context = { "message" : "No nearby parks found. Please refine your search."}
@@ -48,9 +47,9 @@ def index(request):
         context = {
             "type" : type,
             "landmarks_json" : landmarks_json,
-            "initial_lat" : lat,
-            "initial_lng" : lon,
-            "address" : address,
+            "initial_lat" : location.lat,
+            "initial_lng" : location.lon,
+            "address" : location.address,
         }
         return render(request, "findNearest.html", context)
     else:

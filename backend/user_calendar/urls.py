@@ -1,7 +1,7 @@
 from django.urls import path
-from . import views
+from .views import CalendarList, CalendarDetail
 
 urlpatterns = [
-    path('', views.calendar_list, name="calendar-list"),
-    path('<int>pk/', views.calendar_detail, name="calendar-detail")
+    path('', CalendarList.as_view(), name="calendar-list"),
+    path('<int:pk>/', CalendarDetail.as_view(), name="calendar-detail")
 ]

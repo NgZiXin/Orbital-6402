@@ -1,6 +1,7 @@
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Link } from "expo-router";
 
+import { removeItemValue } from "@/components/general/asyncStorage";
 import { modalStyles } from "../../../styles/modal";
 import { globalStyles } from "../../../styles/global";
 import { useState } from "react";
@@ -48,9 +49,13 @@ export default function LogoutModal() {
                     No
                   </Link>
                   <Link
+                    replace
                     href="../login"
                     style={styles.commonButton}
-                    onPress={() => setLogoutModal(false)}
+                    onPress={() => {
+                      removeItemValue("token");
+                      setLogoutModal(false);
+                    }}
                   >
                     Yes
                   </Link>

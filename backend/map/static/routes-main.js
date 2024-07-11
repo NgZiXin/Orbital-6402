@@ -12,11 +12,19 @@ const stravaSegments = L.layerGroup([]);
 const route = L.layerGroup([]);
 const final = L.layerGroup([]);
 
+// Set map boundaries
+const bounds = L.latLngBounds(
+  L.latLng(1.144, 103.535),
+  L.latLng(1.494, 104.502)
+);
+
 // Configure map
 const mapOptions = {
-  center: [1.28416, 103.8533816],
+  center: [1.2868108, 103.8545349],
   zoom: 17,
   layers: [ORIGINAL, route, stravaSegments],
+  maxBounds: bounds,
+  maxBoundsViscosity: 1.0,
 };
 
 const map = new L.map("map", mapOptions);
@@ -251,12 +259,9 @@ function buildRoute(start, end, fitStart, fitEnd, order) {
   const startCoords = `${start.getLatLng().lat}%2C${start.getLatLng().lng}`;
   const endCoords = `${end.getLatLng().lat}%2C${end.getLatLng().lng}`;
 
-  fetch(
-    `${url}get_path?start=${startCoords}&end=${endCoords}`,
-    {
-      method: "GET",
-    }
-  )
+  fetch(`${url}get_path?start=${startCoords}&end=${endCoords}`, {
+    method: "GET",
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`); // TODO: Cannot find route

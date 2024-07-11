@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import StravaAccessToken, StravaRefreshToken
+from .models import StravaToken
 
 # Register your models here.
-admin.site.register(StravaAccessToken)
-admin.site.register(StravaRefreshToken)
+admin.site.register(StravaToken)

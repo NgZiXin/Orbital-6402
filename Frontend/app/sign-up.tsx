@@ -11,6 +11,7 @@ import { globalStyles } from "../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useNavigation } from "expo-router";
 import { useLoading } from "@/hooks/useLoading";
+import { setItem } from "../components/general/asyncStorage";
 
 import UsernameField from "@/components/form/fragments/accountDetails/username";
 import PasswordField from "@/components/form/fragments/accountDetails/password";
@@ -32,6 +33,10 @@ interface SignUpValues {
   weight: string;
   birthday: Date;
   gender: string;
+}
+
+interface SuccessResponse {
+  token: string;
 }
 
 export default function SignUp() {
@@ -76,9 +81,16 @@ export default function SignUp() {
           }
         }
 
-        // Handle successful signup (navigate to login screen)
+        
+        const data: SuccessResponse = await response.json();
+        const token: string = data["token"];
+
+        // stores the user (session-based) token string
+        setItem("token", token);
+
+        // Handle successful login (navigate to profile page)
         actions.resetForm();
-        navigation.navigate("login");
+        navigation.navigate("(tabs)");
       } catch (error: any) {
         const errorMessage = error.message;
         if (errorMessage.includes("similar")) {

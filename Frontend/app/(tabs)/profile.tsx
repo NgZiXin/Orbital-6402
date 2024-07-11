@@ -1,14 +1,12 @@
 import { ScrollView, StyleSheet, Text, View, Image } from "react-native";
 import { globalStyles } from "../../styles/global";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
 import { getItem } from "../../components/general/asyncStorage";
 import { useLoading } from "@/hooks/useLoading";
-import LinkStrava from "../../components/strava/LinkStrava";
 import EditModal from "@/components/modal/profilePage/edit";
 import LogoutModal from "@/components/modal/profilePage/logout";
 import BmiModal from "@/components/modal/profilePage/bmi";
-import SyncModal from "@/components/modal/profilePage/sync";
+
 
 export default function Profile() {
   const { showLoading, hideLoading } = useLoading();
@@ -37,7 +35,7 @@ export default function Profile() {
       // hence, we await to wait for the Promise to complete and grab its value
       const token: string | null = await getItem("token");
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_DOMAIN}accounts/data`,
+        `${process.env.EXPO_PUBLIC_DOMAIN}accounts/detail`,
         {
           method: "GET",
           headers: {
@@ -240,20 +238,6 @@ export default function Profile() {
           </View>
         </View>
       </View>
-
-      <View style={styles.stravaWrapper}>
-        <View style={styles.infoWrapper}>
-          <Text>
-            <Text style={styles.userName}>Strava </Text>
-            <Text style={{ ...styles.userName, ...styles.accent }}>Sync</Text>
-          </Text>
-          <SyncModal />
-        </View>
-
-        <SafeAreaView style={{ width: "100%" }}>
-          <LinkStrava />
-        </SafeAreaView>
-      </View>
     </ScrollView>
   );
 }
@@ -276,7 +260,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: -150,
-    marginBottom: "35%",
+    marginBottom: "100%",
   },
 
   pfp: {
@@ -335,30 +319,5 @@ const styles = StyleSheet.create({
   infoWrapper: {
     flexDirection: "row",
     alignItems: "center",
-  },
-
-  stravaWrapper: {
-    marginTop: 120,
-    width: "100%",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  accent: {
-    color: "red",
-  },
-
-  authCode: {
-    width: "100%",
-    paddingBottom: 10,
-  },
-
-  syncButton: {
-    width: "100%",
-    marginTop: "-5%",
-    padding: 5,
-    borderRadius: 15,
-    backgroundColor: "#FFC4C4",
   },
 });
