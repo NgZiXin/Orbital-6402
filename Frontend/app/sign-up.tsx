@@ -10,6 +10,8 @@ import {
 import { globalStyles } from "../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useNavigation } from "expo-router";
+import { useLoading } from "@/hooks/useLoading";
+import { setItem } from "../components/general/asyncStorage";
 
 import UsernameField from "@/components/form/fragments/accountDetails/username";
 import PasswordField from "@/components/form/fragments/accountDetails/password";
@@ -33,55 +35,82 @@ interface SignUpValues {
   gender: string;
 }
 
+interface SuccessResponse {
+  token: string;
+}
+
 export default function SignUp() {
   const navigation: any = useNavigation();
+  const { showLoading, hideLoading } = useLoading();
 
   const handleSubmit = async (
     values: SignUpValues,
     actions: FormikHelpers<SignUpValues>
   ): Promise<void> => {
     try {
-      // Custom serialization
-      const body = {
-        ...values,
-        birthday: values.birthday.toISOString().split("T")[0], // Convert date to 'YYYY-MM-DD' format
-      };
+      // Loading
+      showLoading();
 
-      const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}accounts/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
+      try {
+        // Custom serialization
+        const body = {
+          ...values,
+          birthday: values.birthday.toISOString().split("T")[0], // Convert date to 'YYYY-MM-DD' format
+        };
 
-      // Case where backend raises an error
-      if (!response.ok) {
-        const errorResponse: ErrorResponse = await response.json();
-        if (errorResponse.username) {
-          Alert.alert("Signup Failed", "That username already exists");
-          return;
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_DOMAIN}accounts/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          }
+        );
+
+        // Case where backend raises an error
+        if (!response.ok) {
+          const errorResponse: ErrorResponse = await response.json();
+          if (errorResponse.username) {
+            Alert.alert("Signup Failed", "That username already exists");
+            return;
+          } else {
+            Alert.alert("Signup Failed", "Network error, please try again");
+            return;
+          }
+        }
+
+        
+        const data: SuccessResponse = await response.json();
+        const token: string = data["token"];
+
+        // stores the user (session-based) token string
+        setItem("token", token);
+
+        // Handle successful login (navigate to profile page)
+        actions.resetForm();
+        navigation.navigate("(tabs)");
+      } catch (error: any) {
+        const errorMessage = error.message;
+        if (errorMessage.includes("similar")) {
+          Alert.alert(
+            "Signup Failed",
+            "Password is too similar to the username"
+          );
+        } else if (errorMessage.includes("commonly used")) {
+          Alert.alert(
+            "Signup Failed",
+            "Password cannot be a commonly used password"
+          );
         } else {
-          Alert.alert("Signup Failed", "Network error, please try again");
-          return;
+          Alert.alert("Signup Failed", "Please try again");
         }
       }
-
-      // Handle successful signup (navigate to login screen)
-      actions.resetForm();
-      navigation.navigate("login");
-    } catch (error: any) {
-      const errorMessage = error.message;
-      if (errorMessage.includes("similar")) {
-        Alert.alert("Signup Failed", "Password is too similar to the username");
-      } else if (errorMessage.includes("commonly used")) {
-        Alert.alert(
-          "Signup Failed",
-          "Password cannot be a commonly used password"
-        );
-      } else {
-        Alert.alert("Signup Failed", "Please try again");
-      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      hideLoading(); // Hide loading spinner after fetch completes
     }
   };
 

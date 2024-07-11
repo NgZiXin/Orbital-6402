@@ -1,16 +1,15 @@
 import { ScrollView, StyleSheet, Text, View, Image } from "react-native";
 import { globalStyles } from "../../styles/global";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
 import { getItem } from "../../components/general/asyncStorage";
-import LinkStrava from "../../components/strava/LinkStrava";
-import LoadingScreen from "@/components/general/loadingScreen";
+import { useLoading } from "@/hooks/useLoading";
 import EditModal from "@/components/modal/profilePage/edit";
 import LogoutModal from "@/components/modal/profilePage/logout";
 import BmiModal from "@/components/modal/profilePage/bmi";
-import SyncModal from "@/components/modal/profilePage/sync";
+
 
 export default function Profile() {
+  const { showLoading, hideLoading } = useLoading();
   const [userDetails, setUserDetails] = useState<string[]>([]);
   const [age, setAge] = useState<number>(0);
   const [bmi, setBMI] = useState<number>(0.0);
@@ -28,27 +27,36 @@ export default function Profile() {
   };
 
   const getUserDetails = async () => {
-    // getItem('token') returns a Promise
-    // hence, we await to wait for the Promise to complete and grab its value
-    const token: string | null = await getItem("token");
-    const response = await fetch(
-      `${process.env.EXPO_PUBLIC_DOMAIN}accounts/data`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
-        },
+    try {
+      // Loading Screen
+      showLoading();
+
+      // getItem('token') returns a Promise
+      // hence, we await to wait for the Promise to complete and grab its value
+      const token: string | null = await getItem("token");
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_DOMAIN}accounts/detail`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
-    );
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
+      const dataObj = await response.json();
+      const valuesArray: string[] = Object.values(dataObj).map(String);
+      setUserDetails(valuesArray);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      hideLoading(); // Hide loading spinner after fetch completes
     }
-
-    const dataObj = await response.json();
-    const valuesArray: string[] = Object.values(dataObj).map(String);
-    setUserDetails(valuesArray);
   };
 
   // getUserDetails() fetches the user data of the current user that's logged in
@@ -118,7 +126,7 @@ export default function Profile() {
     }
   }, [userDetails]);
 
-  return userDetails.length > 0 ? (
+  return (
     <ScrollView
       style={globalStyles.container}
       showsVerticalScrollIndicator={false}
@@ -152,18 +160,16 @@ export default function Profile() {
           />
         )}
 
+        <View style={{ height: "15%" }}>
+          <Text style={styles.userName}>
+            {/* Username is found at index 1 of the array */}
+            {userDetails[1] + " (" + userDetails[5] + ")"}
+          </Text>
 
-          <View style={{ height: "15%"}}>
-            <Text style={styles.userName}>
-              {/* Username is found at index 1 of the array */}
-              {userDetails[1] + " (" + userDetails[5] + ")"}
-            </Text>
-
-            {/* Change name to two parter in future */}
-            {/* <Text>Tom </Text>  
+          {/* Change name to two parter in future */}
+          {/* <Text>Tom </Text>  
               <Text style={{color: 'red'}}>Hanks</Text> */}
-          </View>
-
+        </View>
 
         <View style={styles.iconWrapper}>
           <EditModal triggerUpdate={triggerUpdate} />
@@ -232,23 +238,7 @@ export default function Profile() {
           </View>
         </View>
       </View>
-
-      <View style={styles.stravaWrapper}>
-        <View style={styles.infoWrapper}>
-          <Text>
-            <Text style={styles.userName}>Strava </Text>
-            <Text style={{ ...styles.userName, ...styles.accent }}>Sync</Text>
-          </Text>
-          <SyncModal />
-        </View>
-
-        <SafeAreaView style={{ width: "100%" }}>
-          <LinkStrava />
-        </SafeAreaView>
-      </View>
     </ScrollView>
-  ) : (
-    <LoadingScreen />
   );
 }
 
@@ -270,7 +260,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: -150,
-    marginBottom: "35%",
+    marginBottom: "100%",
   },
 
   pfp: {
@@ -329,30 +319,5 @@ const styles = StyleSheet.create({
   infoWrapper: {
     flexDirection: "row",
     alignItems: "center",
-  },
-
-  stravaWrapper: {
-    marginTop: 120,
-    width: "100%",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  accent: {
-    color: "red",
-  },
-
-  authCode: {
-    width: "100%",
-    paddingBottom: 10,
-  },
-
-  syncButton: {
-    width: "100%",
-    marginTop: "-5%",
-    padding: 5,
-    borderRadius: 15,
-    backgroundColor: "#FFC4C4",
   },
 });

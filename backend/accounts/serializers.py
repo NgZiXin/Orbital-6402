@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import CustomUser
-from django.contrib.auth.hashers import make_password
 
 class CustomUserSerializer(serializers.ModelSerializer):
     
@@ -11,12 +10,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
         }
 
+    # Define custom create and update for password hashing
     def create(self, validated_data):
         password = validated_data.pop('password', None)
-        user = self.Meta.model(**validated_data)
+        user = self.Meta.model(**validated_data) # Create User instance
         if password:
-            user.set_password(password) # Hash password
-        user.save() # Save the user instance to the database
+            user.set_password(password) # Set and hash the password using Django's hashing algorithm
+        user.save() 
         return user
 
     def update(self, instance, validated_data):

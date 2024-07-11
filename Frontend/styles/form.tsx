@@ -13,6 +13,12 @@ export const formStyles = StyleSheet.create({
     left: 9,
   },
 
+  findNearestDetailsFormCommon: {
+    marginBottom: 12,
+    position: "relative",
+    left: 9,
+  },
+
   errorText: {
     ...globalStyles.label,
     color: "red",
@@ -28,5 +34,23 @@ export const formStyles = StyleSheet.create({
     height: 23,
     position: "relative",
     left: 5,
+  },
+
+  buttonsWrapper: {
+    flexDirection: "row",
+  },
+
+  button: {
+    marginTop: 6,
+    flexDirection: "row",
+    justifyContent: "center",
+    backgroundColor: "#F6F2F2",
+    borderRadius: 10,
+    flex: 1,
+  },
+
+  highlightedButton: {
+    borderColor: "red",
+    borderWidth: 1,
   },
 });

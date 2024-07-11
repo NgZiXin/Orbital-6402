@@ -1,6 +1,6 @@
 import { Slider } from "@react-native-assets/slider";
 import { Text, View } from "react-native";
-import { globalStyles } from "../../../../styles/global";
+import { globalStyles } from "../../../../../styles/global";
 import { formStyles } from "@/styles/form";
 
 export default function NumExercises({ formikProps, setScroll }: any) {
@@ -21,6 +21,7 @@ export default function NumExercises({ formikProps, setScroll }: any) {
           trackHeight={3}
           step={1}
           thumbSize={16.5}
+          value={formikProps.values.numExercises}
           minimumTrackTintColor="#FFC4C4"
           maximumTrackTintColor="#D0D0D0"
           thumbTintColor="#FFC4C4"

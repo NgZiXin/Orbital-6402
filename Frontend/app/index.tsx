@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import LoadingScreen from "@/components/general/loadingScreen";
+import LoadingOverlay from "@/components/general/loadingOverlay";
 import { getItem } from "@/components/general/asyncStorage";
 
 // Expo router first routes to this page (entry point)
@@ -15,6 +15,6 @@ const Index = () => {
     });
   }, []);
 
-  return <LoadingScreen />;
+  return <LoadingOverlay />;
 };
 export default Index;

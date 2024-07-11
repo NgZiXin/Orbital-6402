@@ -111,7 +111,7 @@ export default function EditForm({ submitHandler }: any) {
 
             <SubmitButton
               onPressHandler={() => formikProps.handleSubmit()}
-              text="Create Account"
+              text="Edit Account"
             />
           </ScrollView>
         )}

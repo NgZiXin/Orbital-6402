@@ -77,7 +77,7 @@ To learn more about Expo, do look at the following resources:
 
 ### Setting up the Back-end:
 
-1. Before setting up the back-end, you will need a [OneMap account](https://www.onemap.gov.sg/apidocs/register), [Strava account](https://www.strava.com/register/free) and a local [Postgres database](https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04) set up.
+1. Before setting up the back-end, you will need a [OneMap account](https://www.onemap.gov.sg/apidocs/register), [Strava account](https://www.strava.com/register/free), [Groq account](https://console.groq.com/login) and a local [Postgres database](https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04) set up. Please also set up a [Strava api application](https://developers.strava.com/docs/getting-started/#account).
 
 2. Navigate into `./backend` folder. 
    > Note that all the following commands and creations are to be done in this subfolder.
@@ -122,8 +122,16 @@ To learn more about Expo, do look at the following resources:
       DATABASE_PORT='your postgres port'
 
       # OneMap API Config 
-      ONEMAP_EMAIL= 'your onemap account email'
-      ONEMAP_EMAIL_PASSWORD = 'your onemap account password'
+      ONEMAP_EMAIL='your onemap account email'
+      ONEMAP_EMAIL_PASSWORD ='your onemap account password'
+
+      # Strava App Config
+      STRAVA_CLIENT_ID='your strava api application's client id'
+      STRAVA_CLIENT_SECRET='your strava api application's secret'
+      MAX_USERS='your strava api application's number of athletes allowed to connect'
+
+      # Groq Config
+      GROQ_API_KEY="your groq api key"
       ```
 
       An example of an `.env` file:
@@ -138,6 +146,14 @@ To learn more about Expo, do look at the following resources:
       # One Map API Config 
       ONEMAP_EMAIL= 'tom@gmail.com'
       ONEMAP_EMAIL_PASSWORD = 'tom123' 
+
+      # Strava App Config
+      STRAVA_CLIENT_ID='12100'
+      STRAVA_CLIENT_SECRET='a1234567890b1234567890'
+      MAX_USERS='1'
+
+      # Groq Config
+      GROQ_API_KEY="a1234567890b1234567890"
    ```
 
    
