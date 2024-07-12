@@ -7,7 +7,7 @@ import os, requests
 
 class StravaToken(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    authorize = models.BooleanField(default=True)
+    authorize = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
 
     access_token = models.CharField(null=True)
