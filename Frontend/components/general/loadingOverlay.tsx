@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useLoading } from "@/hooks/useLoading";
@@ -12,6 +12,7 @@ export default function LoadingOverlay() {
     if (loading) {
       const timeout = setTimeout(() => {
         hideLoading();
+        Alert.alert("Error", "Network Response Error. Please Ensure stable connection")
         navigation.navigate("login"); // Redirect user to login page after 30 seconds
       }, 30000); 
 

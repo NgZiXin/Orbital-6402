@@ -35,12 +35,7 @@ export default function Location() {
         <View style={{ marginTop: 50 }}>
           <PageHeader topText="" bottomText="Explore Running Routes" />
           <Text style={styles.routesText}>
-            {
-              "Click to explore various cool running routes! "
-            }
-            <Text style={{ color: "red" }}>
-              Sync with Strava at profile page to display segments.
-            </Text>
+            {"Click to explore various cool running routes! "}
           </Text>
           <SubmitButton
             text="View Routes"
