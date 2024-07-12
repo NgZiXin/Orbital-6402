@@ -3,6 +3,7 @@ from .serializers import CustomUserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 class UserCreate(generics.CreateAPIView): 
     # Define class attributes
@@ -36,6 +37,11 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView): # GET, PUT, DEL
     def get_object(self):
         return self.request.user
 
+class PingView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
+        return Response({'message': 'success'})
 
 
 

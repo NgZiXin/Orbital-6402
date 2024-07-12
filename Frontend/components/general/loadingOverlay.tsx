@@ -1,9 +1,24 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { useLoading } from "@/hooks/useLoading";
 
 export default function LoadingOverlay() {
   const { loading, showLoading, hideLoading } = useLoading();
+  const navigation: any = useNavigation();
+
+  useEffect(() => {
+    if (loading) {
+      const timeout = setTimeout(() => {
+        hideLoading();
+        navigation.navigate("login"); // Redirect user to login page after 30 seconds
+      }, 30000); 
+
+      return () => clearTimeout(timeout);
+    }
+  }, [loading]);
+
 
   if (!loading) {
     return null;
