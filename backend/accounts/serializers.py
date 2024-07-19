@@ -1,26 +1,22 @@
 from rest_framework import serializers
 from .models import CustomUser
-from strava_api.serializers import StravaAccessTokenSerializer, StravaRefreshTokenSerializer
-from django.contrib.auth.hashers import make_password
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    # Display additional info
-    strava_access_token = StravaAccessTokenSerializer(read_only=True)
-    strava_refresh_token = StravaRefreshTokenSerializer(read_only=True)
-
+    
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'password', 'height', 'weight', 'birthday', 'gender', 'strava_access_token', 'strava_refresh_token']
+        fields = ['id', 'username', 'password', 'height', 'weight', 'birthday', 'gender']
         extra_kwargs = {
             'password': {'write_only': True},
         }
 
+    # Define custom create and update for password hashing
     def create(self, validated_data):
         password = validated_data.pop('password', None)
-        user = self.Meta.model(**validated_data)
+        user = self.Meta.model(**validated_data) # Create User instance
         if password:
-            user.set_password(password) # Hash password
-        user.save() # Save the user instance to the database
+            user.set_password(password) # Set and hash the password using Django's hashing algorithm
+        user.save() 
         return user
 
     def update(self, instance, validated_data):

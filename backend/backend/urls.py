@@ -24,4 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path("map/", include("map.urls")),
+    path("workout/", include("workout.urls")),
+     path("calendar/", include("user_calendar.urls")),
 ]

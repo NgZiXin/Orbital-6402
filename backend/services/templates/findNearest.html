@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      #map {
+        top: 0;
+        bottom: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <title>Orbital 6402 Find Gym and Park</title>
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+  <script>
+    const type = "{{ type }}";
+    const landmarks_json = `{{ landmarks_json|safe }}`;
+    const initial_lat = "{{ initial_lat }}";
+    const initial_lng = "{{ initial_lng }}";
+    const address = "{{ address }}";
+  </script>
+  <script src="{% static 'basemaps.js' %}"></script>
+  <script src="{% static 'findNearest-main.js' %}"></script>
+</html>

@@ -1,26 +1,24 @@
-import requests
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework import status
-from .utils import get_access_token
+from .helpers import get_onemap_api
 from .serializers import GetPathSerializer
-from strava_api.utils import get_token
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from strava_api.models import StravaToken
 
 @api_view(['GET'])
 def index(request):
-    user = request.user
-    strava_token =  get_token(user)
-    context = {
-         "strava_token": strava_token,
-         "REACT_APP_DOMAIN": os.environ.get("REACT_APP_DOMAIN"),
-    }
-    return render(request, "index.html", context)
+     strava_token = ""
+     try:
+          token = StravaToken.objects.get(user=request.user)
+          strava_token = token.get_token()
+     except Exception:
+          print("User NOT authorized")
+     context = {
+          "strava_token": strava_token,
+          "url": request.build_absolute_uri(request.path)
+     }
+     return render(request, "routes.html", context)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -29,19 +27,15 @@ def get_path(request):
      if serializer.is_valid():
           start = request.GET.get('start') 
           end = request.GET.get('end')
-
-          # Query path using OneMap Api
-          url = f"https://www.onemap.gov.sg/api/public/routingsvc/route?start={start}&end={end}&routeType=walk"
-          headers = {"Authorization": get_access_token()}
-          response = requests.request("GET", url, headers=headers)
-
-          response_json = response.json()
-          if not response.ok:
-               return Response(response_json, status=400)
           
-          data = {}
-          data["route_geometry"] = response_json.get("route_geometry")
-          data["total_distance"] = response_json.get("route_summary").get("total_distance")
-
-          return Response(data, status=status.HTTP_200_OK)
-     return Response({'status': 'error', 'message': 'Invalid Input'}, status=400)
+          try:
+               onemap_api = get_onemap_api()
+               route_geometry, total_distance = onemap_api.get_footpath(start, end)
+               json = {}
+               json["route_geometry"] = route_geometry
+               json["total_distance"] = total_distance
+               return Response(json)
+          except Exception as e:
+               return Response({'error': str(e)}, status=400)
+          
+     return Response({'error': 'Invalid Input'}, status=400)

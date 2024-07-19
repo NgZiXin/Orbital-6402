@@ -40,17 +40,19 @@ export default function EditForm({ submitHandler }: any) {
       };
 
       const token: string | null = await getItem("token");
-      const ip = process.env.EXPO_PUBLIC_DOMAIN;
-      const response = await fetch(`http://${ip}:8000/accounts/data/`, {
-        // put request to update existing user details
-        // of the current user logged in
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_DOMAIN}accounts/data/`,
+        {
+          // put request to update existing user details
+          // of the current user logged in
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`,
+          },
+          body: JSON.stringify(body),
+        }
+      );
 
       // Case where backend raises an error
       if (!response.ok) {
@@ -109,7 +111,7 @@ export default function EditForm({ submitHandler }: any) {
 
             <SubmitButton
               onPressHandler={() => formikProps.handleSubmit()}
-              text="Create Account"
+              text="Edit Account"
             />
           </ScrollView>
         )}

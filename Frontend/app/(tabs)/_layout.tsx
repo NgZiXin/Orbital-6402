@@ -1,10 +1,72 @@
 import { Tabs, useNavigation } from "expo-router";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Platform, View } from "react-native";
+import { useLoading } from "@/hooks/useLoading";
+import { useEffect, useState } from "react";
+import { getItem } from "@/components/general/asyncStorage";
 import Header from "../../components/navigation/header";
+import StravaSyncOverlay from "@/components/general/stravaSyncOverlay";
+import StravaReSyncOverlay from "@/components/general/stravaReSyncOverlay";
 
 export default function TabLayout() {
+  const { showLoading, hideLoading } = useLoading();
   const navigation = useNavigation();
+  const [syncStrava, setSyncStrava] = useState<boolean>(false);
+  const [status, setStatus] = useState<string>("AUTHORIZED");
+  const [stravaClientId, setStravaClientId] = useState<string>("");
+
+  const closeSyncStrava = () => {
+    setSyncStrava(false);
+  };
+
+  const verify = async () => {
+    try {
+      showLoading();
+
+      // getItem('token') returns a Promise
+      // hence, we await to wait for the Promise to complete and grab its value
+      const token: string | null = await getItem("token");
+
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_DOMAIN}strava_api/check_auth`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+
+      setStravaClientId(data["CLIENT_ID"]);
+      setStatus(data["status"]);
+      if (
+        data["status"] == "UNAUTHORIZED" ||
+        data["status"] == "DEAUTHORIZED"
+      ) {
+        setSyncStrava(true);
+      } else {
+        setSyncStrava(false);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      hideLoading();
+    }
+  };
+
+  useEffect(() => {
+    // Verify if user is synced with Strava
+    const timer = setTimeout(() => {
+      verify();
+    }, 1000); // Set timer to improve UX by reducing race conditions
+
+    return () => clearTimeout(timer);
+  }, [syncStrava]);
 
   const screenOptions = () => {
     let headerStyle = {
@@ -116,6 +178,21 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
+      {status == "UNAUTHORIZED" ? (
+        <StravaSyncOverlay
+          syncStrava={syncStrava}
+          closeSyncStrava={closeSyncStrava}
+          stravaClientId={stravaClientId}
+        />
+      ) : status == "DEAUTHORIZED" ? (
+        <StravaReSyncOverlay
+          syncStrava={syncStrava}
+          closeSyncStrava={closeSyncStrava}
+          stravaClientId={stravaClientId}
+        />
+      ) : (
+        <></>
+      )}
     </View>
   );
 }

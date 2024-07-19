@@ -12,7 +12,6 @@ export default function ProgressBar({
   rightLabel,
   progress,
 }: ProgressBarProps) {
-  // safeguard
   let updatedProgress = null;
   if (progress > 100) {
     updatedProgress = 100;

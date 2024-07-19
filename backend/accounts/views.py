@@ -1,29 +1,47 @@
 from rest_framework import generics
-from .models import CustomUser
 from .serializers import CustomUserSerializer
+from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-class UserListCreate(generics.ListCreateAPIView): # listing and creating users
+class UserCreate(generics.CreateAPIView): 
+    # Define class attributes
     permission_classes = [AllowAny]
-    queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
-    # Temp
+    # Override logic for create (i.e. method in generics.CreateAPIView Class)
     def create(self, request, *args, **kwargs):
-        print(request.data)  # This will log the request body
-        return super().create(request, *args, **kwargs)
+        # Pass data into serialiser
+        serializer = self.get_serializer(data=request.data)
 
-class UserDetail(generics.RetrieveAPIView): 
-    permission_classes = [AllowAny]
-    queryset = CustomUser.objects.all()
-    serializer_class = CustomUserSerializer
+        # Checks for invalid request
+        serializer.is_valid(raise_exception=True)
 
-class UserData(generics.RetrieveUpdateDestroyAPIView): # retrieving, updating, and deleting users
+        # Called by CreateModelMixin when saving a new object instance.
+        self.perform_create(serializer)
+
+        # Get Token
+        user = serializer.instance
+        token = Token.objects.get(user=user)
+
+        # Custom output 
+        return Response({'token': token.key})
+
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView): # GET, PUT, DEL
     permission_classes = [IsAuthenticated]
     serializer_class = CustomUserSerializer
+    
+    # Get user's detail by through Authorization token instead of pk
     def get_object(self):
         return self.request.user
 
+class PingView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
+        return Response({'message': 'success'})
 
 
 

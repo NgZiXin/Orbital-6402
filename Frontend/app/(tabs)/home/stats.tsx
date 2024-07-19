@@ -15,6 +15,7 @@ import { Dimensions } from "react-native";
 import WeekToggleModal from "@/components/modal/homePage/weekToggle";
 import initialSkeleton from "./sampleData";
 import { getItem } from "@/components/general/asyncStorage";
+import { useLoading } from "@/hooks/useLoading";
 
 interface WeekDetails {
   total_workout: number;
@@ -72,6 +73,7 @@ const [initialStart, initialEnd]: [string, string] =
   getStartAndEndOfWeek(today);
 
 export default function Stats() {
+  const { showLoading, hideLoading } = useLoading();
   const [dataSkeleton, setDataSkeleton] = useState<any>(initialSkeleton);
   const [weekToggleModal, setWeekToggleModal] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -104,89 +106,106 @@ export default function Stats() {
   }, []);
 
   async function getWeekDetails(): Promise<void> {
-    const currentStart: string = selectedWeek[0];
-    const [dayS, monthS, yearS]: number[] = currentStart.split("/").map(Number);
-    const startDate: Date = new Date(yearS, monthS - 1, dayS);
+    try {
+      // Show Loading Screen
+      showLoading();
 
-    const currentEnd: string = selectedWeek[1];
-    const [dayE, monthE, yearE]: number[] = currentEnd.split("/").map(Number);
-    const endDate: Date = new Date(yearE, monthE - 1, dayE);
+      const currentStart: string = selectedWeek[0];
+      const [dayS, monthS, yearS]: number[] = currentStart
+        .split("/")
+        .map(Number);
+      const startDate: Date = new Date(yearS, monthS - 1, dayS);
 
-    const token: string | null = await getItem("token");
+      const currentEnd: string = selectedWeek[1];
+      const [dayE, monthE, yearE]: number[] = currentEnd.split("/").map(Number);
+      const endDate: Date = new Date(yearE, monthE - 1, dayE);
 
-    const response = await fetch(
-      `${process.env.EXPO_PUBLIC_DOMAIN}strava_api/get_stats/?start_date=${startDate}&end_date=${endDate}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
-        },
+      const token: string | null = await getItem("token");
+      const response = await fetch(
+        `${
+          process.env.EXPO_PUBLIC_DOMAIN
+        }strava_api/get_stats/?start_date=${startDate.toISOString()}&end_date=${endDate.toISOString()}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      // invalid response
+      if (!response.ok) {
+        setIsLoggedIn(false);
+        return;
       }
-    );
+      // valid response
+      const weekDetailsObject: WeekDetails = await response.json();
+      const weekDetailsValues = Object.values(weekDetailsObject);
 
-    // invalid response
-    if (!response.ok) {
+      // grab the first 4 values for weekly stats
+      const weeklyValues: number[] = weekDetailsValues.slice(0, 4);
+
+      // units coversion
+      const totalDistanceValue: number = weeklyValues[2];
+      const convertedToKm: number = (totalDistanceValue * 1.0) / 1000;
+      weeklyValues[2] = convertedToKm;
+
+      const totalDurationValue: number = weeklyValues[3];
+      const convertedToHours: number = (totalDurationValue * 1.0) / 3600;
+      weeklyValues[3] = convertedToHours;
+      setWeekValues(weeklyValues);
+
+      // calculate progress values for weekly stats
+      const progressValuesResult: number[] = weeklyValues.map((num, index) =>
+        calculateProgress(num, weekGoalValues[index])
+      );
+      setProgressValues(progressValuesResult);
+
+      // grab the last 2 values for daily stats
+      const dailyValues: number[][] = weekDetailsValues.slice(4, 6);
+
+      // units conversion
+      const dailyDistanceValues: number[] = dailyValues[0];
+      const convertedToKm1: number[] = dailyDistanceValues.map(
+        (num) => num / 1000
+      );
+      dailyValues[0] = convertedToKm1;
+
+      const dailyDurationValues: number[] = dailyValues[1];
+      const convertedToHours1: number[] = dailyDurationValues.map(
+        (num) => num / 3600
+      );
+      dailyValues[1] = convertedToHours1;
+      setDayValues(dailyValues);
+
+      // update the dataSkeleton
+      const updatedDataSkeleton = dataSkeleton.map(
+        (item: any, index: number) => {
+          const distanceThisDay: number = parseFloat(
+            dailyValues[0][index].toFixed(1)
+          );
+          const durationThisDay: number = parseFloat(
+            dailyValues[1][index].toFixed(1)
+          );
+          return {
+            ...item,
+            value: distanceThisDay,
+            onPress: () => {
+              setDailyDistanceValue(distanceThisDay);
+              setDailyDurationValue(durationThisDay);
+            },
+          };
+        }
+      );
+
+      setDataSkeleton(updatedDataSkeleton);
       setIsLoggedIn(true);
-      return;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      hideLoading(); // Hide loading spinner after fetch completes
     }
-
-    // valid response
-    setIsLoggedIn(true);
-    const weekDetailsObject: WeekDetails = await response.json();
-    const weekDetailsValues = Object.values(weekDetailsObject);
-
-    // grab the first 4 values for weekly stats
-    const weeklyValues: number[] = weekDetailsValues.slice(0, 4);
-
-    // units coversion
-    const totalDistanceValue: number = weeklyValues[2];
-    const convertedToKm: number = (totalDistanceValue * 1.0) / 1000;
-    weeklyValues[2] = convertedToKm;
-
-    const totalDurationValue: number = weeklyValues[3];
-    const convertedToHours: number = (totalDurationValue * 1.0) / 3600;
-    weeklyValues[3] = convertedToHours;
-    setWeekValues(weeklyValues);
-
-    // calculate progress values for weekly stats
-    const progressValuesResult: number[] = weekValues.map((num, index) =>
-      calculateProgress(num, weekGoalValues[index])
-    );
-    setProgressValues(progressValuesResult);
-
-    // grab the last 2 values for daily stats
-    const dailyValues: number[][] = weekDetailsValues.slice(4, 6);
-
-    // units conversion
-    const dailyDistanceValues: number[] = dailyValues[0];
-    const convertedToKm1: number[] = dailyDistanceValues.map(
-      (num) => num / 1000
-    );
-    dailyValues[0] = convertedToKm1;
-
-    const dailyDurationValues: number[] = dailyValues[1];
-    const convertedToHours1: number[] = dailyDurationValues.map(
-      (num) => num / 3600
-    );
-    dailyValues[1] = convertedToHours1;
-    setDayValues(dailyValues);
-
-    // update the dataSkeleton
-    const updatedDataSkeleton = dataSkeleton.map((item: any, index: number) => {
-      const distanceThisDay: number = dayValues[0][index];
-      const durationThisDay: number = dayValues[1][index];
-      return {
-        ...item,
-        value: dailyDistanceValue,
-        onPress: () => {
-          setDailyDistanceValue(distanceThisDay);
-          setDailyDurationValue(durationThisDay);
-        },
-      };
-    });
-
-    setDataSkeleton(updatedDataSkeleton);
   }
 
   // store selectedWeek as a string array
@@ -213,14 +232,17 @@ export default function Stats() {
   function handleGoForward(): void {
     const currentEnd: string = selectedWeek[1];
 
+    const [day0, month0, year0]: number[] = currentEnd.split("/").map(Number);
+    const newStart: Date = new Date(year0, month0 - 1, day0);
+
+    const [day1, month1, year1]: number[] = initialEnd.split("/").map(Number);
+    const initStart: Date = new Date(year1, month1 - 1, day1);
+
     // prevent you from going beyond this week
-    if (currentEnd === initialEnd) {
+    if (newStart >= initStart) {
       setWeekToggleModal(true);
       return;
     }
-
-    const [day, month, year]: number[] = currentEnd.split("/").map(Number);
-    const newStart: Date = new Date(year, month - 1, day);
 
     const newEnd: Date = new Date(newStart);
     newEnd.setDate(newEnd.getDate() + 7);
