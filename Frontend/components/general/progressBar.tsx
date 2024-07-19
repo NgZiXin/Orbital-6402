@@ -12,8 +12,18 @@ export default function ProgressBar({
   rightLabel,
   progress,
 }: ProgressBarProps) {
-  const updatedProgress = progress > 100 ? 100 : progress;
+  // safeguard
+  let updatedProgress = null;
+  if (progress > 100) {
+    updatedProgress = 100;
+  } else if (progress < 0 || progress === undefined) {
+    updatedProgress = 0;
+  } else {
+    updatedProgress = progress;
+  }
+
   const stringVersion: DimensionValue = `${updatedProgress}%`;
+
   return (
     <>
       <View style={styles.labels}>

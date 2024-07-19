@@ -127,7 +127,7 @@ export default function Stats() {
 
     // invalid response
     if (!response.ok) {
-      setIsLoggedIn(false);
+      setIsLoggedIn(true);
       return;
     }
 
