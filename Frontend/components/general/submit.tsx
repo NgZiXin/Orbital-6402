@@ -1,10 +1,16 @@
 import { globalStyles } from "../../styles/global";
-import { StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
+import {
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ViewStyle,
+} from "react-native";
 
 interface SubmitButtonProps {
   onPressHandler: () => void;
   text: string;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
 // When multiple arguments are passed into the FC
@@ -18,15 +24,7 @@ export default function SubmitButton({
   return (
     <>
       <TouchableOpacity onPress={onPressHandler} style={[styles.submit, style]}>
-        <Text
-          style={{
-            ...globalStyles.header,
-            textAlign: "center",
-            fontSize: 12,
-          }}
-        >
-          {text}
-        </Text>
+        <Text style={styles.submitButtonText}>{text}</Text>
       </TouchableOpacity>
     </>
   );
@@ -37,5 +35,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFC4C4",
     borderRadius: 10,
     marginTop: 17,
+  },
+
+  submitButtonText: {
+    ...globalStyles.header,
+    textAlign: "center",
+    fontSize: 12,
   },
 });

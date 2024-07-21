@@ -1,64 +1,69 @@
 import {
   KeyboardAvoidingView,
-  Modal,
   Platform,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
-import { modalStyles } from "../../../styles/modal";
 import { globalStyles } from "../../../styles/global";
 import { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SubmitButton from "@/components/general/submit";
 import AgendaCalendar from "@/components/general/agendaCalendar";
+import GeneralModalTemplate from "../templates/generalModalTemplate";
 
 export default function CalendarModal() {
-  const [calendarModal, setCalendarModal] = useState<boolean>(false);
+  const [visibility, setVisibility] = useState<boolean>(false);
   return (
     <>
       <SubmitButton
-        onPressHandler={() => setCalendarModal(true)}
+        onPressHandler={() => setVisibility(true)}
         text="View Calendar"
-        style={{ position: "relative", bottom: 25, marginBottom: 27 }}
+        style={styles.submitButton}
       />
 
-      {calendarModal == true && (
-        <Modal animationType="slide" visible={calendarModal} transparent={true}>
-          <View style={modalStyles.modalWrapper}>
-            <View
-              style={{
-                ...modalStyles.modalContent,
-                width: "95%",
-                height: "93.5%",
-              }}
-            >
-              <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: 3,
-                  }}
-                >
-                  <Text style={globalStyles.header}>Workout Calendar</Text>
-                  <TouchableOpacity onPress={() => setCalendarModal(false)}>
-                    <Ionicons name="close-circle-outline" size={25}></Ionicons>
-                  </TouchableOpacity>
-                </View>
-
-                <AgendaCalendar />
-              </KeyboardAvoidingView>
-            </View>
+      <GeneralModalTemplate
+        visibleState={visibility}
+        additionalStyles={styles.modalDimmensions}
+      >
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <View style={styles.headerWrapper}>
+            <Text style={globalStyles.header}>Workout Calendar</Text>
+            <TouchableOpacity onPress={() => setVisibility(false)}>
+              <Ionicons name="close-circle-outline" size={25}></Ionicons>
+            </TouchableOpacity>
           </View>
-        </Modal>
-      )}
+
+          {/* TODO: Why TF does this suddenly lead to infinite recursive loop? */}
+          {/* <AgendaCalendar /> */}
+        </KeyboardAvoidingView>
+      </GeneralModalTemplate>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  submitButton: {
+    position: "relative",
+    bottom: 25,
+    marginBottom: 27,
+  },
+
+  modalDimmensions: {
+    width: "95%",
+    height: "93.5%",
+  },
+
+  headerWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 3,
+  },
+});

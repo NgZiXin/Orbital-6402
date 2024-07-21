@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "../../../../styles/global";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomTextInput from "@/components/general/customTextInput";
 import { formStyles } from "@/styles/form";
@@ -9,7 +9,22 @@ const todayDate: Date = new Date();
 
 export default function BirthdayField({ formikProps }: any) {
   const [showPicker, setShowPicker] = useState<boolean>(false);
-  const [selected, setSelected] = useState<boolean>(false);
+  const selected = useRef<boolean>(false);
+  const count = useRef<number>(0);
+
+  useEffect(() => {
+    // Count >= 1 means that we have interacted with the birthday picker at least once
+    // Therefore, it is in a visited state
+    // We can force validation with setFieldTouched
+    if (count.current >= 1) {
+      // Enforce a timeout of 300ms before validation check
+      // So that the tester function for birthday gets the right birthday (wait for external async threads to finish?)
+      const timer = setTimeout(() => {
+        formikProps.setFieldTouched("birthday", true);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [count.current]);
 
   return (
     <>
@@ -22,12 +37,21 @@ export default function BirthdayField({ formikProps }: any) {
             negativeButton={{ label: "Cancel", textColor: "#F5BABA" }}
             positiveButton={{ label: "OK", textColor: "#F5BABA" }}
             value={formikProps.values.birthday}
-            onChange={(event, selectedDate) => {
-              // closing the picker first before setting the field value
-              // magically resolves the buggy/flashy DTP!!
+            onChange={async (event, selectedDate) => {
+              // Here, both selected and count are ref variables instead of the usual state variable
+              // Since making them state variables cuz the DTP to be buggy!
+              if (event.type === "set") {
+                selected.current = true;
+              }
+
+              // Closing the picker first before setting the field value
+              // Magically resolves the buggy/flashy DTP!!
+              count.current += 1;
               setShowPicker(false);
-              setSelected(true);
-              formikProps.setFieldValue("birthday", selectedDate || todayDate);
+              await formikProps.setFieldValue(
+                "birthday",
+                selectedDate || todayDate
+              );
             }}
             maximumDate={todayDate}
           />
@@ -35,7 +59,7 @@ export default function BirthdayField({ formikProps }: any) {
 
         <Pressable onPress={() => setShowPicker(true)}>
           <CustomTextInput
-            style={selected ? styles.selected : globalStyles.input}
+            style={selected.current ? styles.selected : globalStyles.input}
             placeholder={todayDate.toDateString()}
             onChangeText={formikProps.handleChange("birthday")}
             value={formikProps.values.birthday.toLocaleDateString()}

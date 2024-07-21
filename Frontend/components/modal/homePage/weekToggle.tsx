@@ -1,80 +1,53 @@
-import {
-  Modal,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from "react-native";
-
-import { modalStyles } from "../../../styles/modal";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { globalStyles } from "../../../styles/global";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import GeneralModalTemplate from "../templates/generalModalTemplate";
+import SubmitButton from "@/components/general/submit";
 
 interface WeekToggleModalProps {
-  setWeekToggleModal: (visible: boolean) => void;
+  visibility: boolean;
+  setVisibility: (visible: boolean) => void;
 }
 
 export default function WeekToggleModal({
-  setWeekToggleModal,
+  visibility,
+  setVisibility,
 }: WeekToggleModalProps) {
   return (
     <>
-      <Modal animationType="fade" transparent={true}>
-        <View style={modalStyles.modalWrapper}>
-          <View style={modalStyles.modalContent}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={globalStyles.header}>Notification</Text>
-              <TouchableOpacity onPress={() => setWeekToggleModal(false)}>
-                <Ionicons name="close-circle-outline" size={25}></Ionicons>
-              </TouchableOpacity>
-            </View>
-
-            <View>
-              <Text style={globalStyles.para}>
-                You cannot toggle to a date beyond this week!
-              </Text>
-
-              <TouchableOpacity
-                style={styles.okButton}
-                onPress={() => setWeekToggleModal(false)}
-              >
-                <Text style={styles.buttonText}>Ok</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+      <GeneralModalTemplate visibleState={visibility}>
+        <View style={styles.headerWrapper}>
+          <Text style={globalStyles.header}>Notification</Text>
         </View>
-      </Modal>
+
+        <View>
+          <Text style={globalStyles.para}>
+            You cannot toggle to a date beyond this week!
+          </Text>
+
+          <SubmitButton
+            onPressHandler={() => setVisibility(false)}
+            text="Ok"
+            style={styles.submitButton}
+          />
+        </View>
+      </GeneralModalTemplate>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  commonButton: {
-    width: "48%",
-    borderRadius: 15,
-    backgroundColor: "#FFC4C4",
+  headerWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 
-  okButton: {
+  submitButton: {
     width: "40%",
     borderRadius: 15,
     backgroundColor: "#FFC4C4",
     alignSelf: "flex-end",
     marginTop: 5,
     marginBottom: 7,
-  },
-
-  buttonText: {
-    ...globalStyles.header,
-    fontSize: 12,
-    textAlign: "center",
   },
 });

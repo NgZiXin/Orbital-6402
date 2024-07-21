@@ -3,7 +3,7 @@ import { globalStyles } from "../../../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useState } from "react";
 import SubmitButton from "../../general/submit";
-import { getItem } from "@/components/general/asyncStorage";
+import { getToken } from "@/utility/userToken";
 import { useLoading } from "@/hooks/useLoading";
 
 import DistanceField from "../fragments/workoutDetails/runWorkoutDetails/distance";
@@ -58,7 +58,7 @@ export default function RunWorkoutForm({
         "minutes : " +
         values.duration_seconds +
         "seconds";
-      const token: string | null = await getItem("token");
+      const token: string | null = await getToken("token");
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_DOMAIN}workout/get_run_training/?distance=${values.distance}&duration=${duration}&weeks=${values.weeks}&healthConds=${values.healthConds}&otherRemarks=${values.otherRemarks}`,
         {

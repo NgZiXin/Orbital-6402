@@ -2,7 +2,7 @@ import React from "react";
 import { Alert, ScrollView, View } from "react-native";
 import { globalStyles } from "../../../styles/global";
 import { Formik, FormikHelpers } from "formik";
-import { getItem } from "../../general/asyncStorage";
+import { getToken } from "../../../utility/userToken";
 
 import UsernameField from "../fragments/accountDetails/username";
 import PasswordField from "../fragments/accountDetails/password";
@@ -36,15 +36,17 @@ export default function EditForm({ submitHandler }: any) {
       // Custom serialization
       const body = {
         ...values,
-        birthday: values.birthday.toISOString().split("T")[0], // Convert date to 'YYYY-MM-DD' format
+        // Convert date to 'YYYY-MM-DD' format
+        // To match expected database format
+        birthday: values.birthday.toISOString().split("T")[0],
       };
 
-      const token: string | null = await getItem("token");
+      const token: string | null = await getToken("token");
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_DOMAIN}accounts/data/`,
         {
-          // put request to update existing user details
-          // of the current user logged in
+          // Put request to update existing user details
+          // Of the current user logged in
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -69,6 +71,8 @@ export default function EditForm({ submitHandler }: any) {
       // Handle successful edit (close edit modal)
       actions.resetForm();
       submitHandler();
+
+      // Catches any other errors
     } catch (error: any) {
       const errorMessage = error.message;
       if (errorMessage.includes("similar")) {
@@ -96,18 +100,19 @@ export default function EditForm({ submitHandler }: any) {
           gender: "",
         }}
         validationSchema={signupAndEditValidationSchema}
+        // Optimization to minimize operations
+        // Form just validates on blur and submit
         validateOnChange={false}
-        validateOnBlur={false}
         onSubmit={handleSubmit}
       >
         {(formikProps) => (
           <ScrollView showsVerticalScrollIndicator={false}>
             <UsernameField formikProps={formikProps} />
-            <GenderField formikProps={formikProps} />
             <PasswordField formikProps={formikProps} />
+            <GenderField formikProps={formikProps} />
+            <BirthdayField formikProps={formikProps} />
             <HeightField formikProps={formikProps} />
             <WeightField formikProps={formikProps} />
-            <BirthdayField formikProps={formikProps} />
 
             <SubmitButton
               onPressHandler={() => formikProps.handleSubmit()}

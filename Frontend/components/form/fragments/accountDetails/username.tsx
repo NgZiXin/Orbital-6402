@@ -13,8 +13,16 @@ export default function UsernameField({ formikProps }: any) {
           placeholder="John Cena"
           onChangeText={formikProps.handleChange("username")}
           value={formikProps.values.username}
+          // When we click away, run the validation schema on username field
+          onBlur={formikProps.handleBlur("username")}
         />
-        {formikProps.errors.username && (
+
+        {/* 
+          If there is an error and field has been visited
+          Visited: Click into --> click away 
+          Display that error
+        */}
+        {formikProps.errors.username && formikProps.touched.username && (
           <Text style={formStyles.errorText}>
             {formikProps.errors.username}
           </Text>

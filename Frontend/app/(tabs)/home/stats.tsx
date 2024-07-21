@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { globalStyles } from "@/styles/global";
 import PageHeader from "@/components/general/pageHeader";
 import { useEffect, useState } from "react";
@@ -14,7 +15,7 @@ import { BarChart } from "react-native-gifted-charts";
 import { Dimensions } from "react-native";
 import WeekToggleModal from "@/components/modal/homePage/weekToggle";
 import initialSkeleton from "./sampleData";
-import { getItem } from "@/components/general/asyncStorage";
+import { getToken } from "@/utility/userToken";
 import { useLoading } from "@/hooks/useLoading";
 
 interface WeekDetails {
@@ -120,7 +121,7 @@ export default function Stats() {
       const [dayE, monthE, yearE]: number[] = currentEnd.split("/").map(Number);
       const endDate: Date = new Date(yearE, monthE - 1, dayE);
 
-      const token: string | null = await getItem("token");
+      const token: string | null = await getToken("token");
       const response = await fetch(
         `${
           process.env.EXPO_PUBLIC_DOMAIN
@@ -436,7 +437,10 @@ export default function Stats() {
             </View>
 
             {weekToggleModal && (
-              <WeekToggleModal setWeekToggleModal={setWeekToggleModal} />
+              <WeekToggleModal
+                visibility={weekToggleModal}
+                setVisibility={setWeekToggleModal}
+              />
             )}
           </>
         )}

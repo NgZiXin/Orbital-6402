@@ -17,7 +17,7 @@ interface ValidationModalProps {
   topText: string;
   bottomText: string;
   handleDelete?: () => void;
-  style?: StyleProp<ViewStyle>; // Optional style prop
+  style?: StyleProp<ViewStyle>;
 }
 
 export default function ValidationModal({

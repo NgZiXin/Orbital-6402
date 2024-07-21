@@ -1,19 +1,24 @@
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Formik } from "formik";
 import SubmitButton from "../../general/submit";
-
 import RadiusSlider from "../fragments/findNearestDetails/radius";
 import SearchField from "../fragments/findNearestDetails/search";
 import QueryButton from "../fragments/findNearestDetails/query";
+
+interface FindNearestFormValues {
+  radius: number;
+  choice: string;
+  location: string;
+}
 
 export default function FindNearestForm({
   setWebviewUri,
   setFindNearestModal,
 }: any) {
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: FindNearestFormValues) => {
     // Display setWebView on Modal
     setWebviewUri(
-      `${process.env.EXPO_PUBLIC_DOMAIN}services/?type=${values.query}&address=${values.search}&radius=${values.radius}`
+      `${process.env.EXPO_PUBLIC_DOMAIN}services/?type=${values.choice}&address=${values.location}&radius=${values.radius}`
     );
 
     // Close Modal
@@ -24,12 +29,13 @@ export default function FindNearestForm({
     <>
       <Formik
         initialValues={{
-          search: "",
-          query: "",
           radius: 3,
+          choice: "",
+          location: "",
         }}
+        // Optimization to minimize operations
+        // Form just validates on blur and submit
         validateOnChange={false}
-        validateOnBlur={false}
         onSubmit={handleSubmit}
       >
         {(formikProps) => (
@@ -40,7 +46,7 @@ export default function FindNearestForm({
             <SubmitButton
               onPressHandler={formikProps.handleSubmit}
               text="Search"
-              style={{ position: "relative", left: 9, width: "95%" }}
+              style={styles.submitButton}
             />
           </View>
         )}
@@ -48,3 +54,11 @@ export default function FindNearestForm({
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  submitButton: {
+    position: "relative",
+    left: 9,
+    width: "95%",
+  },
+});

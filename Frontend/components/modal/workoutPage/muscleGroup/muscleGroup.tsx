@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { useState, useRef } from "react";
 import { modalStyles } from "../../../../styles/modal";
 import { globalStyles } from "../../../../styles/global";
@@ -16,8 +17,8 @@ import muscleGroupsList from "./helper/list";
 import MultiSelectHeader from "./helper/header";
 import MultiSelectFooter from "./helper/footer";
 import GuideModal from "./guide";
+import MuscleGroupValidationModal from "./muscleGroupValidation";
 import SubmitButton from "@/components/general/submit";
-import ValidationModal from "./validation";
 import CustomChips from "./helper/customChips";
 
 export default function MuscleGroupModal({
@@ -40,8 +41,8 @@ export default function MuscleGroupModal({
         return true;
       }
 
-      // else, its a child entry
-      // try to find a parent entry
+      // Else, its a child entry
+      // Try to find a parent entry
       const parentItem = newItems.find((element: string) => {
         return element.length === 1 && element.charAt(0) === item.charAt(0);
       });
@@ -169,18 +170,16 @@ export default function MuscleGroupModal({
                 />
               </View>
               <GuideModal />
+              <MuscleGroupValidationModal
+                visibility={validationModal}
+                setVisibility={setValidationModal}
+                topText="Workout Validation"
+                bottomText={validationMessage.current}
+              />
               <SubmitButton
                 onPressHandler={handleSubmit}
                 text="Submit Workout"
               />
-              {validationModal && (
-                <ValidationModal
-                  setValidationModal={setValidationModal}
-                  topText="Workout Validation"
-                  bottomText={validationMessage.current}
-                  style={{ backgroundColor: "rgba(0, 0, 0, 0.35)" }}
-                />
-              )}
             </ScrollView>
           </View>
         </View>

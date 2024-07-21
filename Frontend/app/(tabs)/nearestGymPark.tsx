@@ -1,9 +1,9 @@
 import { WebView } from "react-native-webview";
-import { globalStyles } from "@/styles/global";
+import { StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { getToken } from "@/utility/userToken";
 
-export default function RunningRoute() {
+export default function NearestGymPark() {
   const [token, setToken] = useState<string | null>(null);
 
   // On component mount, grab the user token string and store it
@@ -15,10 +15,10 @@ export default function RunningRoute() {
 
     fetchToken();
   }, []);
-
+  
   return token ? (
     <WebView
-      style={globalStyles.container}
+      style={styles.container}
       javaScriptEnabled={true}
       startInLoadingState={true}
       source={{
@@ -33,3 +33,9 @@ export default function RunningRoute() {
     <></>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

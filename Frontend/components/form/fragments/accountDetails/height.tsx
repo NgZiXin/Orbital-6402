@@ -15,8 +15,16 @@ export default function HeightField({ formikProps }: any) {
           onChangeText={formikProps.handleChange("height")}
           value={formikProps.values.height}
           keyboardType="numeric"
+          // When we click away, run the validation schema on height field
+          onBlur={formikProps.handleBlur("height")}
         />
-        {formikProps.errors.height && (
+
+        {/*
+          If there is an error and field has been visited
+          Visited == True: Click into --> click away
+          Display that error
+        */}
+        {formikProps.errors.height && formikProps.touched.height && (
           <Text style={formStyles.errorText}>{formikProps.errors.height}</Text>
         )}
       </View>

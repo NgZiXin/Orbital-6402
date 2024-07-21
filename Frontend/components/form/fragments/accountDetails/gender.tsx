@@ -1,75 +1,107 @@
 import { globalStyles } from "../../../../styles/global";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useState, useEffect } from "react";
 import { formStyles } from "@/styles/form";
 
 export default function GenderField({ formikProps }: any) {
   const [maleButton, setMaleButton] = useState(false);
   const [femaleButton, setFemaleButton] = useState(false);
+  const [count, setCount] = useState<number>(0);
 
-  const maleButtonHandler = (formikProps: any) => {
-    // male button is already active
+  useEffect(() => {
+    // Count >= 1 means that we have interacted with the gender button at least once
+    // Therefore, it is in a visited state
+    // We can force validation with setFieldTouched
+    if (count >= 1) {
+      formikProps.setFieldTouched("gender", true);
+    }
+  }, [count]);
+
+  const maleButtonHandler = async (formikProps: any) => {
+    // Male button is already active
+    // Deactivate it and set its value to the initial (so no validation message shows)
     if (maleButton) {
-      formikProps.setFieldValue("gender", "");
+      await formikProps.setFieldValue("gender", "");
     } else {
-      // male button is not yet active
-      formikProps.setFieldValue("gender", "M");
+      // Male button is not yet active
+      // Activate it and set its value to the new value
+      await formikProps.setFieldValue("gender", "M");
     }
 
     setMaleButton(!maleButton);
     setFemaleButton(false);
+    setCount((prev) => prev + 1);
   };
 
-  const femaleButtonHandler = (formikProps: any) => {
-    // female button is already active
+  const femaleButtonHandler = async (formikProps: any) => {
+    // Female button is already active
+    // Deactivate it and set its value to the initial (so no validation message shows)
     if (femaleButton) {
-      formikProps.setFieldValue("gender", "");
+      await formikProps.setFieldValue("gender", "");
     } else {
-      // female button is not yet active
+      // Female button is not yet active
+      // Activate it and set its value to the new value
+      await formikProps.setFieldTouched("birthday", true);
       formikProps.setFieldValue("gender", "F");
     }
 
     setFemaleButton(!femaleButton);
     setMaleButton(false);
+    setCount((prev) => prev + 1);
   };
 
   return (
     <>
-      <View style={formStyles.accountDetailsFormCommon}>
-        <Text style={globalStyles.label}>Gender:</Text>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TouchableOpacity
-            style={[
-              styles.genderOption,
-              maleButton ? styles.selectedGender : undefined,
-            ]}
-            onPress={() => maleButtonHandler(formikProps)}
-          >
-            <Text style={{ fontSize: 12, fontFamily: "inter-regular" }}>
-              Male
+      <TouchableHighlight onBlur={() => formikProps.handleBlur("gender")}>
+        <View style={formStyles.accountDetailsFormCommon}>
+          <Text style={globalStyles.label}>Gender:</Text>
+          <View style={styles.wrapper}>
+            <TouchableOpacity
+              style={[
+                styles.genderOption,
+                maleButton ? styles.selectedGender : undefined,
+              ]}
+              onPress={() => maleButtonHandler(formikProps)}
+            >
+              <Text style={{ fontSize: 12, fontFamily: "inter-regular" }}>
+                Male
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.genderOption,
+                femaleButton ? styles.selectedGender : undefined,
+              ]}
+              onPress={() => femaleButtonHandler(formikProps)}
+            >
+              <Text style={{ fontSize: 12, fontFamily: "inter-regular" }}>
+                Female
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {formikProps.errors.gender && formikProps.touched.gender && (
+            <Text style={formStyles.errorText}>
+              {formikProps.errors.gender}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.genderOption,
-              femaleButton ? styles.selectedGender : undefined,
-            ]}
-            onPress={() => femaleButtonHandler(formikProps)}
-          >
-            <Text style={{ fontSize: 12, fontFamily: "inter-regular" }}>
-              Female
-            </Text>
-          </TouchableOpacity>
+          )}
         </View>
-        {formikProps.errors.gender && (
-          <Text style={formStyles.errorText}>{formikProps.errors.gender}</Text>
-        )}
-      </View>
+      </TouchableHighlight>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
   genderOption: {
     width: "48%",
     padding: 10,

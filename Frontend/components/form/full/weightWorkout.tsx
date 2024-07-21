@@ -3,7 +3,7 @@ import { globalStyles } from "../../../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useState } from "react";
 import SubmitButton from "../../general/submit";
-import { getItem } from "@/components/general/asyncStorage";
+import { getToken } from "@/utility/userToken";
 import muscleGroupsList from "@/components/modal/workoutPage/muscleGroup/helper/list";
 import { useLoading } from "@/hooks/useLoading";
 
@@ -68,7 +68,7 @@ export default function WeightWorkoutForm({
         .join(", ");
 
       // Query backend
-      const token: string | null = await getItem("token");
+      const token: string | null = await getToken("token");
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_DOMAIN}workout/get_weight_training/?fitnessLevel=${values.fitnessLevel}&numExercises=${values.numExercises}&mainMuscleGroups=${mainMuscleGroups}&subMuscleGroups=${subMuscleGroups}&healthConds=${values.healthConds}&otherRemarks=${values.otherRemarks}`,
         {

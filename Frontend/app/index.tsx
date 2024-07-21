@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import LoadingOverlay from "@/components/general/loadingOverlay";
-import { getItem } from "@/components/general/asyncStorage";
+import { getToken } from "@/utility/userToken";
 
 // Expo router first routes to this page (entry point)
 // This page then redirects to login page
@@ -10,7 +10,7 @@ const Index = () => {
 
   // Check if authenticated
   useEffect(() => {
-    getItem("token").then((token) => {
+    getToken("token").then((token) => {
       // Check if token is valid
       if (token) {
         fetch(`${process.env.EXPO_PUBLIC_DOMAIN}accounts/ping`, {
@@ -38,4 +38,5 @@ const Index = () => {
 
   return <LoadingOverlay />;
 };
+
 export default Index;

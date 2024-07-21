@@ -7,7 +7,7 @@ export default function SearchField({ formikProps }: any) {
   return (
     <>
       <View style={formStyles.findNearestDetailsFormCommon}>
-        <Text style={globalStyles.label}>Search Location</Text>
+        <Text style={globalStyles.label}>Location:</Text>
         <CustomTextInput
           style={globalStyles.input}
           placeholder="Address / Postal Code"
