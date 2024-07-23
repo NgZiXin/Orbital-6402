@@ -1,9 +1,10 @@
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { Formik } from "formik";
 import SubmitButton from "../../general/submit";
-import RadiusSlider from "../fragments/findNearestDetails/radius";
-import SearchField from "../fragments/findNearestDetails/search";
-import QueryButton from "../fragments/findNearestDetails/query";
+import SearchRadiusField from "../fragments/findNearestDetails/radius";
+import ChoiceField from "../fragments/findNearestDetails/choice";
+import LocationField from "../fragments/findNearestDetails/location";
+import findNearestValidationSchema from "../validationSchema/findNearest";
 
 interface FindNearestFormValues {
   radius: number;
@@ -11,18 +12,30 @@ interface FindNearestFormValues {
   location: string;
 }
 
-export default function FindNearestForm({
-  setWebviewUri,
-  setFindNearestModal,
-}: any) {
-  const handleSubmit = (values: FindNearestFormValues) => {
-    // Display setWebView on Modal
-    setWebviewUri(
-      `${process.env.EXPO_PUBLIC_DOMAIN}services/?type=${values.choice}&address=${values.location}&radius=${values.radius}`
-    );
+interface FindNearestFormProps {
+  router: any;
+  setFindNearestModal: (value: boolean) => void;
+}
 
-    // Close Modal
+export default function FindNearestForm({
+  router,
+  setFindNearestModal,
+}: FindNearestFormProps) {
+  const handleSubmit = (values: FindNearestFormValues) => {
+    // Construct the uri for the webview
+    const constructedUri = `${process.env.EXPO_PUBLIC_DOMAIN}services/?type=${values.choice}&address=${values.location}&radius=${values.radius}`;
+
+    // Close the modal
+    // Push to the new page to display the webview
     setFindNearestModal(false);
+    router.push({
+      pathname: "nearestGymPark",
+      // Passing params to another screen using expo router
+      // Reference: https://stackoverflow.com/questions/77747019/how-can-i-pass-parameters-using-expo-router
+      params: {
+        uri: constructedUri,
+      },
+    });
   };
 
   return (
@@ -33,22 +46,25 @@ export default function FindNearestForm({
           choice: "",
           location: "",
         }}
+        validationSchema={findNearestValidationSchema}
         // Optimization to minimize operations
         // Form just validates on blur and submit
         validateOnChange={false}
         onSubmit={handleSubmit}
       >
         {(formikProps) => (
-          <View>
-            <SearchField formikProps={formikProps} />
-            <RadiusSlider formikProps={formikProps} />
-            <QueryButton formikProps={formikProps} />
+          // ScrollView seems to include the keyboard.dismiss feature
+          // Thats why its being used here instead of normal view
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <SearchRadiusField formikProps={formikProps} />
+            <ChoiceField formikProps={formikProps} />
+            <LocationField formikProps={formikProps} />
             <SubmitButton
               onPressHandler={formikProps.handleSubmit}
               text="Search"
               style={styles.submitButton}
             />
-          </View>
+          </ScrollView>
         )}
       </Formik>
     </>

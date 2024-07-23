@@ -13,6 +13,7 @@ export default function BirthdayField({ formikProps }: any) {
   const count = useRef<number>(0);
 
   useEffect(() => {
+    console.log(count.current);
     // Count >= 1 means that we have interacted with the birthday picker at least once
     // Therefore, it is in a visited state
     // We can force validation with setFieldTouched
@@ -68,7 +69,12 @@ export default function BirthdayField({ formikProps }: any) {
           />
         </Pressable>
 
-        {formikProps.errors.birthday && (
+        {/* 
+          If there is an error and field has been visited
+          Visited: Click into --> click away 
+          Display that error
+        */}
+        {formikProps.errors.birthday && count.current >= 1 && (
           <Text style={formStyles.errorText}>
             {formikProps.errors.birthday}
           </Text>

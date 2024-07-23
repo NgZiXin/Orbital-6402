@@ -1,3 +1,5 @@
+// Helper functions for user token handling 
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Key: 'token"

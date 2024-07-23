@@ -1,17 +1,15 @@
 import { Slider } from "@react-native-assets/slider";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "../../../../styles/global";
 import { formStyles } from "@/styles/form";
 
-export default function RadiusSlider({ formikProps }: any) {
+export default function SearchRadiusField({ formikProps }: any) {
   return (
     <>
       <View style={formStyles.findNearestDetailsFormCommon}>
         <View style={formStyles.sliderLabel}>
-          <Text style={globalStyles.label}>Radius of search (km):</Text>
-          <Text style={{ ...globalStyles.label, left: 5 }}>
-            {formikProps.values.radius}
-          </Text>
+          <Text style={globalStyles.label}>Search radius (km):</Text>
+          <Text style={styles.text}>{formikProps.values.radius}</Text>
         </View>
 
         <Slider
@@ -19,8 +17,8 @@ export default function RadiusSlider({ formikProps }: any) {
           minimumValue={0.5}
           maximumValue={5}
           trackHeight={3}
-          value={formikProps.values.radius}
           step={0.5}
+          value={formikProps.values.radius}
           thumbSize={16.5}
           minimumTrackTintColor="#FFC4C4" // Change the color of the filled part
           maximumTrackTintColor="#D0D0D0" // Change the color of the unfilled part
@@ -33,3 +31,10 @@ export default function RadiusSlider({ formikProps }: any) {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  text: {
+    ...globalStyles.label,
+    left: 5,
+  },
+});

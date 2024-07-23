@@ -1,11 +1,5 @@
 import { globalStyles } from "../../../../styles/global";
-import {
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useState, useEffect } from "react";
 import { formStyles } from "@/styles/form";
 
@@ -15,7 +9,7 @@ export default function GenderField({ formikProps }: any) {
   const [count, setCount] = useState<number>(0);
 
   useEffect(() => {
-    // Count >= 1 means that we have interacted with the gender button at least once
+    // Count >= 1 means that we have interacted with the gender buttons at least once
     // Therefore, it is in a visited state
     // We can force validation with setFieldTouched
     if (count >= 1) {
@@ -47,8 +41,7 @@ export default function GenderField({ formikProps }: any) {
     } else {
       // Female button is not yet active
       // Activate it and set its value to the new value
-      await formikProps.setFieldTouched("birthday", true);
-      formikProps.setFieldValue("gender", "F");
+      await formikProps.setFieldValue("gender", "F");
     }
 
     setFemaleButton(!femaleButton);
@@ -58,40 +51,42 @@ export default function GenderField({ formikProps }: any) {
 
   return (
     <>
-      <TouchableHighlight onBlur={() => formikProps.handleBlur("gender")}>
-        <View style={formStyles.accountDetailsFormCommon}>
-          <Text style={globalStyles.label}>Gender:</Text>
-          <View style={styles.wrapper}>
-            <TouchableOpacity
-              style={[
-                styles.genderOption,
-                maleButton ? styles.selectedGender : undefined,
-              ]}
-              onPress={() => maleButtonHandler(formikProps)}
-            >
-              <Text style={{ fontSize: 12, fontFamily: "inter-regular" }}>
-                Male
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.genderOption,
-                femaleButton ? styles.selectedGender : undefined,
-              ]}
-              onPress={() => femaleButtonHandler(formikProps)}
-            >
-              <Text style={{ fontSize: 12, fontFamily: "inter-regular" }}>
-                Female
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {formikProps.errors.gender && formikProps.touched.gender && (
-            <Text style={formStyles.errorText}>
-              {formikProps.errors.gender}
+      <View style={formStyles.accountDetailsFormCommon}>
+        <Text style={globalStyles.label}>Gender:</Text>
+        <View style={styles.wrapper}>
+          <TouchableOpacity
+            style={[
+              styles.genderCommon,
+              maleButton ? styles.selectedGender : undefined,
+            ]}
+            onPress={() => maleButtonHandler(formikProps)}
+          >
+            <Text style={{ fontSize: 12, fontFamily: "inter-regular" }}>
+              Male
             </Text>
-          )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.genderCommon,
+              femaleButton ? styles.selectedGender : undefined,
+            ]}
+            onPress={() => femaleButtonHandler(formikProps)}
+          >
+            <Text style={{ fontSize: 12, fontFamily: "inter-regular" }}>
+              Female
+            </Text>
+          </TouchableOpacity>
         </View>
-      </TouchableHighlight>
+
+        {/* 
+          If there is an error and field has been visited
+          Visited: Click into --> click away 
+          Display that error
+        */}
+        {formikProps.errors.gender && formikProps.touched.gender && (
+          <Text style={formStyles.errorText}>{formikProps.errors.gender}</Text>
+        )}
+      </View>
     </>
   );
 }
@@ -102,7 +97,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
-  genderOption: {
+  genderCommon: {
     width: "48%",
     padding: 10,
     borderWidth: 1,

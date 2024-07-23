@@ -6,7 +6,7 @@ import SubmitButton from "@/components/general/submit";
 import FindNearestForm from "@/components/form/full/findNearest";
 import GeneralModalTemplate from "../templates/generalModalTemplate";
 
-export default function FindNearestModal({ setWebviewUri }: any) {
+export default function FindNearestModal({ router }: any) {
   const [visibility, setVisibility] = useState<boolean>(false);
 
   return (
@@ -28,10 +28,7 @@ export default function FindNearestModal({ setWebviewUri }: any) {
           </TouchableOpacity>
         </View>
 
-        <FindNearestForm
-          setWebviewUri={setWebviewUri}
-          setFindNearestModal={setVisibility}
-        />
+        <FindNearestForm router={router} setFindNearestModal={setVisibility} />
       </GeneralModalTemplate>
     </>
   );
@@ -41,7 +38,6 @@ const styles = StyleSheet.create({
   submitButton: {
     position: "relative",
     bottom: "5%",
-    // marginBottom: "-5%",
   },
 
   paddingAdjustment: {

@@ -1,4 +1,4 @@
-// Helper functions for data processing
+// Helper functions for data processing (on profile page)
 
 // Converts bday from YYYY-MM-DD to DD-MM-YYYY
 export function processBirthday(birthday: string): string {

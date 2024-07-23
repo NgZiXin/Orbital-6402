@@ -89,38 +89,36 @@ export default function EditForm({ submitHandler }: any) {
   };
 
   return (
-    <View style={globalStyles.container}>
-      <Formik
-        initialValues={{
-          username: "",
-          password: "",
-          height: "",
-          weight: "",
-          birthday: new Date(),
-          gender: "",
-        }}
-        validationSchema={signupAndEditValidationSchema}
-        // Optimization to minimize operations
-        // Form just validates on blur and submit
-        validateOnChange={false}
-        onSubmit={handleSubmit}
-      >
-        {(formikProps) => (
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <UsernameField formikProps={formikProps} />
-            <PasswordField formikProps={formikProps} />
-            <GenderField formikProps={formikProps} />
-            <BirthdayField formikProps={formikProps} />
-            <HeightField formikProps={formikProps} />
-            <WeightField formikProps={formikProps} />
+    <Formik
+      initialValues={{
+        username: "",
+        password: "",
+        height: "",
+        weight: "",
+        birthday: new Date(),
+        gender: "",
+      }}
+      validationSchema={signupAndEditValidationSchema}
+      // Optimization to minimize operations
+      // Form just validates on blur and submit
+      validateOnChange={false}
+      onSubmit={handleSubmit}
+    >
+      {(formikProps) => (
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <UsernameField formikProps={formikProps} />
+          <PasswordField formikProps={formikProps} />
+          <GenderField formikProps={formikProps} />
+          <BirthdayField formikProps={formikProps} />
+          <HeightField formikProps={formikProps} />
+          <WeightField formikProps={formikProps} />
 
-            <SubmitButton
-              onPressHandler={() => formikProps.handleSubmit()}
-              text="Edit Account"
-            />
-          </ScrollView>
-        )}
-      </Formik>
-    </View>
+          <SubmitButton
+            onPressHandler={() => formikProps.handleSubmit()}
+            text="Edit Account"
+          />
+        </ScrollView>
+      )}
+    </Formik>
   );
 }

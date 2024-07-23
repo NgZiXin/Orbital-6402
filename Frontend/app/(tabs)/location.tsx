@@ -1,15 +1,13 @@
 import FindNearestModal from "@/components/modal/locationPage/findNearest";
 import { Text, StyleSheet, View } from "react-native";
-import { useState } from "react";
-import { WebView } from "react-native-webview";
 import { globalStyles } from "../../styles/global";
 import PageHeader from "@/components/general/pageHeader";
 import SubmitButton from "@/components/general/submit";
-import { useNavigation } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 
 export default function Location() {
   const navigation: any = useNavigation();
-  const [webviewUri, setWebviewUri] = useState(``);
+  const router = useRouter();
 
   return (
     <View style={globalStyles.container}>
@@ -20,20 +18,7 @@ export default function Location() {
           afterwards to indicate your criteria.
         </Text>
 
-        <FindNearestModal setWebviewUri={setWebviewUri} />
-        {webviewUri ? (
-          <View style={{ padding: 7, height: 250, position: "relative" }}>
-            <WebView
-              javaScriptEnabled={true}
-              startInLoadingState={true}
-              source={{
-                uri: webviewUri,
-              }}
-            />
-          </View>
-        ) : (
-          <></>
-        )}
+        <FindNearestModal router={router} />
 
         <View style={styles.bottomHalfWrapper}>
           <PageHeader topText="" bottomText="Explore Running Routes" />

@@ -24,7 +24,7 @@ export default function Profile() {
   const [age, setAge] = useState<number>(0);
   const [bmi, setBMI] = useState<number>(0.0);
   const [maxHR, setMaxHR] = useState<number>(0);
-  const [containerHeight, setContainerHeight] = useState<number>(0);
+  const [containerHeight, setContainerHeight] = useState<number>(-1);
 
   // editFlag: Deals with user detail edit
   // dataFlag: Deals with data processing
@@ -70,8 +70,8 @@ export default function Profile() {
       const dataObj = await response.json();
       const valuesArray: string[] = Object.values(dataObj).map(String);
 
-      // Triggers the effect function below to begin data processing
-      setUserDetails(valuesArray);
+      // Begin data processing
+      processUserDetails(valuesArray);
 
       // Catch any errors
     } catch (error) {
@@ -81,10 +81,7 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
-    // Ensures that we have successfully grabbed the raw user details first
-    // Before we do any processing
-
+  const processUserDetails = (userDetails: string[]) => {
     if (userDetails.length > 0) {
       // Converts bday from YYYY-MM-DD to DD-MM-YYYY
       const initialBirthday = userDetails[4];
@@ -111,6 +108,8 @@ export default function Profile() {
       const userMaxHR = processMaxHR(userAge);
 
       // Write in the calculated values for age, BMI and max HR
+      // Write in the updated userDetails
+      setUserDetails(userDetails);
       setAge(userAge);
       setBMI(userBMI);
       setMaxHR(userMaxHR);
@@ -120,13 +119,17 @@ export default function Profile() {
       // Triggers re-render with updated values
       setDataFlag(!dataFlag);
     }
-  }, [userDetails]);
+  };
 
   // Grabs the avaliable height (excluding top header and bottom tab bar)
   const handleLayout = (e: any) => {
     e.persist();
     const { height } = e.nativeEvent.layout;
-    setContainerHeight(height);
+
+    // Only sets once initially (when default value is -1)
+    if (containerHeight < 0) {
+      setContainerHeight(height);
+    }
   };
 
   return (
