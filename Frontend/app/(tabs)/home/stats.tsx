@@ -332,7 +332,7 @@ export default function Stats() {
               <View style={styles.weekToggle}>
                 <TouchableOpacity onPress={handleGoBack}>
                   <Ionicons
-                    name="arrow-back-circle-outline"
+                    name="arrow-undo-outline"
                     size={25}
                     style={styles.leftArrow}
                   />
@@ -344,7 +344,7 @@ export default function Stats() {
 
                 <TouchableOpacity onPress={handleGoForward}>
                   <Ionicons
-                    name="arrow-forward-circle-outline"
+                    name="arrow-redo-outline"
                     size={25}
                     style={styles.rightArrow}
                   />
