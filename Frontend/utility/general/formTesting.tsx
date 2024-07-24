@@ -45,3 +45,8 @@ export function postalCodeTest(value: string): boolean {
   const regex = /^(0[1-9]|[1-6][0-9]|7[0-3]|7[5-9]|8[0-2])\d{4}$/;
   return regex.test(value);
 }
+
+// Checks if fields are positive numbers
+export function setGoalsFieldTest(value: number): boolean {
+  return value > 0;
+}

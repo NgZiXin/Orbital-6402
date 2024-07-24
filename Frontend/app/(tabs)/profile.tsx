@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View, Image } from "react-native";
 import { globalStyles } from "../../styles/global";
 import { useState, useEffect } from "react";
-import { getToken } from "../../utility/userToken";
+import { getToken } from "../../utility/general/userToken";
 import { useLoading } from "@/hooks/useLoading";
 import LoadingOverlay from "@/components/general/loadingOverlay";
 import Card from "@/components/general/card";
@@ -16,7 +16,7 @@ import {
   processAge,
   processBMI,
   processMaxHR,
-} from "@/utility/dataProcessing";
+} from "@/utility/profile/dataProcessing";
 
 export default function Profile() {
   const { showLoading, hideLoading } = useLoading();

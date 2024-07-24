@@ -8,8 +8,19 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
-from backend.utils import datetime_to_utc_timestamp
 import pytz, os
+from datetime import datetime
+
+
+# Helper function 
+def convert_to_singapore_time(date_str):
+    # UTC+0 time 
+    date_naive = parse_datetime(date_str)
+    
+    # UTC+8 time
+    singapore_tz = pytz.timezone("Asia/Singapore")
+    date_singapore = date_naive.astimezone(singapore_tz)
+    return(date_singapore)
 
 @api_view(['GET'])
 def strava_check_auth(request):
@@ -70,66 +81,86 @@ def strava_get_stats(request):
     serializer = StravaGetStatsSerializer(data=request.GET)
     if serializer.is_valid():
         try:
-            # Create keys array (i.e. intervals)
-            start_date = parse_datetime(request.GET.get('start_date'))
-            end_date = parse_datetime(request.GET.get('end_date'))
-            
-            intervals = [0 for _ in range(7)]
-            current_date = start_date
+            # Create an array of end dates 
+            # Populate it with 7 end dates (mon end, tues end ... sun end)
+            week_start_date = convert_to_singapore_time(request.GET.get('start_date'))
+            week_end_date = convert_to_singapore_time(request.GET.get('end_date'))
+
+            end_dates = [0 for _ in range(7)]
+
+            # Week start date is 1 minute past midnight 
+            # Subtract 1 minute & 1 second from it to get the correct base value 
+            current_end = week_start_date - timedelta(minutes= 1, seconds= 1)
             for i in range(7):
-                next_date = current_date + timedelta(hours=24)
-                intervals[i] = next_date
-                current_date = next_date
-            
-            # Store weekly results
-            all_results = []
+                next_end = current_end + timedelta(hours= 24)
+                end_dates[i] = next_end
+                current_end = next_end
+
+            # Store weekly activities
+            all_activities = []
             total_achievements = 0
             total_distance = 0
             total_duration = 0
 
-            # Store daily results
+            # Store daily activities
             distance_daily = [0 for _ in range(7)] 
             duration_daily = [0 for _ in range(7)] 
 
-            # Populate all_results
+            # Populate all_activities
             token = StravaToken.objects.get(user=request.user)
-            prev_length = 30
-            count = 1
-            datetime_to_utc_timestamp(start_date)
-            while(prev_length == 30):
-                next_result = token.fetch_activities(datetime_to_utc_timestamp(start_date), datetime_to_utc_timestamp(end_date), count)
-                count += 1
-                prev_length = len(next_result)
-                all_results += next_result
+            max_activities_per_page = 30
+            page_number = 1
 
-            # Populate all variables
-            for i in range(len(all_results)):
-                activity = all_results[i]
+            week_start_date_epoch = int(week_start_date.timestamp())
+            week_end_date_epoch = int(week_end_date.timestamp())
 
-                # get activity date
-                start_date_utc = datetime.strptime(activity.get("start_date"), "%Y-%m-%dT%H:%M:%SZ")
-                start_date_utc = start_date_utc.replace(tzinfo=pytz.UTC)
-                start_date_singapore = start_date_utc.astimezone(pytz.timezone('Asia/Singapore'))
+            while True:
+                next_activities = token.fetch_activities(week_start_date_epoch, week_end_date_epoch, page_number)
+                all_activities += next_activities
 
-                # find its basket for daily results
+                if len(next_activities) < max_activities_per_page: 
+                    # We are at the last page already 
+                    # Exit out since we have collected all relevant activites
+                    break 
+                else:
+                    # Continue onto the next page 
+                    page_number += 1
+
+            # Populate all other variables
+            for i in range(len(all_activities)):
+                activity = all_activities[i]
+               
+                # Start date with no timezone info 
+                start_date_naive = datetime.strptime(activity.get("start_date"), "%Y-%m-%dT%H:%M:%SZ")
+
+                # Give the start date a timezone of UTC+0 
+                # Which is actually its implicit timezone 
+                utc_tz = pytz.UTC
+                start_date_utc0 = utc_tz.localize(start_date_naive)
+                
+                # Convert the timezone to UTC+8 (SG time)
+                singapore_tz = pytz.timezone('Asia/Singapore')
+                start_date_utc8 = start_date_utc0.astimezone(singapore_tz)
+
+                # Find its basket for daily activities
                 key = 0
                 while(key < 7):
-                    if (start_date_singapore < intervals[key]):
+                    if (start_date_utc8 < end_dates[key]):
                         break
                     key += 1
                 
-                # update weekly results
+                # Update weekly activities
                 total_achievements += activity.get("achievement_count")
                 total_distance += activity.get("distance") # In metres
                 total_duration += activity.get("elapsed_time") # In seconds
 
-                # update daily results
+                # Update daily activities
                 distance_daily[key] += activity.get("distance")
                 duration_daily[key] += activity.get("elapsed_time")
             
             # Output
             result = {
-                "total_workout" : len(all_results),
+                "total_workout" : len(all_activities),
                 "total_achievements" : total_achievements,
                 "total_distance" : total_distance,
                 "total_duration" : total_duration,
@@ -144,12 +175,4 @@ def strava_get_stats(request):
         except Exception as e:
             return Response({'error': str(e)}, status=400)
     return Response({'error': 'Invalid Query'}, status=400)
-
-            
-                
-
-        
-        
-     
-   
 

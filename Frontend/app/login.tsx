@@ -13,11 +13,11 @@ import {
 import { globalStyles } from "../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useNavigation } from "expo-router";
-import { setToken } from "../utility/userToken";
+import { setToken } from "../utility/general/userToken";
 import { useLoading } from "@/hooks/useLoading";
 
-import UsernameField from "@/components/form/fragments/accountDetails/username";
-import PasswordField from "@/components/form/fragments/accountDetails/password";
+import UsernameField from "@/components/form/fragments/accountFields/username";
+import PasswordField from "@/components/form/fragments/accountFields/password";
 import SubmitButton from "@/components/general/submit";
 import loginValidationSchema from "@/components/form/validationSchema/login";
 
@@ -85,7 +85,7 @@ export default function Login() {
       actions.resetForm();
       navigation.navigate("(tabs)");
 
-      // Catches any errors
+      // Catches other errors
     } catch (error: any) {
       console.error(error.message);
     } finally {

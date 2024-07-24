@@ -6,7 +6,7 @@ import { formStyles } from "@/styles/form";
 export default function WeightField({ formikProps }: any) {
   return (
     <>
-      <View style={formStyles.accountDetailsFormCommon}>
+      <View style={formStyles.noSliderFormCommon}>
         <Text style={globalStyles.label}>Weight (in kg):</Text>
 
         <CustomTextInput

@@ -28,7 +28,7 @@ export default function MuscleGroups({ formikProps, workoutModalHeight }: any) {
 
   return (
     <>
-      <View style={{ ...formStyles.workoutDetailsFormCommon, width: "95%" }}>
+      <View style={{ ...formStyles.sliderFormCommon, width: "95%" }}>
         <Text style={globalStyles.label}>Target Muscle Groups: </Text>
         <View style={styles.wrapper}>
           <TouchableOpacity

@@ -3,15 +3,15 @@ import { globalStyles } from "../../../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useState } from "react";
 import SubmitButton from "../../general/submit";
-import { getToken } from "@/utility/userToken";
+import { getToken } from "@/utility/general/userToken";
 import muscleGroupsList from "@/components/modal/workoutPage/muscleGroup/helper/list";
 import { useLoading } from "@/hooks/useLoading";
 
-import FitnessLevel from "../fragments/workoutDetails/weightWorkoutDetails/fitnessLevel";
-import NumExercises from "../fragments/workoutDetails/weightWorkoutDetails/numExercise";
-import MuscleGroups from "../fragments/workoutDetails/weightWorkoutDetails/muscleGroups";
-import HealthConditions from "../fragments/workoutDetails/healthConditions";
-import OtherRemarks from "../fragments/workoutDetails/otherRemarks";
+import FitnessLevel from "../fragments/workoutFields/weightWorkoutFields/fitnessLevel";
+import NumExercises from "../fragments/workoutFields/weightWorkoutFields/numExercise";
+import MuscleGroups from "../fragments/workoutFields/weightWorkoutFields/muscleGroups";
+import HealthConditions from "../fragments/workoutFields/healthConditions";
+import OtherRemarks from "../fragments/workoutFields/otherRemarks";
 
 type WeightWorkoutValues = {
   fitnessLevel: number;

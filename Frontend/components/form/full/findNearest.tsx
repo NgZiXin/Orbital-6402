@@ -1,9 +1,9 @@
 import { ScrollView, StyleSheet } from "react-native";
 import { Formik } from "formik";
 import SubmitButton from "../../general/submit";
-import SearchRadiusField from "../fragments/findNearestDetails/radius";
-import ChoiceField from "../fragments/findNearestDetails/choice";
-import LocationField from "../fragments/findNearestDetails/location";
+import SearchRadiusField from "../fragments/findNearestFields/radius";
+import ChoiceField from "../fragments/findNearestFields/choice";
+import LocationField from "../fragments/findNearestFields/location";
 import findNearestValidationSchema from "../validationSchema/findNearest";
 
 interface FindNearestFormValues {

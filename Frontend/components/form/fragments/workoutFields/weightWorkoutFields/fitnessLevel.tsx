@@ -6,7 +6,7 @@ import { formStyles } from "@/styles/form";
 export default function FitnessLevel({ formikProps, setScroll }: any) {
   return (
     <>
-      <View style={formStyles.workoutDetailsFormCommon}>
+      <View style={formStyles.sliderFormCommon}>
         <View style={formStyles.sliderLabel}>
           <Text style={globalStyles.label}>Level of Fitness:</Text>
           <Text style={{ ...globalStyles.label, left: 5 }}>

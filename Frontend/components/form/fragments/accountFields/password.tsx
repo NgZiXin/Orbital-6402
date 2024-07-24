@@ -10,7 +10,7 @@ export default function PasswordField({ formikProps }: any) {
 
   return (
     <>
-      <View style={formStyles.accountDetailsFormCommon}>
+      <View style={formStyles.noSliderFormCommon}>
         <Text style={globalStyles.label}>Password:</Text>
         <View style={styles.wrapper}>
           <CustomTextInput

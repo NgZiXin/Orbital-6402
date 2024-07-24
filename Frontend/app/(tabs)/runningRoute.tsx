@@ -1,7 +1,7 @@
 import { WebView } from "react-native-webview";
 import { globalStyles } from "@/styles/global";
 import { useEffect, useState } from "react";
-import { getToken } from "@/utility/userToken";
+import { getToken } from "@/utility/general/userToken";
 
 export default function RunningRoute() {
   const [token, setToken] = useState<string | null>(null);

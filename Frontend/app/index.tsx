@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import LoadingOverlay from "@/components/general/loadingOverlay";
-import { getToken } from "@/utility/userToken";
+import { getToken } from "@/utility/general/userToken";
 
 // Expo router first routes to this page (entry point)
 // This page then redirects to login page

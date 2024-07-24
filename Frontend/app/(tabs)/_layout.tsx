@@ -3,10 +3,10 @@ import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Platform, StyleSheet, View } from "react-native";
 import { useLoading } from "@/hooks/useLoading";
 import { useEffect, useState } from "react";
-import { getToken } from "@/utility/userToken";
+import { getToken } from "@/utility/general/userToken";
 import Header from "../../components/navigation/header";
-import StravaSyncModal from "@/components/modal/profilePage/stravaSync";
-import StravaReSyncModal from "@/components/modal/profilePage/stravaReSync";
+import StravaSyncModal from "@/components/modal/general/stravaSync";
+import StravaReSyncModal from "@/components/modal/general/stravaReSync";
 
 export default function TabLayout() {
   const { showLoading, hideLoading } = useLoading();

@@ -51,7 +51,7 @@ export default function GenderField({ formikProps }: any) {
 
   return (
     <>
-      <View style={formStyles.accountDetailsFormCommon}>
+      <View style={formStyles.noSliderFormCommon}>
         <Text style={globalStyles.label}>Gender:</Text>
         <View style={styles.wrapper}>
           <TouchableOpacity

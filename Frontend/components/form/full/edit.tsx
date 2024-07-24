@@ -2,14 +2,14 @@ import React from "react";
 import { Alert, ScrollView, View } from "react-native";
 import { globalStyles } from "../../../styles/global";
 import { Formik, FormikHelpers } from "formik";
-import { getToken } from "../../../utility/userToken";
+import { getToken } from "../../../utility/general/userToken";
 
-import UsernameField from "../fragments/accountDetails/username";
-import PasswordField from "../fragments/accountDetails/password";
-import GenderField from "../fragments/accountDetails/gender";
-import HeightField from "../fragments/accountDetails/height";
-import WeightField from "../fragments/accountDetails/weight";
-import BirthdayField from "../fragments/accountDetails/birthday";
+import UsernameField from "../fragments/accountFields/username";
+import PasswordField from "../fragments/accountFields/password";
+import GenderField from "../fragments/accountFields/gender";
+import HeightField from "../fragments/accountFields/height";
+import WeightField from "../fragments/accountFields/weight";
+import BirthdayField from "../fragments/accountFields/birthday";
 
 import SubmitButton from "../../general/submit";
 import signupAndEditValidationSchema from "../validationSchema/signupAndEdit";

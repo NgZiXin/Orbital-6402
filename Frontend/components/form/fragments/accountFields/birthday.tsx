@@ -29,7 +29,7 @@ export default function BirthdayField({ formikProps }: any) {
 
   return (
     <>
-      <View style={formStyles.accountDetailsFormCommon}>
+      <View style={formStyles.noSliderFormCommon}>
         <Text style={globalStyles.label}>Birthday:</Text>
         {showPicker && (
           <DateTimePicker

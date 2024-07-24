@@ -93,7 +93,7 @@ export default function ChoiceField({ formikProps }: any) {
 
 const styles = StyleSheet.create({
   fieldWrapper: {
-    ...formStyles.findNearestDetailsFormCommon,
+    ...formStyles.sliderFormCommon,
     width: "95%",
   },
 

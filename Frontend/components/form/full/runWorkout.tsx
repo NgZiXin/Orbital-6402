@@ -3,14 +3,14 @@ import { globalStyles } from "../../../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useState } from "react";
 import SubmitButton from "../../general/submit";
-import { getToken } from "@/utility/userToken";
+import { getToken } from "@/utility/general/userToken";
 import { useLoading } from "@/hooks/useLoading";
 
-import DistanceField from "../fragments/workoutDetails/runWorkoutDetails/distance";
-import DurationPicker from "../fragments/workoutDetails/runWorkoutDetails/duration";
-import WeekSlider from "../fragments/workoutDetails/runWorkoutDetails/week";
-import HealthConditions from "../fragments/workoutDetails/healthConditions";
-import OtherRemarks from "../fragments/workoutDetails/otherRemarks";
+import DistanceField from "../fragments/workoutFields/runWorkoutFields/distance";
+import DurationPicker from "../fragments/workoutFields/runWorkoutFields/duration";
+import WeekSlider from "../fragments/workoutFields/runWorkoutFields/week";
+import HealthConditions from "../fragments/workoutFields/healthConditions";
+import OtherRemarks from "../fragments/workoutFields/otherRemarks";
 
 type RunWorkoutValues = {
   distance: number;

@@ -1,5 +1,5 @@
 import { Alert, StyleSheet } from "react-native";
-import { getToken } from "@/utility/userToken";
+import { getToken } from "@/utility/general/userToken";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import SubmitButton from "../general/submit";

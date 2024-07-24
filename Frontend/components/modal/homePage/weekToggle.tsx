@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "../../../styles/global";
 import GeneralModalTemplate from "../templates/generalModalTemplate";
 import SubmitButton from "@/components/general/submit";

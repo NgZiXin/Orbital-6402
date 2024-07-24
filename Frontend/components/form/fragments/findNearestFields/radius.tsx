@@ -6,7 +6,7 @@ import { formStyles } from "@/styles/form";
 export default function SearchRadiusField({ formikProps }: any) {
   return (
     <>
-      <View style={formStyles.findNearestDetailsFormCommon}>
+      <View style={formStyles.sliderFormCommon}>
         <View style={formStyles.sliderLabel}>
           <Text style={globalStyles.label}>Search radius (km):</Text>
           <Text style={styles.text}>{formikProps.values.radius}</Text>

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Link } from "expo-router";
-import { removeToken } from "@/utility/userToken";
+import { removeToken } from "@/utility/general/userToken";
 import { modalStyles } from "../../../styles/modal";
 import { globalStyles } from "../../../styles/global";
 import { useState } from "react";

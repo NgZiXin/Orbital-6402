@@ -6,7 +6,7 @@ import { formStyles } from "@/styles/form";
 export default function DistanceField({ formikProps }: any) {
   return (
     <>
-      <View style={{ ...formStyles.workoutDetailsFormCommon, width: "95%"}}>
+      <View style={{ ...formStyles.sliderFormCommon, width: "95%" }}>
         <Text style={globalStyles.label}>Target Distance (in km):</Text>
         <CustomTextInput
           style={globalStyles.input}

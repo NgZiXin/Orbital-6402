@@ -1,7 +1,7 @@
 import { WebView } from "react-native-webview";
 import { StyleSheet } from "react-native";
 import { useEffect, useState, useCallback } from "react";
-import { getToken } from "@/utility/userToken";
+import { getToken } from "@/utility/general/userToken";
 import { useLocalSearchParams } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 

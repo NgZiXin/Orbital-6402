@@ -13,12 +13,12 @@ import { Formik, FormikHelpers } from "formik";
 import { useNavigation } from "expo-router";
 import { useLoading } from "@/hooks/useLoading";
 
-import UsernameField from "@/components/form/fragments/accountDetails/username";
-import PasswordField from "@/components/form/fragments/accountDetails/password";
-import GenderField from "@/components/form/fragments/accountDetails/gender";
-import HeightField from "@/components/form/fragments/accountDetails/height";
-import WeightField from "@/components/form/fragments/accountDetails/weight";
-import BirthdayField from "@/components/form/fragments/accountDetails/birthday";
+import UsernameField from "@/components/form/fragments/accountFields/username";
+import PasswordField from "@/components/form/fragments/accountFields/password";
+import GenderField from "@/components/form/fragments/accountFields/gender";
+import HeightField from "@/components/form/fragments/accountFields/height";
+import WeightField from "@/components/form/fragments/accountFields/weight";
+import BirthdayField from "@/components/form/fragments/accountFields/birthday";
 import SubmitButton from "@/components/general/submit";
 import signupAndEditValidationSchema from "@/components/form/validationSchema/signupAndEdit";
 

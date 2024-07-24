@@ -9,7 +9,7 @@ export default function DurationPicker({ formikProps }: any) {
     value > min ? value - 1 : max;
 
   return (
-    <View style={formStyles.workoutDetailsFormCommon}>
+    <View style={formStyles.sliderFormCommon}>
       <View style={globalStyles.container}>
         <Text style={globalStyles.label}>
           Target Finish Time (hours : minutes : seconds)
@@ -113,7 +113,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 8,
-
   },
   timeControl: {
     alignItems: "center",

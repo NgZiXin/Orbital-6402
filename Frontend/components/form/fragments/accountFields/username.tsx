@@ -6,7 +6,7 @@ import { formStyles } from "@/styles/form";
 export default function UsernameField({ formikProps }: any) {
   return (
     <>
-      <View style={formStyles.accountDetailsFormCommon}>
+      <View style={formStyles.noSliderFormCommon}>
         <Text style={globalStyles.label}>Name:</Text>
         <CustomTextInput
           style={globalStyles.input}

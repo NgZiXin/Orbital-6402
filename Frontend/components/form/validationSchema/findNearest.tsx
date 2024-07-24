@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { postalCodeTest } from "@/utility/formTesting";
+import { postalCodeTest } from "@/utility/general/formTesting";
 
 const findNearestValidationSchema = yup.object({
   radius: yup.number().required("Search radius is required"),

@@ -1,5 +1,9 @@
 import * as yup from "yup";
-import { heightTest, weightTest, birthdayTest } from "@/utility/formTesting";
+import {
+  heightTest,
+  weightTest,
+  birthdayTest,
+} from "@/utility/general/formTesting";
 
 const signupAndEditValidationSchema = yup.object({
   username: yup
