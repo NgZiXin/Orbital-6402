@@ -4,19 +4,21 @@ import {
   StyleProp,
   StyleSheet,
   Text,
+  TextStyle,
   TouchableOpacity,
   ViewStyle,
 } from "react-native";
 
 interface SubmitButtonProps {
-  onPressHandler: () => void;
-  text: string;
+  onPressHandler: () => void | Promise<void>;
+  text?: string;
   icon?: [
     iconName: keyof typeof Ionicons.glyphMap,
     iconSize: number,
     iconStyle: StyleProp<ViewStyle>
   ];
   style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
 }
 
 // When arguments are passed into the FC
@@ -27,13 +29,12 @@ export default function SubmitButton({
   text,
   icon,
   style,
+  textStyle,
 }: SubmitButtonProps) {
   return (
     <>
       <TouchableOpacity onPress={onPressHandler} style={[styles.submit, style]}>
-        <Text style={icon ? globalStyles.para : styles.submitButtonText}>
-          {text}
-        </Text>
+        {text && <Text style={[styles.text, textStyle]}>{text}</Text>}
         {icon && <Ionicons name={icon[0]} size={icon[1]} style={icon[2]} />}
       </TouchableOpacity>
     </>
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
     marginTop: 17,
   },
 
-  submitButtonText: {
+  text: {
     ...globalStyles.header,
     textAlign: "center",
     fontSize: 12,

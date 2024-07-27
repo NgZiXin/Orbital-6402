@@ -28,15 +28,16 @@ class WeightTrainer(GroqAPI):
         numQueries = 0 # Allow up to a maximum of 3 requeries
         resp_json = {}
 
-        while numQueries < 3:
+        while numQueries < 10:
             try:
                 resp_json = self.__query_weight_training_json()
                 break
             except(BadResponseError):
+                print(numQueries)
                 numQueries += 1
             
         # need to query general response
-        if numQueries >= 3:
+        if numQueries >= 10:
             resp_json = self.__query_weight_training_convo()
         return resp_json
 
@@ -117,12 +118,14 @@ class WeightTrainer(GroqAPI):
                         """,
                     }
                 ],
+                # Reference: https://deepinfra.com/mistralai/Mixtral-8x7B-Instruct-v0.1/api#input-top_p, 
+                # https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
                 temperature=2, # Increase randomness for more varied output
-                max_tokens=5000,
-                top_p=1,
-                stream=False,
-                response_format={"type": "json_object"},
-                stop=None
+                max_tokens=5000, # Max its able to use 
+                top_p=1, # More probable/less probable token 
+                stream=False, # Dont break the output into individual streams
+                response_format={"type": "json_object"}, # Obvious
+                stop=None # Stop only when naturally complete response or run out of tokens (words/pieces of words)
             )
             
             # Convert to JSON object

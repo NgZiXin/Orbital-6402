@@ -16,7 +16,7 @@ import { Dimensions } from "react-native";
 import WeekToggleModal from "@/components/modal/homePage/weekToggle";
 import { getToken } from "@/utility/general/userToken";
 import { useLoading } from "@/hooks/useLoading";
-import SetGoalsModal from "@/components/modal/homePage/setGoals";
+import SetGoalsModal from "@/components/modal/homePage/statsPage/setGoals";
 
 import {
   getDates,

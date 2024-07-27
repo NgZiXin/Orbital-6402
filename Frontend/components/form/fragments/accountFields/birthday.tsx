@@ -13,7 +13,6 @@ export default function BirthdayField({ formikProps }: any) {
   const count = useRef<number>(0);
 
   useEffect(() => {
-    console.log(count.current);
     // Count >= 1 means that we have interacted with the birthday picker at least once
     // Therefore, it is in a visited state
     // We can force validation with setFieldTouched
@@ -65,7 +64,6 @@ export default function BirthdayField({ formikProps }: any) {
             onChangeText={formikProps.handleChange("birthday")}
             value={formikProps.values.birthday.toLocaleDateString()}
             editable={false}
-            onPressIn={() => setShowPicker(true)}
           />
         </Pressable>
 

@@ -7,15 +7,18 @@ import {
   View,
 } from "react-native";
 
-import { globalStyles } from "../../../styles/global";
+import { globalStyles } from "../../../../styles/global";
 import { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SubmitButton from "@/components/general/submit";
 import AgendaCalendar from "@/components/general/agendaCalendar";
-import GeneralModalTemplate from "../templates/generalModalTemplate";
+import AddAgendaModal from "./addAgenda";
+import GeneralModalTemplate from "../../templates/generalModalTemplate";
 
 export default function CalendarModal() {
   const [visibility, setVisibility] = useState<boolean>(false);
+  const [updateFlag, setUpdateFlag] = useState<boolean>(false);
+
   return (
     <>
       <SubmitButton
@@ -40,8 +43,11 @@ export default function CalendarModal() {
             </TouchableOpacity>
           </View>
 
-          {/* TODO: Why TF does this suddenly lead to infinite recursive loop? */}
-          {/* <AgendaCalendar /> */}
+          <AgendaCalendar
+            updateFlag={updateFlag}
+            setUpdateFlag={setUpdateFlag}
+          />
+          <AddAgendaModal setUpdateFlag={setUpdateFlag} />
         </KeyboardAvoidingView>
       </GeneralModalTemplate>
     </>

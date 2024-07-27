@@ -1,8 +1,8 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { globalStyles } from "../../../styles/global";
+import { globalStyles } from "@/styles/global";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import GeneralModalTemplate from "../templates/generalModalTemplate";
+import GeneralModalTemplate from "../../templates/generalModalTemplate";
 import SubmitButton from "@/components/general/submit";
 import SetGoalsForm from "@/components/form/full/setGoals";
 
@@ -23,6 +23,7 @@ export default function SetGoalsModal({
         text="Set Goals"
         icon={["checkmark-done-outline", 25, styles.buttonIcon]}
         style={styles.submitButton}
+        textStyle={styles.submitButtonText}
       />
 
       <GeneralModalTemplate visibleState={visibility}>
@@ -44,12 +45,6 @@ export default function SetGoalsModal({
 }
 
 const styles = StyleSheet.create({
-  headerWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-
   submitButton: {
     width: "43%",
     backgroundColor: "#F6F2F2",
@@ -58,6 +53,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     justifyContent: "center",
+  },
+
+  submitButtonText: {
+    fontFamily: "inter-regular",
+  },
+
+  headerWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 
   buttonIcon: {

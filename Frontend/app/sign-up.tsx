@@ -65,7 +65,7 @@ export default function SignUp() {
         }
       );
 
-      // Case where backend raises an error
+      // Backend raises an error
       if (!response.ok) {
         const errorResponse: ErrorResponse = await response.json();
         if (errorResponse.username) {
