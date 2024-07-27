@@ -1,60 +1,60 @@
-import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text } from "react-native";
 
-import { modalStyles } from "../../../../styles/modal";
 import { globalStyles } from "../../../../styles/global";
 import { useState } from "react";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import SubmitButton from "@/components/general/submit";
+import GeneralModalTemplate from "../../templates/generalModalTemplate";
 
 export default function GuideModal() {
-  const [guideModal, setGuideModal] = useState(false);
+  const [visibility, setVisibility] = useState<boolean>(false);
   return (
+    // Can consider a blur effect for the background actually
+    // When opening this doubly nested modal (ie: layer = 3)
     <>
       <SubmitButton
-        onPressHandler={() => setGuideModal(true)}
+        onPressHandler={() => setVisibility(true)}
         text="Read Guide"
       />
 
-      {guideModal == true && (
-        <Modal animationType="fade" visible={guideModal} transparent={true}>
-          <View
-            style={{
-              ...modalStyles.modalWrapper,
-              backgroundColor: "rgba(0, 0, 0, 0.35)",
-            }}
-          >
-            <View style={modalStyles.modalContent}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text style={globalStyles.header}>Workout Creation</Text>
-                <TouchableOpacity onPress={() => setGuideModal(false)}>
-                  <Ionicons name="close-circle-outline" size={25}></Ionicons>
-                </TouchableOpacity>
-              </View>
+      <GeneralModalTemplate
+        visibleState={visibility}
+        additionalStyles={styles.background}
+        forWrapper={true}
+      >
+        <Text style={globalStyles.header}>Workout Creation</Text>
 
-              <ScrollView showsVerticalScrollIndicator={false}>
-                <Text style={globalStyles.para}>
-                  1. Number of main muscle groups selected must not exceed
-                  number of exercises.
-                </Text>
-                <Text style={globalStyles.para}>
-                  2. You must select a main muscle group first before selecting
-                  a sub muscle group.
-                </Text>
-                <Text style={globalStyles.para}>
-                  3. Selecting a sub muscle group means that you want exercises
-                  that emphasizes on those areas.
-                </Text>
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-      )}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <Text style={globalStyles.para}>
+            1. Number of main muscle groups selected must not exceed number of
+            exercises.
+          </Text>
+          <Text style={globalStyles.para}>
+            2. You must select a main muscle group first before selecting a sub
+            muscle group.
+          </Text>
+          <Text style={globalStyles.para}>
+            3. Selecting a sub muscle group means that you want exercises that
+            emphasizes on those areas.
+          </Text>
+          <SubmitButton
+            onPressHandler={() => setVisibility(false)}
+            text="Ok"
+            style={styles.submitButton}
+          />
+        </ScrollView>
+      </GeneralModalTemplate>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  background: {
+    backgroundColor: "rgba(0, 0, 0, 0.35)",
+  },
+
+  submitButton: {
+    alignSelf: "flex-end",
+    width: "50%",
+    marginTop: "5%",
+  },
+});

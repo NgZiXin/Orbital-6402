@@ -1,12 +1,22 @@
 import { ScrollView, StyleSheet, Text, View, Image } from "react-native";
 import { globalStyles } from "../../styles/global";
 import { useState, useEffect } from "react";
-import { getItem } from "../../components/general/asyncStorage";
+import { getToken } from "../../utility/general/userToken";
 import { useLoading } from "@/hooks/useLoading";
+import LoadingOverlay from "@/components/general/loadingOverlay";
+import Card from "@/components/general/card";
 import EditModal from "@/components/modal/profilePage/edit";
 import LogoutModal from "@/components/modal/profilePage/logout";
 import BmiModal from "@/components/modal/profilePage/bmi";
 
+import {
+  processBirthday,
+  processHeight,
+  processWeight,
+  processAge,
+  processBMI,
+  processMaxHR,
+} from "@/utility/profile/dataProcessing";
 
 export default function Profile() {
   const { showLoading, hideLoading } = useLoading();
@@ -14,26 +24,32 @@ export default function Profile() {
   const [age, setAge] = useState<number>(0);
   const [bmi, setBMI] = useState<number>(0.0);
   const [maxHR, setMaxHR] = useState<number>(0);
+  const [containerHeight, setContainerHeight] = useState<number>(-1);
 
-  // boolFlag1: interacts with edit
-  // boolFlag2: interacts with processing
-  const [boolFlag1, setBoolFlag1] = useState<boolean>(true);
-  const [boolFlag2, setBoolFlag2] = useState<boolean>(true);
+  // editFlag: Deals with user detail edit
+  // dataFlag: Deals with data processing
+  const [editFlag, setEditFlag] = useState<boolean>(true);
+  const [dataFlag, setDataFlag] = useState<boolean>(true);
 
-  // this function is called after closing the edit modal
-  // it triggers getUserDetails()
+  // This function is called after closing the edit modal
   const triggerUpdate = () => {
-    setBoolFlag1((prev) => !prev);
+    setEditFlag((prev) => !prev);
   };
 
+  // It then triggers getUserDetails()
+  // On mount also!
+  useEffect(() => {
+    getUserDetails();
+  }, [editFlag]);
+
+  // Gets user details from backend database
   const getUserDetails = async () => {
     try {
-      // Loading Screen
       showLoading();
 
       // getItem('token') returns a Promise
-      // hence, we await to wait for the Promise to complete and grab its value
-      const token: string | null = await getItem("token");
+      // Hence, we await to wait for the Promise to complete and grab its value
+      const token: string | null = await getToken("token");
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_DOMAIN}accounts/detail`,
         {
@@ -49,202 +65,188 @@ export default function Profile() {
         throw new Error("Network response was not ok");
       }
 
+      // Successful response
+      // Extract out values
       const dataObj = await response.json();
       const valuesArray: string[] = Object.values(dataObj).map(String);
-      setUserDetails(valuesArray);
+
+      // Begin data processing
+      processUserDetails(valuesArray);
+
+      // Catch any errors
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
-      hideLoading(); // Hide loading spinner after fetch completes
+      hideLoading();
     }
   };
 
-  // getUserDetails() fetches the user data of the current user that's logged in
-  // via the auth token stored under asyncStorage
-  // the fetched user data is then stored under userDetails
-  useEffect(() => {
-    getUserDetails();
-  }, [boolFlag1]);
-
-  // when userDetail changes, effect function is invoked
-  // it does a bunch of processing
-  // then, it flips a boolean flag, triggering a ('final') re-render
-  // in the mount - edit - submit - close process
-  useEffect(() => {
+  const processUserDetails = (userDetails: string[]) => {
     if (userDetails.length > 0) {
-      // Conversion part
-      // Change bday from YYYY-MM-DD to DD-MM-YYYY
+      // Converts bday from YYYY-MM-DD to DD-MM-YYYY
       const initialBirthday = userDetails[4];
-      const [year, month, day] = initialBirthday.split("-");
-      const updatedBirthday = `${day}-${month}-${year}`;
+      const updatedBirthday = processBirthday(initialBirthday);
       userDetails[4] = updatedBirthday;
 
       // Ensure height is 2dp
       const height: string = userDetails[2];
-      const heightValue: number = parseFloat(height);
-      const heightValueRounded: number =
-        Math.round((heightValue + Number.EPSILON) * 100) / 100;
-      userDetails[2] = heightValueRounded.toString();
+      const updatedHeight = processHeight(height);
+      userDetails[2] = updatedHeight;
 
       // Ensure weight is integer
       const weight: string = userDetails[3];
-      const weightValue: number = parseFloat(weight);
-      const weightValueRounded: number = Math.trunc(weightValue);
-      userDetails[3] = weightValueRounded.toString();
+      const updatedWeight = processWeight(weight);
+      userDetails[3] = updatedWeight;
 
-      // Calculate age part
-      const birthDate = new Date(initialBirthday);
-      const currentDate = new Date();
+      // Calculate age
+      const userAge = processAge(initialBirthday);
 
-      let userAge = currentDate.getFullYear() - birthDate.getFullYear();
-      const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+      // Calculate BMI
+      const userBMI = processBMI(height, weight);
 
-      // If current month is before birth month OR in the same month but birth day is ahead of current day
-      if (
-        monthDiff < 0 ||
-        (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())
-      ) {
-        userAge--;
-      }
+      // Calculate Max HR
+      const userMaxHR = processMaxHR(userAge);
 
-      // Calculate BMI part
-      // Formula: BMI = Weight (kg) / Height (m) square
-      const userWeight = Number(userDetails[3]);
-      const userHeight = Number(userDetails[2]);
-      const userBMI = (userWeight * 1.0) / userHeight ** 2;
-
-      // Calculate Max HR part
-      // Formula: 220 - age
-      const userMaxHR = 220 - userAge;
-
+      // Write in the calculated values for age, BMI and max HR
+      // Write in the updated userDetails
+      setUserDetails(userDetails);
       setAge(userAge);
-      // Formula to round BMI to 2dp
-      setBMI(Math.round((userBMI + Number.EPSILON) * 100) / 100);
+      setBMI(userBMI);
       setMaxHR(userMaxHR);
 
-      setBoolFlag2(!boolFlag2);
+      // Toggles the data flag
+      // Signalling the end of data processing
+      // Triggers re-render with updated values
+      setDataFlag(!dataFlag);
     }
-  }, [userDetails]);
+  };
+
+  // Grabs the avaliable height (excluding top header and bottom tab bar)
+  const handleLayout = (e: any) => {
+    e.persist();
+    const { height } = e.nativeEvent.layout;
+
+    // Only sets once initially (when default value is -1)
+    if (containerHeight < 0) {
+      setContainerHeight(height);
+    }
+  };
 
   return (
-    <ScrollView
-      style={globalStyles.container}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.bgWrapper}>
-        <Image
-          source={require("../../assets/images/bg-image.jpg")}
-          style={styles.banner}
-        />
-      </View>
-
-      <View style={styles.profileWrapper}>
-        {/* 
-            When userDetails is populated 
-            After the async getUserDetails function finishes
-            Then only, is this component rendered
-            This same idea is repeated multiple times below! 
-          */}
-        {/* Gender is found at index 5 of the array */}
-        {userDetails[5] == "F" && (
-          <Image
-            source={require("../../assets/images/female-pfp.jpg")}
-            style={styles.pfp}
-          />
-        )}
-
-        {userDetails[5] == "M" && (
-          <Image
-            source={require("../../assets/images/male-pfp.png")}
-            style={styles.pfp}
-          />
-        )}
-
-        <View style={{ height: "15%" }}>
-          <Text style={styles.userName}>
-            {/* Username is found at index 1 of the array */}
-            {userDetails[1] + " (" + userDetails[5] + ")"}
-          </Text>
-
-          {/* Change name to two parter in future */}
-          {/* <Text>Tom </Text>  
-              <Text style={{color: 'red'}}>Hanks</Text> */}
-        </View>
-
-        <View style={styles.iconWrapper}>
-          <EditModal triggerUpdate={triggerUpdate} />
-          <LogoutModal />
-        </View>
-
-        <View style={styles.detailsWrapper}>
-          <View style={styles.merged}>
-            <View style={globalStyles.cardV1}>
-              {userDetails.length > 0 && (
-                <View style={styles.cardInner}>
-                  <Text style={styles.header}>Height:</Text>
-                  {/* Height is found at index 2 of the array */}
-                  <Text style={styles.para}>{userDetails[2] + "m"}</Text>
-                </View>
-              )}
-            </View>
-            <View style={globalStyles.cardV1}>
-              {userDetails.length > 0 && (
-                <View style={styles.cardInner}>
-                  <Text style={styles.header}>Weight:</Text>
-                  {/* Weight is found at index 3 of the array */}
-                  <Text style={styles.para}>{userDetails[3] + "kg"}</Text>
-                </View>
-              )}
-            </View>
-            <View style={globalStyles.cardV1}>
-              {userDetails.length > 0 && (
-                <View style={styles.cardInner}>
-                  <Text style={styles.header}>Birthday:</Text>
-                  {/* Birthday is found at index 4 of the array */}
-                  <Text style={styles.para}>{userDetails[4]}</Text>
-                </View>
-              )}
-            </View>
+    <>
+      {userDetails.length == 0 ? (
+        <LoadingOverlay />
+      ) : (
+        <ScrollView
+          style={globalStyles.container}
+          // ScrollView has two parts: Outer view (fixed) + Inner scrollable container (variable)
+          // Sets height of scrollable container
+          contentContainerStyle={{ height: containerHeight }}
+          showsVerticalScrollIndicator={false}
+          onLayout={handleLayout}
+        >
+          <View style={styles.bannerWrapper}>
+            <Image
+              source={require("../../assets/images/bg-image.jpg")}
+              style={styles.banner}
+            />
           </View>
 
-          <View style={styles.merged}>
-            <View style={globalStyles.cardV1}>
-              {userDetails.length > 0 && (
-                <View style={styles.cardInner}>
-                  <Text style={styles.header}>Age:</Text>
-                  <Text style={styles.para}>{age}</Text>
-                </View>
-              )}
+          <View style={styles.profileWrapper}>
+            {/* Gender is found at index 5 of the array */}
+            {userDetails[5] == "F" && (
+              <Image
+                source={require("../../assets/images/female-pfp.jpg")}
+                style={styles.profilePicture}
+              />
+            )}
+
+            {userDetails[5] == "M" && (
+              <Image
+                source={require("../../assets/images/male-pfp.png")}
+                style={styles.profilePicture}
+              />
+            )}
+
+            <Text style={styles.userName}>
+              {/* Username is found at index 1 of the array */}
+              {userDetails[1] + " (" + userDetails[5] + ")"}
+            </Text>
+
+            <View style={styles.iconWrapper}>
+              <EditModal triggerUpdate={triggerUpdate} />
+              <LogoutModal />
             </View>
-            <View style={globalStyles.cardV1}>
-              {userDetails.length > 0 && (
-                <View style={styles.cardInner}>
+
+            <View style={styles.detailsWrapper}>
+              <View style={styles.detailsHalf}>
+                <Card
+                  outerStyle={globalStyles.cardV1}
+                  innerStyle={styles.cardInner}
+                >
+                  <Text style={globalStyles.header}>Height:</Text>
+                  {/* Height is found at index 2 of the array */}
+                  <Text style={styles.para}>{userDetails[2] + "m"}</Text>
+                </Card>
+
+                <Card
+                  outerStyle={globalStyles.cardV1}
+                  innerStyle={styles.cardInner}
+                >
+                  <Text style={globalStyles.header}>Weight:</Text>
+                  {/* Weight is found at index 3 of the array */}
+                  <Text style={styles.para}>{userDetails[3] + "kg"}</Text>
+                </Card>
+
+                <Card
+                  outerStyle={globalStyles.cardV1}
+                  innerStyle={styles.cardInner}
+                >
+                  <Text style={globalStyles.header}>Birthday:</Text>
+                  {/* Birthday is found at index 4 of the array */}
+                  <Text style={styles.para}>{userDetails[4]}</Text>
+                </Card>
+              </View>
+
+              <View style={styles.detailsHalf}>
+                <Card
+                  outerStyle={globalStyles.cardV1}
+                  innerStyle={styles.cardInner}
+                >
+                  <Text style={globalStyles.header}>Age:</Text>
+                  <Text style={styles.para}>{age}</Text>
+                </Card>
+
+                <Card
+                  outerStyle={globalStyles.cardV1}
+                  innerStyle={styles.cardInner}
+                >
                   <View style={styles.infoWrapper}>
-                    <Text style={styles.header}>BMI: </Text>
+                    <Text style={globalStyles.header}>BMI: </Text>
                     <BmiModal />
                   </View>
                   <Text style={styles.para}>{bmi}</Text>
-                </View>
-              )}
-            </View>
-            <View style={globalStyles.cardV1}>
-              {userDetails.length > 0 && (
-                <View style={styles.cardInner}>
-                  <Text style={styles.header}>Max HR:</Text>
+                </Card>
+
+                <Card
+                  outerStyle={globalStyles.cardV1}
+                  innerStyle={styles.cardInner}
+                >
+                  <Text style={globalStyles.header}>Max HR:</Text>
                   <Text style={styles.para}>{maxHR + "bpm"}</Text>
-                </View>
-              )}
+                </Card>
+              </View>
             </View>
           </View>
-        </View>
-      </View>
-    </ScrollView>
+        </ScrollView>
+      )}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  bgWrapper: {
-    height: "18%",
+  bannerWrapper: {
+    height: "21%",
   },
 
   banner: {
@@ -255,22 +257,25 @@ const styles = StyleSheet.create({
   },
 
   profileWrapper: {
-    height: "37%",
+    height: "82%",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
-    marginTop: -150,
-    marginBottom: "100%",
+
+    // Move up by half the width
+    // So that end of banner aligns exactly with midpoint of picture
+    marginTop: -75,
   },
 
-  pfp: {
+  profilePicture: {
     width: 150,
     height: 150,
-    resizeMode: "contain",
-    borderRadius: 150 / 2,
-    overflow: "hidden",
     borderWidth: 1.5,
     borderColor: "red",
+
+    // Creates a circular effect
+    borderRadius: 150 / 2,
+    resizeMode: "contain",
+    overflow: "hidden",
   },
 
   userName: {
@@ -281,38 +286,29 @@ const styles = StyleSheet.create({
   },
 
   iconWrapper: {
-    marginTop: "2%",
-    width: "100%",
+    marginTop: "1%",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: "3%",
   },
 
   detailsWrapper: {
-    marginTop: "-37%",
-    width: "100%",
-    height: "35%",
     flexDirection: "row",
   },
 
-  merged: {
-    marginTop: "40%",
-    width: "50%",
-    height: "100%",
-  },
-
-  header: {
-    ...globalStyles.header,
+  detailsHalf: {
+    width: "48%",
   },
 
   para: {
     ...globalStyles.para,
+    marginBottom: 3,
     position: "relative",
     top: -16,
   },
 
   cardInner: {
-    height: "75%",
     paddingHorizontal: 10,
   },
 

@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-// common styles across all components
+// Common styles across all components
 export const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -26,6 +26,7 @@ export const globalStyles = StyleSheet.create({
     fontSize: 12,
   },
 
+  // General styles for the custom text input
   input: {
     borderWidth: 1,
     borderColor: "#ddd",
@@ -35,7 +36,7 @@ export const globalStyles = StyleSheet.create({
     fontSize: 12,
   },
 
-  // for profile page only
+  // For profile page only
   cardV1: {
     borderRadius: 7,
     borderWidth: 1,
@@ -46,17 +47,17 @@ export const globalStyles = StyleSheet.create({
     marginHorizontal: 4,
     marginVertical: 6,
 
-    // android only
-    // width: right offset, height: down offset
+    // Android only
+    // Width: right offset, height: down offset
     elevation: 2.5,
 
-    // ios only
+    // Ios only
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 2,
   },
 
-  // for all other pages
+  // For all other pages
   cardV2: {
     borderRadius: 7,
     borderWidth: 1,
@@ -64,10 +65,10 @@ export const globalStyles = StyleSheet.create({
     backgroundColor: "#fff",
     shadowColor: "#333",
 
-    // android only
+    // Android only
     elevation: 2.5,
 
-    // ios only
+    // Ios only
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 2,

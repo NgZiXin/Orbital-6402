@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
+import AboutModal from "../modal/general/about";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 interface HeaderProps {
@@ -8,24 +9,19 @@ interface HeaderProps {
 }
 
 export default function Header({ navigation, style }: HeaderProps) {
-  const syncData = () => {
-    // Will update this to sync data with Strava in future
-    console.log("Placeholder!");
-  };
-
-  const accountPage = () => {
+  const accountPage = (): void => {
     navigation.navigate("profile");
   };
 
   return (
     <View style={[styles.header, style]}>
-      <Ionicons size={25} name="sync" onPress={syncData} style={styles.icons} />
+      <AboutModal />
       <Text style={styles.headerText}>Workout Wizards!</Text>
       <Ionicons
         size={25}
         name="person-circle-outline"
         onPress={accountPage}
-        style={styles.icons}
+        style={styles.icon}
       />
     </View>
   );
@@ -48,7 +44,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
 
-  icons: {
-    paddingTop: 3,
+  icon: {
+    paddingTop: 2,
   },
 });

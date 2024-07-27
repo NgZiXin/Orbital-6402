@@ -12,16 +12,18 @@ export default function ProgressBar({
   rightLabel,
   progress,
 }: ProgressBarProps) {
-  let updatedProgress = null;
+  // Convert progress value into percentage
+  let percentage = null;
   if (progress > 100) {
-    updatedProgress = 100;
+    percentage = 100;
   } else if (progress < 0 || progress === undefined) {
-    updatedProgress = 0;
+    percentage = 0;
   } else {
-    updatedProgress = progress;
+    percentage = progress;
   }
 
-  const stringVersion: DimensionValue = `${updatedProgress}%`;
+  const percentageString: DimensionValue = `${percentage}%`;
+
   return (
     <>
       <View style={styles.labels}>
@@ -29,7 +31,7 @@ export default function ProgressBar({
         <Text style={globalStyles.para}>{rightLabel}</Text>
       </View>
       <View style={styles.backgroundBar}>
-        <View style={[styles.progressBar, { width: stringVersion }]}></View>
+        <View style={[styles.progressBar, { width: percentageString }]}></View>
       </View>
     </>
   );

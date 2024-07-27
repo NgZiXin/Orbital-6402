@@ -1,184 +1,502 @@
-import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "@/styles/global";
-
-import { Agenda, DateData } from "react-native-calendars";
-
-function timeToString(time: number): string {
-  const date = new Date(time);
-  return date.toISOString().split("T")[0];
-}
+import { getToken } from "@/utility/general/userToken";
+import CalendarListModal from "../modal/homePage/calendarPage/calendarList";
+import { MarkedDates } from "react-native-calendars/src/types";
+import {
+  dateComparison,
+  monthsBetween,
+  getDayOfWeek,
+} from "@/utility/home/dateProcessing";
+import { FlashList, ListRenderItem, ViewToken } from "@shopify/flash-list";
+import { numberToMonthMap } from "@/constants/monthMap";
+import SubmitButton from "./submit";
+import EditAgendaModal from "../modal/homePage/calendarPage/editAgenda";
+import DeleteAgendaModal from "../modal/homePage/calendarPage/deleteAgenda";
 
 interface CalendarItem {
-  name: string;
-  day: string;
+  id?: number;
+  databaseId?: number;
+  header: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  body: string;
 }
 
-// items must match the shape specified by the docs (refer to docs)
-type CalendarItems = {
+interface CalendarItems {
   [key: string]: CalendarItem[];
-};
+}
 
-const getDates = () => {
-  const todayDate = new Date().toISOString().split("T")[0];
+interface AgendaCalendarProps {
+  updateFlag: boolean;
+  setUpdateFlag: (updateFunction: (prevValue: boolean) => boolean) => void;
+}
 
-  const laterDate = new Date();
-  laterDate.setMonth(laterDate.getMonth() + 2);
-  const twoMonthsLater = laterDate.toISOString().split("T")[0];
+// UTC+8, match this computer's timezone
+const todayDate: Date = new Date();
+todayDate.setHours(todayDate.getHours() + 8);
 
-  return { todayDate, twoMonthsLater };
-};
+const todayDateFormatted: string = todayDate.toISOString().split("T")[0];
+const [year, month, _] = todayDateFormatted.split("-");
 
-const { todayDate, twoMonthsLater } = getDates();
+let initialMarkedDates: MarkedDates = {};
+initialMarkedDates[todayDateFormatted] = { selected: true };
 
-export default function AgendaCalendar() {
-  const [items, setItems] = useState<CalendarItems>({});
+export default function AgendaCalendar({
+  updateFlag,
+  setUpdateFlag,
+}: AgendaCalendarProps) {
+  const flashListRef = useRef<FlashList<any>>(null);
 
-  // currently: using sample items
-  // in future: use items pulled from backend database
-  function loadItems(day: DateData) {
-    setTimeout(() => {
-      for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-        const strTime: string = timeToString(time);
+  // Need default values!
+  // Before any agenda exists
+  const minDate = useRef<string>(todayDateFormatted);
+  const maxDate = useRef<string>(todayDateFormatted);
+  const markedDates = useRef<MarkedDates>(initialMarkedDates);
+  const selectedDate = useRef<string>(todayDateFormatted);
 
-        if (!items[strTime] && new Date(strTime) <= new Date(twoMonthsLater)) {
-          items[strTime] = [];
+  // To store (month, year) that we have already created header for
+  // Local variable so it repopulates each time list re-renders
+  const seen: [string, string][] = [];
 
-          const numItems = Math.floor(Math.random() * 3 + 1);
-          for (let j = 0; j < numItems; j++) {
-            items[strTime].push({
-              name: "Item for " + strTime + " #" + j,
-              day: strTime,
-            });
-          }
+  const [monthYear, setMonthYear] = useState<string[]>([month, year]);
+  const [items, setItems] = useState<CalendarItems | null>(null);
+  const [calendarList, setCalendarList] = useState<boolean>(false);
+  const [editModal, setEditModal] = useState<boolean>(false);
+  const [editId, setEditId] = useState<number>(-1);
+  const [deleteModal, setDeleteModal] = useState<boolean>(false);
+  const [deleteId, setDeleteId] = useState<number>(-1);
+
+  useEffect(() => {
+    getItems();
+  }, [updateFlag]);
+
+  const getItems = async (): Promise<void> => {
+    try {
+      const token: string | null = await getToken("token");
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_DOMAIN}calendar/`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`,
+          },
         }
+      );
+
+      // Backend raises an error
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
 
-      const newItems: CalendarItems = {};
-      Object.keys(items).forEach((key) => {
-        newItems[key] = items[key];
-      });
-      setItems(newItems);
-    }, 500);
-  }
+      // Successful response
+      // Extract out the data response
+      const dataArray: CalendarItem[] = await response.json();
 
-  const renderItem = (item: CalendarItem, isFirst: boolean) => {
+      // Sort the array
+      // By date --> then by start time --> then by end time
+      dataArray.sort((first: CalendarItem, second: CalendarItem) => {
+        const dateComparisonResult = dateComparison(first.date, second.date);
+        if (dateComparisonResult !== 0) {
+          return dateComparisonResult;
+        }
+        const startTimeComparison = first.start_time.localeCompare(
+          second.start_time
+        );
+        if (startTimeComparison !== 0) {
+          return startTimeComparison;
+        }
+        return first.end_time.localeCompare(second.end_time);
+      });
+
+      // Iterate through the entries
+      // Populate the itemResult array
+      let currentDate: string | null = null;
+      let itemsResult: CalendarItems = {};
+
+      // Edge case, early return
+      if (dataArray.length === 0) {
+        // Force re-render
+        setItems(null);
+        return;
+      }
+
+      for (let i = 0; i < dataArray.length; i++) {
+        const item: CalendarItem = dataArray[i];
+
+        const dateValue = dataArray[i].date;
+
+        if (currentDate == null) {
+          currentDate = dateValue;
+          itemsResult[currentDate] = [];
+          // Earliest date with agenda
+          minDate.current = currentDate;
+        } else {
+          const dateComparisonResult = dateComparison(dateValue, currentDate);
+          if (dateComparisonResult > 0) {
+            currentDate = dateValue;
+            itemsResult[currentDate] = [];
+          }
+        }
+
+        // Copy over the id into a new field
+        // Remove the old field
+        // Since Flashlist advices against any key/id props inside items
+        item["databaseId"] = item.id;
+        delete item["id"];
+
+        itemsResult[currentDate].push(item);
+      }
+
+      // Latest date with agenda
+      maxDate.current = currentDate as string;
+
+      // Populate the markedDateResult array
+      let markedDateResult: MarkedDates = {};
+      Object.keys(itemsResult).forEach((date) => [
+        (markedDateResult[date] = {
+          marked: true,
+          dotColor: "#F2AAC1",
+          // Make the initial day selected
+          selected: date === minDate.current ? true : false,
+        }),
+      ]);
+
+      markedDates.current = markedDateResult;
+      selectedDate.current = minDate.current;
+
+      setMonthYear([
+        minDate.current.split("-")[1],
+        minDate.current.split("-")[0],
+      ]);
+
+      setItems(itemsResult);
+
+      // Catch other errors
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
+  const handleEdit = (databaseId: number) => {
+    setEditModal(true);
+    setEditId(databaseId);
+  };
+
+  const handleDelete = async (databaseId: number): Promise<void> => {
+    setDeleteModal(true);
+    setDeleteId(databaseId);
+  };
+
+  const renderItem: ListRenderItem<[string, CalendarItem[]]> = ({
+    item,
+    index,
+  }) => {
+    const [date, calendarItems] = item;
+    const [year, month, day] = date.split("-");
+    const dayOfWeek: string = getDayOfWeek(date);
+
+    const hasHeader: boolean = seen.some(
+      (item) => item[0] === month && item[1] === year
+    );
+
+    if (!hasHeader) {
+      seen.push([month, year]);
+    }
+
     return (
-      <TouchableOpacity
-        style={[styles.item, isFirst == true ? { marginTop: 30 } : undefined]}
-      >
-        <Text style={globalStyles.para}>{item.name}</Text>
-      </TouchableOpacity>
+      <View style={styles.itemWrapper}>
+        {!hasHeader && (
+          <View style={styles.itemHeaderWrapper}>
+            <Text style={styles.itemHeader}>
+              {numberToMonthMap[month] + ", " + year}
+            </Text>
+          </View>
+        )}
+        <View style={styles.itemBodyWrapper}>
+          <View style={styles.dayWrapper}>
+            <Text
+              style={
+                date === todayDateFormatted
+                  ? [styles.dayNumber, styles.dayHighlighted]
+                  : styles.dayNumber
+              }
+            >
+              {day}
+            </Text>
+            <Text
+              style={
+                date === todayDateFormatted
+                  ? [styles.dayName, styles.dayHighlighted]
+                  : styles.dayName
+              }
+            >
+              {dayOfWeek}
+            </Text>
+          </View>
+
+          <View style={styles.dayItemsWrapper}>
+            {calendarItems.map((calendarItem, innerIndex) => (
+              <View
+                // Unique key constructed from index
+                key={index.toString() + innerIndex.toString()}
+                style={styles.item}
+              >
+                <View style={styles.agendaHeaderWrapper}>
+                  <Text style={globalStyles.header}>{calendarItem.header}</Text>
+                  <View style={styles.iconWrapper}>
+                    <SubmitButton
+                      onPressHandler={() =>
+                        handleEdit(calendarItem.databaseId as number)
+                      }
+                      icon={["create-outline", 19, {}]}
+                      style={styles.submitButton}
+                    />
+
+                    <SubmitButton
+                      onPressHandler={() =>
+                        handleDelete(calendarItem.databaseId as number)
+                      }
+                      icon={["close-outline", 22, {}]}
+                      style={styles.submitButton}
+                    />
+                  </View>
+                </View>
+
+                <Text style={styles.itemTime}>
+                  {calendarItem.start_time} - {calendarItem.end_time}
+                </Text>
+                <Text style={styles.itemText}>{calendarItem.body}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
     );
   };
 
-  // Optimization
-  // If two items have different names, re-render the items
-  const rowHasChanged = (r1: CalendarItem, r2: CalendarItem) => {
-    return r1.name !== r2.name;
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: Array<ViewToken> }) => {
+      if (viewableItems.length > 0) {
+        // Simply look at the first item's date
+        const firstItemDate: string = viewableItems[0].item[0];
+        const [year, month, _] = firstItemDate.split("-");
+        setMonthYear([month, year]);
+      }
+    },
+    []
+  );
+
+  const handleScrollToIndex = (index: number) => {
+    // Set timeout for smoother transition
+    setTimeout(() => {
+      flashListRef.current?.scrollToIndex({
+        index: index,
+        animated: true,
+        // Scroll to the top of the visible position
+        viewPosition: 0,
+      });
+    }, 100);
   };
 
   return (
-    <View style={{ flex: 1, paddingTop: 5 }}>
-      <Agenda
-        //@ts-ignore
-        items={items}
-        loadItemsForMonth={loadItems}
-        selected={todayDate}
-        maxDate={twoMonthsLater}
-        futureScrollRange={3} // + 1 as buffer
-        renderItem={renderItem}
-        renderEmptyDate={() => {
-          return <></>;
-        }}
-        renderEmptyData={() => {
-          return <></>;
-        }}
-        rowHasChanged={rowHasChanged}
-        firstDay={1}
-        weekStartsOn={1}
-        showClosingKnob={true}
-        markedDates={{}}
-        hideExtraDays={true}
-        theme={
-          {
-            "stylesheet.agenda.main": {
-              weekdays: {
-                position: "absolute",
-                left: 0,
-                right: 0,
-                top: 0,
-                flexDirection: "row",
-                justifyContent: "space-around",
-                marginLeft: 15,
-                marginRight: 15,
-
-                paddingTop: 15,
-                paddingBottom: 4.5,
-                backgroundColor: "white",
-              },
-
-              knobContainer: {
-                flex: 1,
-                position: "absolute",
-                left: 0,
-                right: 0,
-                height: 24,
-                bottom: 3,
-                alignItems: "center",
-                backgroundColor: "white",
-                marginBottom: -3, // balance out
-              },
-
-              reservations: {
-                backgroundColor: "#F6F2F2",
-                flex: 1,
-                marginTop: 92,
-                paddingBottom: 18,
-              },
-            },
-
-            "stylesheet.calendar.header": {
-              dayTextAtIndex5: {
-                // saturday
-                color: "red",
-              },
-
-              dayTextAtIndex6: {
-                // sunday
-                color: "red",
-              },
-
-              backgroundColor: "red",
-            },
-
-            textDayFontFamily: "inter-semibold",
-            textDayHeaderFontFamily: "inter-semibold",
-            textMonthFontFamily: "inter-semibold",
-
-            todayTextColor: "red",
-            textSectionTitleColor: "#A3ADB8", // for the day headers
-            selectedDayTextColor: "#2D4150",
-            selectedDayBackgroundColor: "pink",
-            agendaDayNumColor: "#929BA5", // one shade darker than day header color
-            agendaDayTextColor: "#929BA5",
-            agendaTodayColor: "red",
-            agendaKnobColor: "#F6F2F2",
-          } as any
-        }
-        style={{ position: "relative", bottom: 7 }} // so the max future date is fully visible
+    <>
+      <SubmitButton
+        onPressHandler={() => setCalendarList(true)}
+        text={numberToMonthMap[monthYear[0]] + " " + monthYear[1]}
+        icon={["chevron-down-outline", 20, styles.icon]}
+        style={styles.button}
+        textStyle={styles.buttonText}
       />
-    </View>
+
+      {minDate.current &&
+        maxDate.current &&
+        markedDates.current &&
+        selectedDate.current && (
+          <CalendarListModal
+            minDate={minDate}
+            maxDate={maxDate}
+            markedDates={markedDates}
+            prevSelected={selectedDate}
+            visibility={calendarList}
+            setVisibility={setCalendarList}
+            setMonthYear={setMonthYear}
+            handleScrollToIndex={handleScrollToIndex}
+          />
+        )}
+
+      <View style={styles.listWrapper}>
+        {items && (
+          <FlashList
+            ref={flashListRef}
+            data={Object.entries(items)}
+            // Assuming 30 days a month, 1 item each day
+            estimatedItemSize={
+              (monthsBetween(minDate.current, maxDate.current) + 1) * 30
+            }
+            renderItem={renderItem}
+            onViewableItemsChanged={onViewableItemsChanged}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingTop: 12,
+              backgroundColor: "#F6F2F2",
+            }}
+          />
+        )}
+
+        {!items && (
+          <View style={styles.noItemWrapper}>
+            <Text style={globalStyles.header}>Oops!</Text>
+            <Text style={globalStyles.para}>No existing agenda items.</Text>
+            <Text style={globalStyles.label}>
+              Click the button below to add items.
+            </Text>
+          </View>
+        )}
+      </View>
+
+      <EditAgendaModal
+        visibility={editModal}
+        setVisibility={setEditModal}
+        databaseId={editId}
+        setUpdateFlag={setUpdateFlag}
+      />
+
+      <DeleteAgendaModal
+        visibility={deleteModal}
+        setVisibility={setDeleteModal}
+        databaseId={deleteId}
+        setUpdateFlag={setUpdateFlag}
+      />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  button: {
+    ...globalStyles.cardV2,
+    marginTop: 5,
+    padding: 5,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  buttonText: {
+    ...globalStyles.header,
+    fontFamily: "inter-regular",
+    textAlign: "center",
+  },
+
+  icon: {
+    marginTop: 3,
+    marginLeft: 7,
+  },
+
+  listWrapper: {
+    height: 500,
+    marginTop: 17,
+    borderRadius: 10,
+    // If child flashlist overflows, hide the exceeded parts
+    // Thus achieving a border radius effect
+    overflow: "hidden",
+    backgroundColor: "#F6F2F2",
+    flex: 1,
+  },
+
+  itemWrapper: {
+    marginBottom: 22,
+  },
+
+  itemHeaderWrapper: {
+    // backgroundColor: "pink",
+  },
+
+  itemHeader: {
+    fontFamily: "inter-regular",
+    fontSize: 14,
+    color: "#929BA5",
+    marginLeft: 15,
+  },
+
+  itemBodyWrapper: {
+    flexDirection: "row",
+    // backgroundColor: "green",
+  },
+
+  dayWrapper: {
+    width: "20%",
+    alignItems: "center",
+    marginTop: 6,
+  },
+
+  dayNumber: {
+    ...globalStyles.header,
+    fontSize: 20,
+    color: "#929BA5",
+    position: "relative",
+    right: 1,
+  },
+
+  dayName: {
+    ...globalStyles.para,
+    color: "#929BA5",
+    marginTop: -12,
+    position: "relative",
+    right: 1,
+  },
+
+  dayHighlighted: {
+    color: "red",
+  },
+
+  dayItemsWrapper: {
+    width: "80%",
+  },
+
   item: {
     backgroundColor: "white",
-    borderRadius: 5,
+    borderRadius: 7,
     padding: 10,
+    paddingTop: 5,
     marginRight: 10,
-    marginTop: 17,
+    marginTop: 10,
+  },
+
+  agendaHeaderWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  iconWrapper: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: -17,
+  },
+
+  submitButton: {
+    backgroundColor: "white",
+    borderRadius: 0,
+    margin: 0,
+  },
+
+  itemTime: {
+    ...globalStyles.para,
+    marginTop: -7,
+  },
+
+  itemText: {
+    ...globalStyles.para,
+    marginTop: 7,
+  },
+
+  noItemWrapper: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
