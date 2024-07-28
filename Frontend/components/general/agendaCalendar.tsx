@@ -8,6 +8,7 @@ import {
   dateComparison,
   monthsBetween,
   getDayOfWeek,
+  oneDayLater,
 } from "@/utility/home/dateProcessing";
 import { FlashList, ListRenderItem, ViewToken } from "@shopify/flash-list";
 import { numberToMonthMap } from "@/constants/monthMap";
@@ -68,6 +69,8 @@ export default function AgendaCalendar({
   const [editId, setEditId] = useState<number>(-1);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const [deleteId, setDeleteId] = useState<number>(-1);
+  const [listHeight, setListHeight] = useState<number>(-1);
+  const [lastHeight, setLastHeight] = useState<number>(-1);
 
   useEffect(() => {
     getItems();
@@ -154,16 +157,30 @@ export default function AgendaCalendar({
       // Latest date with agenda
       maxDate.current = currentDate as string;
 
-      // Populate the markedDateResult array
+      // Fill in a dummy item at the end
+      const dummyItem: CalendarItem = {
+        header: "",
+        date: "",
+        start_time: "",
+        end_time: "",
+        body: "dummyItem",
+      };
+
+      const dummyDate = oneDayLater(currentDate as string);
+      itemsResult[dummyDate] = [];
+      itemsResult[dummyDate].push(dummyItem);
+
+      // Populate the markedDateResult array (change this name to activeDateResult!)
       let markedDateResult: MarkedDates = {};
-      Object.keys(itemsResult).forEach((date) => [
-        (markedDateResult[date] = {
-          marked: true,
-          dotColor: "#F2AAC1",
-          // Make the initial day selected
-          selected: date === minDate.current ? true : false,
-        }),
-      ]);
+      Object.keys(itemsResult).forEach((date) => {
+        // Don't set dummyDate as active
+        if (date !== dummyDate) {
+          markedDateResult[date] = {
+            // Make the initial day selected
+            selected: date === minDate.current ? true : false,
+          };
+        }
+      });
 
       markedDates.current = markedDateResult;
       selectedDate.current = minDate.current;
@@ -207,78 +224,112 @@ export default function AgendaCalendar({
       seen.push([month, year]);
     }
 
+    const isFirstItem: boolean = true ? index === 0 : false;
+    const isDummyItem: boolean = true
+      ? calendarItems[0].body === "dummyItem"
+      : false;
+
+    const isLast: boolean = true ? date === maxDate.current : false;
+
     return (
-      <View style={styles.itemWrapper}>
-        {!hasHeader && (
-          <View style={styles.itemHeaderWrapper}>
-            <Text style={styles.itemHeader}>
-              {numberToMonthMap[month] + ", " + year}
-            </Text>
+      <>
+        {!isDummyItem && (
+          <View
+            style={styles.itemWrapper}
+            onLayout={(e: any) => handleItemLayout(e, isLast)}
+          >
+            {!hasHeader && (
+              <View
+                style={[
+                  styles.itemHeaderWrapper,
+                  // So that when scrolled to
+                  // First item has the same top spacing as others
+                  isFirstItem ? { marginTop: 0.02 * listHeight } : undefined,
+                ]}
+              >
+                <Text style={styles.itemHeader}>
+                  {numberToMonthMap[month] + ", " + year}
+                </Text>
+              </View>
+            )}
+            <View style={styles.itemBodyWrapper}>
+              <View style={styles.dayWrapper}>
+                <Text
+                  style={
+                    date === todayDateFormatted
+                      ? [styles.dayNumber, styles.dayHighlighted]
+                      : styles.dayNumber
+                  }
+                >
+                  {day}
+                </Text>
+                <Text
+                  style={
+                    date === todayDateFormatted
+                      ? [styles.dayName, styles.dayHighlighted]
+                      : styles.dayName
+                  }
+                >
+                  {dayOfWeek}
+                </Text>
+              </View>
+
+              <View style={styles.dayItemsWrapper}>
+                {calendarItems.map((calendarItem, innerIndex) => (
+                  <View
+                    // Unique key constructed from index
+                    key={index.toString() + innerIndex.toString()}
+                    style={styles.item}
+                  >
+                    <View style={styles.agendaHeaderWrapper}>
+                      <Text style={globalStyles.header}>
+                        {calendarItem.header}
+                      </Text>
+                      <View style={styles.iconWrapper}>
+                        <SubmitButton
+                          onPressHandler={() =>
+                            handleEdit(calendarItem.databaseId as number)
+                          }
+                          icon={["create-outline", 19, {}]}
+                          style={styles.submitButton}
+                        />
+
+                        <SubmitButton
+                          onPressHandler={() =>
+                            handleDelete(calendarItem.databaseId as number)
+                          }
+                          icon={["close-outline", 22, {}]}
+                          style={styles.submitButton}
+                        />
+                      </View>
+                    </View>
+
+                    <Text style={styles.itemTime}>
+                      {calendarItem.start_time} - {calendarItem.end_time}
+                    </Text>
+                    <Text style={styles.itemText}>{calendarItem.body}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
           </View>
         )}
-        <View style={styles.itemBodyWrapper}>
-          <View style={styles.dayWrapper}>
-            <Text
-              style={
-                date === todayDateFormatted
-                  ? [styles.dayNumber, styles.dayHighlighted]
-                  : styles.dayNumber
-              }
-            >
-              {day}
-            </Text>
-            <Text
-              style={
-                date === todayDateFormatted
-                  ? [styles.dayName, styles.dayHighlighted]
-                  : styles.dayName
-              }
-            >
-              {dayOfWeek}
-            </Text>
-          </View>
 
-          <View style={styles.dayItemsWrapper}>
-            {calendarItems.map((calendarItem, innerIndex) => (
-              <View
-                // Unique key constructed from index
-                key={index.toString() + innerIndex.toString()}
-                style={styles.item}
-              >
-                <View style={styles.agendaHeaderWrapper}>
-                  <Text style={globalStyles.header}>{calendarItem.header}</Text>
-                  <View style={styles.iconWrapper}>
-                    <SubmitButton
-                      onPressHandler={() =>
-                        handleEdit(calendarItem.databaseId as number)
-                      }
-                      icon={["create-outline", 19, {}]}
-                      style={styles.submitButton}
-                    />
-
-                    <SubmitButton
-                      onPressHandler={() =>
-                        handleDelete(calendarItem.databaseId as number)
-                      }
-                      icon={["close-outline", 22, {}]}
-                      style={styles.submitButton}
-                    />
-                  </View>
-                </View>
-
-                <Text style={styles.itemTime}>
-                  {calendarItem.start_time} - {calendarItem.end_time}
-                </Text>
-                <Text style={styles.itemText}>{calendarItem.body}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-      </View>
+        {isDummyItem && lastHeight !== -1 && (
+          // 22 is the bottom margin of the last item (not captured by onLayout)
+          // Last term is accounting for viewPos: 0.03
+          <View
+            style={{ height: listHeight - lastHeight - 22 - 0.02 * listHeight }}
+          ></View>
+        )}
+      </>
     );
   };
 
+  // TODO: future (think about fwd and bwd scroll, as well as how to identify them!)
   const onViewableItemsChanged = useCallback(
+    // No dependencies within the body
+    // Memoize once and re-use
     ({ viewableItems }: { viewableItems: Array<ViewToken> }) => {
       if (viewableItems.length > 0) {
         // Simply look at the first item's date
@@ -291,22 +342,40 @@ export default function AgendaCalendar({
   );
 
   const handleScrollToIndex = (index: number) => {
-    // Set timeout for smoother transition
+    // Set timeout to allow time for list to load in first
+    // Before scrolling to index
     setTimeout(() => {
       flashListRef.current?.scrollToIndex({
         index: index,
         animated: true,
-        // Scroll to the top of the visible position
-        viewPosition: 0,
+        // Scroll to near the top of the visible position
+        viewPosition: 0.02,
       });
-    }, 100);
+    }, 500);
+  };
+
+  const handleListLayout = (e: any): void => {
+    e.persist();
+    const { height } = e.nativeEvent.layout;
+    if (listHeight < 0) {
+      setListHeight(height);
+    }
+  };
+
+  const handleItemLayout = (e: any, isLast: boolean): void => {
+    e.persist();
+    const { height } = e.nativeEvent.layout;
+    if (isLast && lastHeight < 0) {
+      setLastHeight(height);
+    }
   };
 
   return (
     <>
       <SubmitButton
         onPressHandler={() => setCalendarList(true)}
-        text={numberToMonthMap[monthYear[0]] + " " + monthYear[1]}
+        text={"From: " + numberToMonthMap[monthYear[0]] + " " + monthYear[1]}
+        // text="Choose a date"
         icon={["chevron-down-outline", 20, styles.icon]}
         style={styles.button}
         textStyle={styles.buttonText}
@@ -328,7 +397,7 @@ export default function AgendaCalendar({
           />
         )}
 
-      <View style={styles.listWrapper}>
+      <View style={styles.listWrapper} onLayout={handleListLayout}>
         {items && (
           <FlashList
             ref={flashListRef}
@@ -338,10 +407,9 @@ export default function AgendaCalendar({
               (monthsBetween(minDate.current, maxDate.current) + 1) * 30
             }
             renderItem={renderItem}
-            onViewableItemsChanged={onViewableItemsChanged}
+            // onViewableItemsChanged={onViewableItemsChanged}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
-              paddingTop: 12,
               backgroundColor: "#F6F2F2",
             }}
           />
@@ -397,7 +465,6 @@ const styles = StyleSheet.create({
   },
 
   listWrapper: {
-    height: 500,
     marginTop: 17,
     borderRadius: 10,
     // If child flashlist overflows, hide the exceeded parts
@@ -411,6 +478,7 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
 
+  // For debugging, dont remove
   itemHeaderWrapper: {
     // backgroundColor: "pink",
   },

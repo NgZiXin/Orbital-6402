@@ -12,15 +12,6 @@ export default function WeightWorkoutModal({
   clearAll,
 }: any) {
   const [visibility, setVisibility] = useState<boolean>(false);
-  const [modalHeight, setModalHeight] = useState<number>(0);
-
-  const handleLayout = (event: any) => {
-    event.persist(); // Persist the event
-    const { height } = event.nativeEvent.layout;
-    // Add 30 since padding top == 15 and padding bottom == 15
-    // For the modalContent element
-    setModalHeight(height + 30);
-  };
 
   return (
     <>
@@ -34,9 +25,9 @@ export default function WeightWorkoutModal({
         visibleState={visibility}
         additionalStyles={styles.paddingAdjustment}
       >
-        <View onLayout={handleLayout}>
+        <View>
           <View style={styles.headerWrapper}>
-            <Text style={styles.modalHeader}>Gym Planner:</Text>
+            <Text style={styles.modalHeader}>Gym Planner</Text>
             <TouchableOpacity onPress={() => setVisibility(false)}>
               <Ionicons name="close-circle-outline" size={25}></Ionicons>
             </TouchableOpacity>
@@ -47,7 +38,6 @@ export default function WeightWorkoutModal({
             setWeightWorkoutData={setWeightWorkoutData}
             setMessage={setMessage}
             clearAll={clearAll}
-            weightWorkoutModalHeight={modalHeight}
           />
         </View>
       </GeneralModalTemplate>
