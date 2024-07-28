@@ -2,6 +2,7 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,6 +14,7 @@ import { CalendarList } from "react-native-calendars";
 import { monthsBetween } from "@/utility/home/dateProcessing";
 import { MarkedDates } from "react-native-calendars/src/types";
 import { MarkingProps } from "react-native-calendars/src/calendar/day/marking";
+import SubmitButton from "@/components/general/submit";
 
 // dun delete bitch
 interface Day {
@@ -96,10 +98,20 @@ export default function CalendarListModal({
         additionalStyles={styles.modalDimmension}
       >
         <KeyboardAvoidingView
-          style={{ flex: 1 }}
           keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
+          <Pressable
+            onPress={() => setVisibility(false)}
+            style={styles.toggleWrapper}
+          >
+            <TouchableOpacity
+              style={styles.toggle}
+              onPress={() => setVisibility(false)}
+              hitSlop={20}
+            />
+          </Pressable>
+
           <CalendarList
             current={prevSelected.current}
             minDate={minDate.current}
@@ -107,15 +119,22 @@ export default function CalendarListModal({
             pastScrollRange={
               monthsBetween(minDate.current, prevSelected.current) + 1
             }
-            futureScrollRange={
-              monthsBetween(prevSelected.current, maxDate.current) + 1
-            }
+            futureScrollRange={monthsBetween(
+              prevSelected.current,
+              maxDate.current
+            )}
             firstDay={1}
             calendarWidth={updatedWidth}
             hideExtraDays={true}
             markedDates={markedDates.current}
             theme={
               {
+                "stylesheet.calendar.main": {
+                  container: {
+                    paddingBottom: 50,
+                    // backgroundColor: "green",
+                  },
+                },
                 "stylesheet.calendar.header": {
                   dayTextAtIndex5: {
                     // Saturday
@@ -181,6 +200,19 @@ export default function CalendarListModal({
 }
 
 const styles = StyleSheet.create({
+  toggleWrapper: {
+    paddingTop: 10,
+    marginBottom: 10,
+  },
+
+  toggle: {
+    width: "12.5%",
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#F6F2F2",
+    alignSelf: "center",
+  },
+
   modalDimmension: {
     width: "100%",
     height: "100%",

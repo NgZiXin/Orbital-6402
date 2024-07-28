@@ -5,17 +5,11 @@ import { useState } from "react";
 import SubmitButton from "@/components/general/submit";
 import GeneralModalTemplate from "../../templates/generalModalTemplate";
 
-export default function GuideModal() {
-  const [visibility, setVisibility] = useState<boolean>(false);
+export default function GuideModal({ visibility, setVisibility }: any) {
   return (
     // Can consider a blur effect for the background actually
     // When opening this doubly nested modal (ie: layer = 3)
     <>
-      <SubmitButton
-        onPressHandler={() => setVisibility(true)}
-        text="Read Guide"
-      />
-
       <GeneralModalTemplate
         visibleState={visibility}
         additionalStyles={styles.background}

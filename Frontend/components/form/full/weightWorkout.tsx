@@ -43,7 +43,6 @@ export default function WeightWorkoutForm({
   setWeightWorkoutData,
   setMessage,
   clearAll,
-  weightWorkoutModalHeight,
 }: any) {
   const { showLoading, hideLoading } = useLoading();
   const [scroll, setScroll] = useState(true);
@@ -123,10 +122,7 @@ export default function WeightWorkoutForm({
           >
             <FitnessLevel formikProps={formikProps} setScroll={setScroll} />
             <NumExercises formikProps={formikProps} setScroll={setScroll} />
-            <MuscleGroups
-              formikProps={formikProps}
-              workoutModalHeight={weightWorkoutModalHeight}
-            />
+            <MuscleGroups formikProps={formikProps} />
             <HealthConditions formikProps={formikProps} />
             <OtherRemarks formikProps={formikProps} />
             <SubmitButton

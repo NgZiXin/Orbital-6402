@@ -25,10 +25,10 @@ export default function MuscleGroupModal({
   setMuscleGroupModal,
   selectedItems,
   setSelectedItems,
-  workoutModalHeight,
   formikProps,
 }: any) {
-  const [validationModal, setValidationModal] = useState(false);
+  const [validationModal, setValidationModal] = useState<boolean>(false);
+  const [guideModal, setGuideModal] = useState<boolean>(false);
   const validationMessage = useRef("");
 
   function renderSelectText() {
@@ -57,6 +57,7 @@ export default function MuscleGroupModal({
     setSelectedItems(newList);
   }
 
+  // Count of main muscle groups
   function getCount() {
     const temp = selectedItems.filter((item: string) => {
       return item.length == 1;
@@ -80,18 +81,15 @@ export default function MuscleGroupModal({
     }
   }
 
+  const handlePressInfo = () => {
+    setGuideModal(true);
+  };
+
   return (
     <>
       <Modal animationType="fade" visible={true} transparent={true}>
-        <View
-          style={{
-            ...modalStyles.modalWrapper,
-            backgroundColor: "rgba(0, 0, 0, 0)",
-          }}
-        >
-          <View
-            style={{ ...modalStyles.modalContent, height: workoutModalHeight }}
-          >
+        <View style={modalStyles.modalWrapper}>
+          <View style={modalStyles.modalContent}>
             <ScrollView showsVerticalScrollIndicator={false}>
               <View
                 style={{
@@ -106,6 +104,7 @@ export default function MuscleGroupModal({
                   <Ionicons name="close-circle-outline" size={25}></Ionicons>
                 </TouchableOpacity>
               </View>
+
               <Text
                 style={{
                   ...globalStyles.para,
@@ -113,8 +112,14 @@ export default function MuscleGroupModal({
                   bottom: 5,
                 }}
               >
-                Click on the button below to start planning. Read the guide if
-                you are uncertain of something.
+                Click on the button below to start planning.
+                <TouchableOpacity onPress={handlePressInfo}>
+                  <Ionicons
+                    name="information-circle-outline"
+                    size={18}
+                    color="red"
+                  />
+                </TouchableOpacity>
               </Text>
 
               <View style={{ marginTop: 7 }}>
@@ -135,12 +140,13 @@ export default function MuscleGroupModal({
                   selectedItems={selectedItems}
                   onSelectedItemsChange={selectValidation}
                   renderSelectText={renderSelectText}
-                  customChipsRenderer={(props: any) => (
-                    <CustomChips
-                      {...props}
-                      workoutModalHeight={workoutModalHeight}
-                    />
-                  )}
+                  customChipsRenderer={({
+                    selectedItems,
+                  }: {
+                    selectedItems: string[];
+                  }) => {
+                    return <CustomChips selectedItems={selectedItems} />;
+                  }}
                   parentChipsRemoveChildren={true}
                   showsVerticalScrollIndicator={false}
                   colors={styles.colors}
@@ -169,7 +175,10 @@ export default function MuscleGroupModal({
                   }}
                 />
               </View>
-              <GuideModal />
+              <GuideModal
+                visibility={guideModal}
+                setVisibility={setGuideModal}
+              />
               <MuscleGroupValidationModal
                 visibility={validationModal}
                 setVisibility={setValidationModal}
@@ -177,6 +186,7 @@ export default function MuscleGroupModal({
                 bottomText={validationMessage.current}
               />
               <SubmitButton
+                style={{ marginTop: 25 }}
                 onPressHandler={handleSubmit}
                 text="Submit Workout"
               />

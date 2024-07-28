@@ -68,7 +68,6 @@ export default function AddAgendaForm({
       // Successful response
       // Extract out the data response
       const dataArray: CalendarItem[] = await getResponse.json();
-      console.log(dataArray);
 
       // Check for conflicts with existing entries
       const currStart = values.startTime;
@@ -90,7 +89,6 @@ export default function AddAgendaForm({
             continue;
           } else {
             hasConflict = true;
-            console.log(startTime, endTime);
             conflictingTime.push(startTime);
             conflictingTime.push(endTime);
             break;
@@ -124,7 +122,7 @@ export default function AddAgendaForm({
         end_time: values.endTime,
       };
 
-      const fetchResponse = await fetch(
+      const putResponse = await fetch(
         `${process.env.EXPO_PUBLIC_DOMAIN}calendar/`,
         {
           method: "POST",
@@ -137,7 +135,7 @@ export default function AddAgendaForm({
       );
 
       // Backend raises an error
-      if (!fetchResponse.ok) {
+      if (!putResponse.ok) {
         throw new Error("Network response was not ok");
       }
 

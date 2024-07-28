@@ -4,7 +4,7 @@ import MuscleGroupModal from "@/components/modal/workoutPage/muscleGroup/muscleG
 import { globalStyles } from "@/styles/global";
 import { formStyles } from "@/styles/form";
 
-export default function MuscleGroups({ formikProps, workoutModalHeight }: any) {
+export default function MuscleGroups({ formikProps }: any) {
   const [selectButton, setSelectButton] = useState(false);
   const [nilButton, setNilButton] = useState(false);
 
@@ -29,7 +29,7 @@ export default function MuscleGroups({ formikProps, workoutModalHeight }: any) {
   return (
     <>
       <View style={{ ...formStyles.sliderFormCommon, width: "95%" }}>
-        <Text style={globalStyles.label}>Target Muscle Groups: </Text>
+        <Text style={globalStyles.label}>Muscle Groups: </Text>
         <View style={styles.wrapper}>
           <TouchableOpacity
             style={[styles.option, selectButton ? styles.selected : undefined]}
@@ -51,7 +51,6 @@ export default function MuscleGroups({ formikProps, workoutModalHeight }: any) {
             setMuscleGroupModal={setMuscleGroupModal}
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
-            workoutModalHeight={workoutModalHeight}
             formikProps={formikProps}
           />
         )}
