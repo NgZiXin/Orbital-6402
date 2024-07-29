@@ -10,7 +10,8 @@ const SCOPE = "read,read_all,profile:read_all,activity:read_all";
 export default function LinkStrava({ callback, stravaClientId }: any) {
   // Create deepl link url
 
-  const redirect_uri = Linking.createURL("");
+  const redirect_uri = Linking.createURL("profile");
+
 
   const openAuth = async () => {
     const token: string | null = await getToken("token");

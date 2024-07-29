@@ -3,6 +3,7 @@ import { globalStyles } from "@/styles/global";
 import { useEffect, useState } from "react";
 import { getToken } from "@/utility/general/userToken";
 
+
 export default function RunningRoute() {
   const [token, setToken] = useState<string | null>(null);
 
