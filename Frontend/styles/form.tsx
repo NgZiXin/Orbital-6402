@@ -1,19 +1,15 @@
 import { StyleSheet } from "react-native";
 import { globalStyles } from "./global";
 
-// common styles across form components and fragments
+// Common styles across form components and fragments
 export const formStyles = StyleSheet.create({
-  accountDetailsFormCommon: {
+  // For forms with no slider fields
+  noSliderFormCommon: {
     marginBottom: 15,
   },
 
-  workoutDetailsFormCommon: {
-    marginBottom: 12,
-    position: "relative",
-    left: 9,
-  },
-
-  findNearestDetailsFormCommon: {
+  // For forms with slider fields
+  sliderFormCommon: {
     marginBottom: 12,
     position: "relative",
     left: 9,

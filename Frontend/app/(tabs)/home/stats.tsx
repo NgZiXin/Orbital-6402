@@ -5,17 +5,30 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { globalStyles } from "@/styles/global";
 import PageHeader from "@/components/general/pageHeader";
 import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import ProgressBar from "@/components/general/progressBar";
-import { BarChart } from "react-native-gifted-charts";
+import { BarChart, barDataItem } from "react-native-gifted-charts";
 import { Dimensions } from "react-native";
 import WeekToggleModal from "@/components/modal/homePage/weekToggle";
-import initialSkeleton from "./sampleData";
-import { getItem } from "@/components/general/asyncStorage";
+import { getToken } from "@/utility/general/userToken";
 import { useLoading } from "@/hooks/useLoading";
+import SetGoalsModal from "@/components/modal/homePage/statsPage/setGoals";
+
+import {
+  getDates,
+  getInitialDates,
+  stringToDate,
+} from "@/utility/home/dateProcessing";
+
+import {
+  calculateProgress,
+  metersToKilometers,
+  secondsToHours,
+} from "@/utility/home/dataProcessing";
 
 interface WeekDetails {
   total_workout: number;
@@ -26,105 +39,111 @@ interface WeekDetails {
   duration_daily: number[];
 }
 
+interface DayMap {
+  [key: number]: string;
+}
+
+const indexToDayMap: DayMap = {
+  0: "Mon",
+  1: "Tues",
+  2: "Wed",
+  3: "Thurs",
+  4: "Fri",
+  5: "Sat",
+  6: "Sun",
+};
+
+const dataSkeleton: barDataItem[] = [
+  { value: 0 },
+  { value: 0 },
+  { value: 0 },
+  { value: 0 },
+  { value: 0 },
+  { value: 0 },
+  { value: 0 },
+];
+
+// Calculate screen width
 const screenWidth: number = Dimensions.get("window").width;
 
-function getFormattedDate(dateInput: Date): string {
-  let day: number = dateInput.getDate();
-  let month: number = dateInput.getMonth() + 1; // Months are zero-indexed, so add 1
-  let year: number = dateInput.getFullYear();
-
-  // Format to DD/MM/YYYY
-  let formattedDate: string = `${day < 10 ? "0" + day : day}/${
-    month < 10 ? "0" + month : month
-  }/${year}`;
-  return formattedDate;
-}
-
-// where start: one week before end
-function getDates(start: Date, end: Date): [string, string] {
-  const startDate: string = getFormattedDate(start);
-  const endDate: string = getFormattedDate(end);
-  return [startDate, endDate];
-}
-
-function getStartAndEndOfWeek(todayDate: Date): [string, string] {
-  // Get the day of the week (0 for Sunday, 1 for Monday, etc.)
-  const dayOfWeek = todayDate.getDay();
-
-  // Calculate the start date of the week (Monday)
-  const startOfWeek = new Date(todayDate);
-  // If today is Sunday (dayOfWeek = 0), we go back 6 days to the previous Monday
-  // Otherwise, we go back to the previous Monday
-  startOfWeek.setDate(todayDate.getDate() - ((dayOfWeek + 6) % 7));
-  const startDate = getFormattedDate(startOfWeek);
-
-  // Calculate the end date of the week (Sunday)
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6);
-  const endDate = getFormattedDate(endOfWeek);
-
-  // Return the start and end dates
-  return [startDate, endDate];
-}
-
-// Calculate initial values
+// Calculate initial week start & week end dates
 const today: Date = new Date();
-const [initialStart, initialEnd]: [string, string] =
-  getStartAndEndOfWeek(today);
+const [initialWeekStart, initialWeekEnd]: [string, string] =
+  getInitialDates(today);
 
 export default function Stats() {
   const { showLoading, hideLoading } = useLoading();
-  const [dataSkeleton, setDataSkeleton] = useState<any>(initialSkeleton);
-  const [weekToggleModal, setWeekToggleModal] = useState<boolean>(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-  // Hardcode for now
-  const [weekGoalValues, setWeekGoalValues] = useState<number[]>([7, 9, 30, 4]);
+  const [selectedWeek, setSelectedWeek] = useState<[string, string]>([
+    initialWeekStart,
+    initialWeekEnd,
+  ]);
 
-  // Dynamic
-  const [weekValues, setWeekValues] = useState<number[]>([]);
+  // Initially, set barData to the dataSkeleton object array
+  // This sets up our 7 bar objects (ie: days) for further processing later
+  const [barData, setBarData] = useState<barDataItem[]>(dataSkeleton);
+
+  /* 
+    State variables for: 
+      - Weekly attained values
+      - Weekly goal values 
+      - Weekly progress values 
+  */
+  const [weeklyValues, setWeeklyValues] = useState<number[]>([]);
+  const [weekGoalValues, setWeekGoalValues] = useState<number[]>([7, 9, 30, 4]); // Arbitrary initial values
   const [progressValues, setProgressValues] = useState<number[]>([]);
 
+  /* 
+    State variables for: 
+      - Daily values (distance & duration)
+      - Daily value (distance & duration)
+      - Highlighted day value 
+  */
   const [dayValues, setDayValues] = useState<number[][]>([]);
-  const [dailyDistanceValue, setDailyDistanceValue] = useState<number>(-1);
-  const [dailyDurationValue, setDailyDurationValue] = useState<number>(-1);
+  const [dailyDistanceValue, setDailyDistanceValue] = useState<number>(0);
+  const [dailyDurationValue, setDailyDurationValue] = useState<number>(0);
+  const [highlightedDay, setHighlightedDay] = useState<number>(0);
 
-  function calculateProgress(current: number, goal: number): number {
-    // Avoid division by zero
-    if (goal === 0) {
-      return 0;
-    }
+  /* 
+    State variables for: 
+      - Visibility of weekToggleModal
+      - Authorization status of user 
+      - Update flag that deals with triggering getWeekDetails() 
+  */
+  const [weekToggleModal, setWeekToggleModal] = useState<boolean>(false);
+  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
+  const [update, setUpdate] = useState<boolean>(false);
 
-    // Force float division, then truncate
-    const progress: number = Math.trunc(((current * 1.0) / goal) * 100);
-    return progress;
-  }
-
-  // on component mount, run the getWeekDetails() once
+  // On component mount, run getWeekDetails()
+  // On update flag change, run getWeekDetails()
   useEffect(() => {
     getWeekDetails();
-  }, []);
+  }, [update]);
 
-  async function getWeekDetails(): Promise<void> {
+  const getWeekDetails = async (): Promise<void> => {
     try {
-      // Show Loading Screen
       showLoading();
 
-      const currentStart: string = selectedWeek[0];
-      const [dayS, monthS, yearS]: number[] = currentStart
-        .split("/")
-        .map(Number);
-      const startDate: Date = new Date(yearS, monthS - 1, dayS);
+      // weekStartDate is in UTC+0
+      // It displays 4pm the previous day
+      // Set minute to 1, so when backend converts to UTC+8, we get the correct day 00:01am
+      const currentWeekStart: string = selectedWeek[0];
+      const weekStartDate: Date = stringToDate(currentWeekStart);
+      weekStartDate.setHours(0, 1, 0, 0);
 
-      const currentEnd: string = selectedWeek[1];
-      const [dayE, monthE, yearE]: number[] = currentEnd.split("/").map(Number);
-      const endDate: Date = new Date(yearE, monthE - 1, dayE);
+      // weekEndDate is in UTC+0
+      // It displays 4pm the previous day
+      // Set hour to 23 and minute to 59, so it now displays 4pm today (maintaining the UTC+0)
+      // When backend converts to UTC+8, we get the correct day 23:59pm
+      const currentWeekEnd: string = selectedWeek[1];
+      const weekEndDate: Date = stringToDate(currentWeekEnd);
+      weekEndDate.setHours(23, 59, 0, 0);
 
-      const token: string | null = await getItem("token");
+      const token: string | null = await getToken("token");
       const response = await fetch(
         `${
           process.env.EXPO_PUBLIC_DOMAIN
-        }strava_api/get_stats/?start_date=${startDate.toISOString()}&end_date=${endDate.toISOString()}`,
+        }strava_api/get_stats/?start_date=${weekStartDate.toISOString()}&end_date=${weekEndDate.toISOString()}`,
         {
           method: "GET",
           headers: {
@@ -134,153 +153,186 @@ export default function Stats() {
         }
       );
 
-      // invalid response
+      // Invalid response
       if (!response.ok) {
-        setIsLoggedIn(false);
+        // User is not synced with Strava
+        setIsAuthorized(false);
         return;
       }
-      // valid response
+
+      // Valid response
+      // Extract out the values array
       const weekDetailsObject: WeekDetails = await response.json();
       const weekDetailsValues = Object.values(weekDetailsObject);
 
-      // grab the first 4 values for weekly stats
+      // Grab the first 4 values for weekly stats
       const weeklyValues: number[] = weekDetailsValues.slice(0, 4);
 
-      // units coversion
+      // Units coversion + 1dp rounding
       const totalDistanceValue: number = weeklyValues[2];
-      const convertedToKm: number = (totalDistanceValue * 1.0) / 1000;
-      weeklyValues[2] = convertedToKm;
+      weeklyValues[2] = metersToKilometers(totalDistanceValue);
 
       const totalDurationValue: number = weeklyValues[3];
-      const convertedToHours: number = (totalDurationValue * 1.0) / 3600;
-      weeklyValues[3] = convertedToHours;
-      setWeekValues(weeklyValues);
+      weeklyValues[3] = secondsToHours(totalDurationValue);
+      setWeeklyValues(weeklyValues);
 
-      // calculate progress values for weekly stats
+      // Calculate progress values for weekly stats
       const progressValuesResult: number[] = weeklyValues.map((num, index) =>
         calculateProgress(num, weekGoalValues[index])
       );
       setProgressValues(progressValuesResult);
 
-      // grab the last 2 values for daily stats
+      // Grab the last 2 values for daily stats
       const dailyValues: number[][] = weekDetailsValues.slice(4, 6);
 
-      // units conversion
+      // Units conversion + 1dp rounding
       const dailyDistanceValues: number[] = dailyValues[0];
-      const convertedToKm1: number[] = dailyDistanceValues.map(
-        (num) => num / 1000
-      );
-      dailyValues[0] = convertedToKm1;
+      dailyValues[0] = dailyDistanceValues.map(metersToKilometers);
 
       const dailyDurationValues: number[] = dailyValues[1];
-      const convertedToHours1: number[] = dailyDurationValues.map(
-        (num) => num / 3600
-      );
-      dailyValues[1] = convertedToHours1;
+      dailyValues[1] = dailyDurationValues.map(secondsToHours);
       setDayValues(dailyValues);
 
-      // update the dataSkeleton
-      const updatedDataSkeleton = dataSkeleton.map(
-        (item: any, index: number) => {
-          const distanceThisDay: number = parseFloat(
-            dailyValues[0][index].toFixed(1)
-          );
-          const durationThisDay: number = parseFloat(
-            dailyValues[1][index].toFixed(1)
-          );
-          return {
-            ...item,
-            value: distanceThisDay,
-            onPress: () => {
-              setDailyDistanceValue(distanceThisDay);
-              setDailyDurationValue(durationThisDay);
-            },
-          };
-        }
-      );
+      // Update the barData
+      // Note: Index maps to a particular day
+      const updatedBarData = barData.map((item: any, index: number) => {
+        const distanceThisDay: number = parseFloat(
+          dailyValues[0][index].toFixed(1)
+        );
+        const durationThisDay: number = parseFloat(
+          dailyValues[1][index].toFixed(1)
+        );
 
-      setDataSkeleton(updatedDataSkeleton);
-      setIsLoggedIn(true);
+        return {
+          // This is necessary so that initially, we get a highlighted day
+          label: (
+            <Text
+              style={index === highlightedDay ? styles.highlighted : undefined}
+            >
+              {indexToDayMap[index]}
+            </Text>
+          ),
+          value: distanceThisDay,
+          onPress: () => {
+            setDailyDistanceValue(distanceThisDay);
+            setDailyDurationValue(durationThisDay);
+            handleHighlight(index);
+          },
+        };
+      });
+
+      // Set the initial daily value for both cells
+      // Based on the highlighted day - either 0 or 1 - 6 (from an later/earlier week)
+      setDailyDistanceValue(dailyValues[0][highlightedDay]);
+      setDailyDurationValue(dailyValues[1][highlightedDay]);
+
+      // @ts-ignore
+      setBarData(updatedBarData);
+      setIsAuthorized(true);
+
+      // Catch other errors
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
-      hideLoading(); // Hide loading spinner after fetch completes
+      hideLoading();
     }
-  }
+  };
 
-  // store selectedWeek as a string array
-  // first value: start day
-  // second value: end day
-  // format: DD/MM/YYYY
-  const [selectedWeek, setSelectedWeek] = useState<[string, string]>([
-    initialStart,
-    initialEnd,
-  ]);
+  /*
+    Key idea:
+      - Need to mutate barData to trigger a re-render of the barChart 
+      - To do so, we need the most updated value of highlighted day 
+      - Thus, we call setBarData within setHighlightedDay!! 
+  */
+  const handleHighlight = (index: number): void => {
+    setHighlightedDay((prevHighlightedDay) => {
+      setBarData((prevBarData: any) => {
+        // Create a new array from the previous barData
+        const newBarData = [...prevBarData];
 
-  function handleGoBack() {
-    const currentStart: string = selectedWeek[0];
+        // Update the label of the newly highlighted day
+        newBarData[index] = {
+          ...newBarData[index],
+          label: <Text style={styles.highlighted}>{indexToDayMap[index]}</Text>,
+        };
 
-    const [day, month, year]: number[] = currentStart.split("/").map(Number);
-    const newEnd: Date = new Date(year, month - 1, day); // Months are zero-indexed, so minus 1
+        // Revert the label of the previously highlighted day
+        // If currently highlighted day is different from prev highlighted day
+        if (index != prevHighlightedDay) {
+          newBarData[prevHighlightedDay] = {
+            ...newBarData[prevHighlightedDay],
+            label: <Text>{indexToDayMap[prevHighlightedDay]}</Text>,
+          };
+        }
 
-    const newStart: Date = new Date(newEnd);
-    newStart.setDate(newStart.getDate() - 7);
-    setSelectedWeek(getDates(newStart, newEnd));
-    getWeekDetails();
-  }
+        // Return the new array
+        // To trigger a re-render
+        return newBarData;
+      });
 
-  function handleGoForward(): void {
-    const currentEnd: string = selectedWeek[1];
+      // Return the new highlighted day index to trigger a re-render
+      return index;
+    });
+  };
 
-    const [day0, month0, year0]: number[] = currentEnd.split("/").map(Number);
-    const newStart: Date = new Date(year0, month0 - 1, day0);
+  const handleGoBack = (): void => {
+    const currentWeekStart: string = selectedWeek[0];
+    const newWeekEnd: Date = stringToDate(currentWeekStart);
+    newWeekEnd.setDate(newWeekEnd.getDate() - 1);
 
-    const [day1, month1, year1]: number[] = initialEnd.split("/").map(Number);
-    const initStart: Date = new Date(year1, month1 - 1, day1);
+    const newWeekStart: Date = new Date(newWeekEnd);
+    newWeekStart.setDate(newWeekStart.getDate() - 6);
 
-    // prevent you from going beyond this week
-    if (newStart >= initStart) {
+    setSelectedWeek(getDates(newWeekStart, newWeekEnd));
+    // Only when update variable has changed
+    // Then we trigger the getWeekDetails() function
+    // This ensures that the above thread has finished, and we don't use incorrect values
+    setUpdate(!update);
+  };
+
+  const handleGoForward = (): void => {
+    const currentWeekEnd: string = selectedWeek[1];
+
+    // If currentWeekEnd matches the initialWeekEnd
+    // Then we are at the initial (latest) week, we cannot go further
+    if (currentWeekEnd == initialWeekEnd) {
       setWeekToggleModal(true);
       return;
     }
 
-    const newEnd: Date = new Date(newStart);
-    newEnd.setDate(newEnd.getDate() + 7);
-    setSelectedWeek(getDates(newStart, newEnd));
-    getWeekDetails();
-  }
+    const newWeekStart: Date = stringToDate(currentWeekEnd);
+    newWeekStart.setDate(newWeekStart.getDate() + 1);
 
-  // TODO: milestone 3
-  function handleSetGoals() {
-    console.log("todo");
-  }
+    const newWeekEnd: Date = new Date(newWeekStart);
+    newWeekEnd.setDate(newWeekEnd.getDate() + 6);
 
-  function handleViewAll() {
-    console.log("todo");
-  }
+    setSelectedWeek(getDates(newWeekStart, newWeekEnd));
+    // Only when update variable has changed
+    // Then we trigger the getWeekDetails() function
+    // This ensures that the above thread has finished, and we don't use incorrect values
+    setUpdate(!update);
+  };
 
   return (
     <View style={globalStyles.container}>
-      {/* paddingHorizontal: 10, then each wrapper: paddingHorizontal: 2 */}
-      {/* to prevent scrollview from cutting elements off horizontally */}
       <ScrollView
-        style={{ marginTop: 57, padding: 12, paddingHorizontal: 10 }}
+        style={styles.contentWrapper}
         showsVerticalScrollIndicator={false}
       >
-        <View style={{ paddingHorizontal: 2 }}>
+        <View style={styles.wrapperCommon}>
           <PageHeader
             topText="Summary"
             bottomText="Weekly Performance"
             topTextNoMarginTop={true}
           />
         </View>
-        {isLoggedIn && (
+        {isAuthorized && (
           <>
-            <View style={styles.statsWrapper}>
+            <View style={[styles.statsWrapper, styles.wrapperCommon]}>
               <View style={styles.weekToggle}>
                 <TouchableOpacity onPress={handleGoBack}>
                   <Ionicons
-                    name="arrow-back-circle-outline"
+                    name="arrow-undo-outline"
                     size={25}
                     style={styles.leftArrow}
                   />
@@ -292,19 +344,20 @@ export default function Stats() {
 
                 <TouchableOpacity onPress={handleGoForward}>
                   <Ionicons
-                    name="arrow-forward-circle-outline"
+                    name="arrow-redo-outline"
                     size={25}
                     style={styles.rightArrow}
                   />
                 </TouchableOpacity>
               </View>
+
               <View style={styles.stats}>
                 <View style={styles.statsHalf}>
                   <View style={[styles.statsCell, styles.statsCellExtra]}>
-                    <Text style={globalStyles.label}>Workout Count</Text>
+                    <Text style={globalStyles.label}>Workouts:</Text>
                     <Text style={globalStyles.label}>
                       <Text style={styles.highlightedText}>
-                        {progressValues[0] + "%"}
+                        {progressValues[0] + "% "}
                       </Text>
                       progress
                     </Text>
@@ -314,16 +367,17 @@ export default function Stats() {
                       style={styles.statsIcon}
                     />
                     <ProgressBar
-                      leftLabel={weekValues[0]}
+                      leftLabel={weeklyValues[0]}
                       rightLabel={weekGoalValues[0]}
                       progress={progressValues[0]}
                     />
                   </View>
+
                   <View style={styles.statsCell}>
-                    <Text style={globalStyles.label}>Exercise Duration</Text>
+                    <Text style={globalStyles.label}>Hours:</Text>
                     <Text style={globalStyles.label}>
                       <Text style={styles.highlightedText}>
-                        {progressValues[3] + "%"}
+                        {progressValues[3] + "% "}
                       </Text>
                       progress
                     </Text>
@@ -333,19 +387,20 @@ export default function Stats() {
                       style={styles.statsIcon}
                     />
                     <ProgressBar
-                      leftLabel={weekValues[3]}
+                      leftLabel={weeklyValues[3]}
                       rightLabel={weekGoalValues[3]}
                       progress={progressValues[3]}
                     />
                   </View>
                 </View>
+
                 <View style={styles.statsHalf}>
                   <View style={[styles.statsCell, styles.statsCellExtra]}>
-                    <Text style={globalStyles.label}>Total Distance</Text>
+                    <Text style={globalStyles.label}>Kilometers:</Text>
                     <Text style={globalStyles.label}>
                       <Text style={styles.highlightedText}>
-                        {progressValues[2] + "%"}
-                      </Text>{" "}
+                        {progressValues[2] + "% "}
+                      </Text>
                       progress
                     </Text>
                     <Ionicons
@@ -355,26 +410,27 @@ export default function Stats() {
                     />
 
                     <ProgressBar
-                      leftLabel={weekValues[2]}
+                      leftLabel={weeklyValues[2]}
                       rightLabel={weekGoalValues[2]}
                       progress={progressValues[2]}
                     />
                   </View>
+
                   <View style={styles.statsCell}>
-                    <Text style={globalStyles.label}>Achievements</Text>
+                    <Text style={globalStyles.label}>Achievements:</Text>
                     <Text style={globalStyles.label}>
                       <Text style={styles.highlightedText}>
-                        {progressValues[1] + "%"}
-                      </Text>{" "}
+                        {progressValues[1] + "% "}
+                      </Text>
                       progress
                     </Text>
                     <Ionicons
                       name="rocket-outline"
                       size={35}
-                      style={[styles.statsIcon, styles.iconExtra]}
+                      style={[styles.statsIcon, styles.statsIconExtra]}
                     />
                     <ProgressBar
-                      leftLabel={weekValues[1]}
+                      leftLabel={weeklyValues[1]}
                       rightLabel={weekGoalValues[1]}
                       progress={progressValues[1]}
                     />
@@ -383,75 +439,77 @@ export default function Stats() {
               </View>
             </View>
 
-            <View style={styles.buttonsWrapper}>
-              <TouchableOpacity onPress={handleSetGoals} style={styles.button}>
-                <Text style={globalStyles.para}>Set Goals</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleViewAll}
-                style={[styles.button, styles.buttonExtra]}
-              >
-                <Text style={globalStyles.para}>View All</Text>
-              </TouchableOpacity>
-            </View>
-
-            <PageHeader topText="" bottomText="Weekly Mileage" />
-            <View style={styles.barChartWrapper}>
-              <BarChart
-                // general
-                data={dataSkeleton}
-                width={screenWidth - 24} // since padding of 12
-                hideRules
-                hideOrigin
-                // handle y-axis
-                showYAxisIndices={false}
-                hideYAxisText
-                yAxisThickness={0}
-                yAxisLabelWidth={0}
-                // handle x-axis
-                disableScroll
-                initialSpacing={0}
-                spacing={20}
-                barWidth={(screenWidth - 24 - 120) / 7} // maths
-                xAxisLength={screenWidth - 25}
-                parentWidth={screenWidth - 24}
-                //styling
-                frontColor="#FBB3B3"
-                xAxisLabelTextStyle={globalStyles.label}
-                barBorderBottomLeftRadius={0}
-                barBorderBottomRightRadius={0}
-                barBorderRadius={7}
+            <View style={[styles.buttonsWrapper, styles.wrapperCommon]}>
+              <SetGoalsModal
+                setWeekGoalValues={setWeekGoalValues}
+                setUpdate={setUpdate}
               />
             </View>
 
-            <View style={styles.selectedDayStatsWrapper}>
-              <View style={styles.selectedDayStatCell1}>
-                <Text style={styles.topText}>{dailyDistanceValue}</Text>
-                <Text style={styles.bottomText}>Distance (km)</Text>
-              </View>
-              <View>
-                <Text style={styles.topText}>{dailyDurationValue}</Text>
-                <Text style={styles.bottomText}>Duration (hr:min)</Text>
+            <View style={styles.wrapperCommon}>
+              <PageHeader topText="" bottomText="Weekly Mileage" />
+              <View style={styles.barChart}>
+                <BarChart
+                  // General
+                  data={barData}
+                  width={screenWidth - 24} // Since padding of 12
+                  hideRules
+                  hideOrigin
+                  // Handle y-axis
+                  showYAxisIndices={false}
+                  hideYAxisText
+                  yAxisThickness={0}
+                  yAxisLabelWidth={0}
+                  // Handle x-axis
+                  disableScroll
+                  initialSpacing={0}
+                  spacing={20}
+                  // 24: Total horizontal padding
+                  // 120: Total spacing across 7 bars
+                  // 7: Split the remaining space across 7 bars
+                  barWidth={(screenWidth - 24 - 120) / 7}
+                  xAxisLength={screenWidth - 24}
+                  parentWidth={screenWidth - 24}
+                  //Styling
+                  frontColor="#FBB3B3"
+                  xAxisLabelTextStyle={globalStyles.label}
+                  barBorderBottomLeftRadius={0}
+                  barBorderBottomRightRadius={0}
+                  barBorderRadius={7}
+                />
               </View>
             </View>
 
-            {weekToggleModal && (
-              <WeekToggleModal setWeekToggleModal={setWeekToggleModal} />
-            )}
+            <View
+              style={[styles.selectedDayStatsWrapper, styles.wrapperCommon]}
+            >
+              <View style={styles.statCell1}>
+                <Text style={styles.topText}>{dailyDistanceValue}</Text>
+                <Text style={styles.bottomText}>
+                  {dailyDistanceValue == 1 ? "Kilometer" : "Kilometers"}
+                </Text>
+              </View>
+              <View>
+                <Text style={styles.topText}>{dailyDurationValue}</Text>
+                <Text style={styles.bottomText}>
+                  {dailyDurationValue == 1 ? "Hour" : "Hours"}
+                </Text>
+              </View>
+            </View>
+
+            <WeekToggleModal
+              visibility={weekToggleModal}
+              setVisibility={setWeekToggleModal}
+            />
           </>
         )}
 
-        {!isLoggedIn && (
-          <View
-            style={{
-              backgroundColor: "#F6F2F2",
-              borderRadius: 10,
-              padding: 10,
-            }}
-          >
+        {!isAuthorized && (
+          <View style={styles.wrapperCommon}>
+            <Text style={globalStyles.header}>Oops!</Text>
             <Text style={globalStyles.para}>
-              You must log into strava first before viewing your workout
-              statistics!
+              You must log in and sync with Strava first before viewing your
+              workout statistics!
             </Text>
           </View>
         )}
@@ -461,10 +519,26 @@ export default function Stats() {
 }
 
 const styles = StyleSheet.create({
+  // Main content wrapper: Horizontal padding of 10
+  // All the direct child wrappers: Horizontal padding of 2
+  // To prevent scrollview from cutting elements off horizontally
+  contentWrapper: {
+    // Top padding 0
+    // So top of inner scrollable container of scrollview matches top of outer container
+    // Then, marginTop 70 to push the both containers down
+    marginTop: 70,
+    paddingTop: 0,
+    paddingBottom: 12,
+    paddingHorizontal: 10,
+  },
+
+  wrapperCommon: {
+    paddingHorizontal: 2,
+  },
+
   statsWrapper: {
     marginTop: "-7%",
     height: 385,
-    paddingHorizontal: 2,
   },
 
   weekToggle: {
@@ -509,7 +583,7 @@ const styles = StyleSheet.create({
   },
 
   highlightedText: {
-    fontSize: 13.5,
+    fontSize: 13,
   },
 
   statsIcon: {
@@ -518,54 +592,57 @@ const styles = StyleSheet.create({
     top: "5.5%",
   },
 
-  iconExtra: {
+  statsIconExtra: {
     top: "6.5%",
   },
 
   buttonsWrapper: {
-    flexDirection: "row",
-    marginTop: "4.5%",
     marginBottom: "15%",
-    paddingHorizontal: 2,
   },
 
   button: {
-    width: "31%",
+    width: "43%",
     backgroundColor: "#F6F2F2",
     borderRadius: 10,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-evenly",
+    alignSelf: "center",
+    justifyContent: "center",
   },
 
-  buttonExtra: {
-    marginLeft: "2.5%",
+  buttonIcon: {
+    position: "relative",
+    left: 4,
   },
 
-  barChartWrapper: {
-    marginTop: "-27%",
+  barChart: {
     marginBottom: "10%",
     paddingHorizontal: 2,
+    marginTop: -10,
   },
 
   selectedDayStatsWrapper: {
     marginTop: "-5%",
     marginBottom: "10%",
     flexDirection: "row",
-    paddingHorizontal: 2,
   },
 
-  selectedDayStatCell1: {
+  statCell1: {
     marginRight: "7%",
   },
 
   topText: {
     ...globalStyles.header,
     fontSize: 16,
-    marginBottom: "-7%",
+    marginBottom: -5,
   },
 
   bottomText: {
     ...globalStyles.para,
     lineHeight: 17,
+  },
+
+  highlighted: {
+    color: "red",
   },
 });

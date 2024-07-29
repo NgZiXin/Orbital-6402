@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "@/styles/global";
 import PageHeader from "@/components/general/pageHeader";
-import CalendarModal from "@/components/modal/homePage/calendar";
+import CalendarModal from "@/components/modal/homePage/calendarPage/calendar";
 // keep this for future
 import SadIcon from "@/assets/icons/sad";
 import HappyIcon from "@/assets/icons/happy";

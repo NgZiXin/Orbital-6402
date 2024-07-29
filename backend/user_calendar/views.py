@@ -22,7 +22,7 @@ class CalendarDetail(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'pk'
 
     def get_queryset(self):
-        # Filter calendar entriess by user ensures user can only update or destroy their own entries
+        # Filter calendar entries by user ensures user can only update or destroy their own entries
         user = self.request.user
         return Calendar.objects.filter(user=user)
 

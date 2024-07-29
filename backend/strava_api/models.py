@@ -133,3 +133,5 @@ class StravaToken(models.Model):
             self.profile_read_all = 'profile:read_all' in scopes
             self.activity_read_all = 'activity:read_all' in scopes
     
+
+    

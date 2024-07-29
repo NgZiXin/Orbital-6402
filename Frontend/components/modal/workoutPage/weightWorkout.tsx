@@ -1,81 +1,69 @@
-import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-
-import { modalStyles } from "../../../styles/modal";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { globalStyles } from "../../../styles/global";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SubmitButton from "@/components/general/submit";
 import WeightWorkoutForm from "@/components/form/full/weightWorkout";
+import GeneralModalTemplate from "../templates/generalModalTemplate";
 
-export default function WeightWorkoutModal({setWeightWorkoutData, setMessage, clearAll}: any) {
-  const [weightWorkoutModal, setWeightWorkoutModal] = useState<boolean>(false);
-  const [modalHeight, setModalHeight] = useState<number>(0);
-
-  const handleLayout = (event: any) => {
-    event.persist(); // Persist the event
-    const { height } = event.nativeEvent.layout;
-    setModalHeight(height);
-  };
+export default function WeightWorkoutModal({
+  setWeightWorkoutData,
+  setMessage,
+  clearAll,
+}: any) {
+  const [visibility, setVisibility] = useState<boolean>(false);
 
   return (
     <>
       <SubmitButton
-        onPressHandler={() => setWeightWorkoutModal(true)}
+        onPressHandler={() => setVisibility(true)}
         text="Weight Workout"
-        style={{ flex: 1, marginHorizontal: 5 }}
+        style={styles.submitButton}
       />
 
-      {weightWorkoutModal == true && (
-        <Modal animationType="fade" visible={weightWorkoutModal} transparent={true}>
-          <View style={modalStyles.modalWrapper}>
-            <View
-              style={{
-                ...modalStyles.modalContent,
-                paddingLeft: 6,
-              }}
-              // keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-              // behavior={Platform.OS === "ios" ? "padding" : undefined}
-              onLayout={handleLayout}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text
-                  style={{
-                    ...globalStyles.header,
-                    position: "relative",
-                    left: 9,
-                  }}
-                >
-                  Plan for your next gym session:
-                </Text>
-                <TouchableOpacity onPress={() => setWeightWorkoutModal(false)}>
-                  <Ionicons name="close-circle-outline" size={25}></Ionicons>
-                </TouchableOpacity>
-              </View>
-
-              <WeightWorkoutForm
-                setWeightWorkoutModal={setWeightWorkoutModal}
-                setWeightWorkoutData={setWeightWorkoutData}
-                setMessage={setMessage}
-                clearAll={clearAll}
-                weightWorkoutModalHeight={modalHeight}
-              />
-            </View>
+      <GeneralModalTemplate
+        visibleState={visibility}
+        additionalStyles={styles.paddingAdjustment}
+      >
+        <View>
+          <View style={styles.headerWrapper}>
+            <Text style={styles.modalHeader}>Gym Planner</Text>
+            <TouchableOpacity onPress={() => setVisibility(false)}>
+              <Ionicons name="close-circle-outline" size={25}></Ionicons>
+            </TouchableOpacity>
           </View>
-        </Modal>
-      )}
+
+          <WeightWorkoutForm
+            setWeightWorkoutModal={setVisibility}
+            setWeightWorkoutData={setWeightWorkoutData}
+            setMessage={setMessage}
+            clearAll={clearAll}
+          />
+        </View>
+      </GeneralModalTemplate>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  submitButton: {
+    flex: 1,
+    marginHorizontal: 5,
+  },
+
+  paddingAdjustment: {
+    paddingLeft: 6,
+  },
+
+  headerWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  modalHeader: {
+    ...globalStyles.header,
+    position: "relative",
+    left: 9,
+  },
+});

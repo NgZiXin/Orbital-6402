@@ -1,13 +1,16 @@
 import { WebView } from "react-native-webview";
-import { StyleSheet } from "react-native";
+import { globalStyles } from "@/styles/global";
 import { useEffect, useState } from "react";
-import { getItem } from "@/components/general/asyncStorage";
+import { getToken } from "@/utility/general/userToken";
 
-export default function runningRoute() {
+
+export default function RunningRoute() {
   const [token, setToken] = useState<string | null>(null);
+
+  // On component mount, grab the user token string and store it
   useEffect(() => {
     const fetchToken = async () => {
-      const storedToken = await getItem("token");
+      const storedToken = await getToken("token");
       setToken(storedToken);
     };
 
@@ -16,7 +19,7 @@ export default function runningRoute() {
 
   return token ? (
     <WebView
-      style={styles.container}
+      style={globalStyles.container}
       javaScriptEnabled={true}
       startInLoadingState={true}
       source={{
@@ -31,9 +34,3 @@ export default function runningRoute() {
     <></>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

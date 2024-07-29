@@ -18,11 +18,14 @@ def index(request):
     serializer = WebviewSerializer(data=request.GET)
     if serializer.is_valid():
         try:
-            radius = int(request.GET.get('radius')) * 1000 # Convert to km
+            radius = float(request.GET.get('radius')) * 1000 # Convert to km
             location = Location(request.GET.get('address'), radius)
         except(InvalidSearchError):
-            context = { "message" : "Invalid Search. Please refine your search."}
-            return render(request, "error.html", context )
+            context = { 
+                "message_p1": "Invalid Search.", 
+                "message_p2": "Please refine your search."
+            }
+            return render(request, "error.html", context)
         
         # Get nearest gym / park
         type = request.GET.get('type')
@@ -35,14 +38,23 @@ def index(request):
                 landmarks = location.find_nearest_parks()
             landmarks_json = json.dumps([landmark.__dict__ for landmark in landmarks])
         except(NoNearbyParkFound):
-            context = { "message" : "No nearby parks found. Please refine your search."}
-            return render(request, "error.html", context ) 
+            context = { 
+                "message_p1": "No nearby parks found.", 
+                "message_p2": "Please refine your search."
+            }
+            return render(request, "error.html", context) 
         except(NoNearbyGymFound):
-            context = { "message" : "No nearby gyms found. Please refine your search."}
-            return render(request, "error.html", context ) 
+            context = { 
+                "message_p1": "No nearby gyms found.", 
+                "message_p2":  "Please refine your search."
+            }
+            return render(request, "error.html", context) 
         except:
-            context = { "message" : "Please refine your search."}
-            return render(request, "error.html", context ) 
+            context = { 
+                "message_p1": "Please refine your search.", 
+                "message_p2": ""
+            }
+            return render(request, "error.html", context) 
 
         context = {
             "type" : type,
@@ -53,7 +65,12 @@ def index(request):
         }
         return render(request, "findNearest.html", context)
     else:
-        context = { "message" : "Invalid Query."}
+        # With the frontend form validation in place
+        # This section should never be reached 
+        context = { 
+            "message_p1": "Invalid Query.", 
+            "message_p2": ""
+        }
         return render(request, "error.html", context)
 
 

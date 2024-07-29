@@ -1,12 +1,12 @@
 import { Tabs, useNavigation } from "expo-router";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
-import { Platform, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { useLoading } from "@/hooks/useLoading";
 import { useEffect, useState } from "react";
-import { getItem } from "@/components/general/asyncStorage";
+import { getToken } from "@/utility/general/userToken";
 import Header from "../../components/navigation/header";
-import StravaSyncOverlay from "@/components/general/stravaSyncOverlay";
-import StravaReSyncOverlay from "@/components/general/stravaReSyncOverlay";
+import StravaSyncModal from "@/components/modal/general/stravaSync";
+import StravaReSyncModal from "@/components/modal/general/stravaReSync";
 
 export default function TabLayout() {
   const { showLoading, hideLoading } = useLoading();
@@ -15,17 +15,14 @@ export default function TabLayout() {
   const [status, setStatus] = useState<string>("AUTHORIZED");
   const [stravaClientId, setStravaClientId] = useState<string>("");
 
-  const closeSyncStrava = () => {
-    setSyncStrava(false);
-  };
-
+  // Check if current user is synced with Strava
   const verify = async () => {
     try {
       showLoading();
 
       // getItem('token') returns a Promise
-      // hence, we await to wait for the Promise to complete and grab its value
-      const token: string | null = await getItem("token");
+      // Hence, we await to wait for the Promise to complete and grab its value
+      const token: string | null = await getToken("token");
 
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_DOMAIN}strava_api/check_auth`,
@@ -40,10 +37,14 @@ export default function TabLayout() {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      const data = await response.json();
 
+      // Successful query
+      // Extract client ID and sync status
+      const data = await response.json();
       setStravaClientId(data["CLIENT_ID"]);
       setStatus(data["status"]);
+
+      // Data processing
       if (
         data["status"] == "UNAUTHORIZED" ||
         data["status"] == "DEAUTHORIZED"
@@ -52,6 +53,8 @@ export default function TabLayout() {
       } else {
         setSyncStrava(false);
       }
+
+      // Catch any errors
     } catch (error) {
       console.log(error);
     } finally {
@@ -60,7 +63,9 @@ export default function TabLayout() {
   };
 
   useEffect(() => {
-    // Verify if user is synced with Strava
+    // Delay by 1000ms
+    // So that there is time for initial setup before first run (on mount)
+    // So that there is time for Strava to update sync status before re-run (if first run fails and triggers sync/re-sync)
     const timer = setTimeout(() => {
       verify();
     }, 1000); // Set timer to improve UX by reducing race conditions
@@ -69,51 +74,28 @@ export default function TabLayout() {
   }, [syncStrava]);
 
   const screenOptions = () => {
-    let headerStyle = {
-      height: 95,
-      backgroundColor: "#E5E5E5",
-    };
-
-    let tabBarStyle = { backgroundColor: "#E5E5E5", height: 60 };
-    let tabBarLabelStyle =
-      Platform.OS == "android"
-        ? {
-            fontFamily: "inter-regular",
-            fontSize: 10,
-            // ensure position type matches
-            position: "relative" as "relative",
-            bottom: 5,
-          }
-        : {
-            fontFamily: "inter-regular",
-            fontSize: 10,
-            position: "relative" as "relative",
-            top: 15,
-          };
-
     return {
       headerShown: true,
       headerTitle: () => {
         return <Header navigation={navigation} />;
       },
-      headerStyle: headerStyle,
-      tabBarStyle: tabBarStyle,
+      headerStyle: styles.mainHeader,
+      tabBarStyle: styles.tabBar,
       tabBarActiveTintColor: "red",
       tabBarInactiveTintColor: "black",
       tabBarLabel: "Home",
-      tabBarLabelStyle: tabBarLabelStyle,
+      tabBarLabelStyle:
+        Platform.OS == "android" ? styles.androidLabel : styles.iosLabel,
     };
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.mainContainer}>
       <Tabs screenOptions={screenOptions}>
+        {/* Profile at the top, so after login --> profile */}
         <Tabs.Screen
           name="profile"
           options={{
-            // After login --> profile
-            // So can sync strava
-
             // Hides it from tab bar
             // Nonetheless, route still exists
             // Routing to profile this way allows the bottom tab bar to be visible!
@@ -123,6 +105,13 @@ export default function TabLayout() {
 
         <Tabs.Screen
           name="runningRoute"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="nearestGymPark"
           options={{
             href: null,
           }}
@@ -178,17 +167,18 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
+
       {status == "UNAUTHORIZED" ? (
-        <StravaSyncOverlay
-          syncStrava={syncStrava}
-          closeSyncStrava={closeSyncStrava}
-          stravaClientId={stravaClientId}
+        <StravaSyncModal
+          visibility={syncStrava}
+          setVisibility={setSyncStrava}
+          stravaClientID={stravaClientId}
         />
       ) : status == "DEAUTHORIZED" ? (
-        <StravaReSyncOverlay
-          syncStrava={syncStrava}
-          closeSyncStrava={closeSyncStrava}
-          stravaClientId={stravaClientId}
+        <StravaReSyncModal
+          visibility={syncStrava}
+          setVisibility={setSyncStrava}
+          stravaClientID={stravaClientId}
         />
       ) : (
         <></>
@@ -196,3 +186,34 @@ export default function TabLayout() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  mainHeader: {
+    height: 95,
+    backgroundColor: "#E5E5E5",
+  },
+
+  tabBar: {
+    backgroundColor: "#E5E5E5",
+    height: 60,
+  },
+
+  androidLabel: {
+    fontFamily: "inter-regular",
+    fontSize: 10,
+    // Ensure position type matches
+    position: "relative" as "relative",
+    bottom: 5,
+  },
+
+  iosLabel: {
+    fontFamily: "inter-regular",
+    fontSize: 10,
+    position: "relative" as "relative",
+    top: 15,
+  },
+
+  mainContainer: {
+    flex: 1,
+  },
+});
