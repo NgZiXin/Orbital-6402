@@ -12,6 +12,7 @@ import { globalStyles } from "../styles/global";
 import { Formik, FormikHelpers } from "formik";
 import { useNavigation } from "expo-router";
 import { useLoading } from "@/hooks/useLoading";
+import { setToken } from "../utility/general/userToken";
 
 import UsernameField from "@/components/form/fragments/accountFields/username";
 import PasswordField from "@/components/form/fragments/accountFields/password";
@@ -84,11 +85,11 @@ export default function SignUp() {
       // Extract the token string from the response
       const data: SuccessResponse = await response.json();
       const token: string = data["token"];
-      console.log(token)
+      setToken("token", token);
 
-      // Handle successful signup (navigate to login page)
+      // Handle successful signup (navigate to profile page)
       actions.resetForm();
-      navigation.navigate("login");
+      navigation.navigate("(tabs)");
 
       // Catch other errors
     } catch (error: any) {
