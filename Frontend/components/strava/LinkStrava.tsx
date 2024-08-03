@@ -70,7 +70,7 @@ export default function LinkStrava({ callback, stravaClientId }: any) {
   return (
     <SubmitButton
       onPressHandler={handleSubmit}
-      text="Sync"
+      text="Re-Sync"
       style={styles.submitButton}
     />
   );

@@ -26,10 +26,6 @@ interface ErrorResponse {
   username: string[];
 }
 
-interface SuccessResponse {
-  token: string;
-}
-
 interface SignUpValues {
   username: string;
   password: string;
@@ -80,11 +76,6 @@ export default function SignUp() {
           return;
         }
       }
-
-      // Extract the token string from the response
-      const data: SuccessResponse = await response.json();
-      const token: string = data["token"];
-      console.log(token)
 
       // Handle successful signup (navigate to login page)
       actions.resetForm();
