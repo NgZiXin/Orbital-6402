@@ -93,6 +93,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+# To run test cases, you need to grant your user permission to create new (alias) database for testing: ALTER USER your_user CREATEDB;
 
 DATABASES = {
     'default': {
