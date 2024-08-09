@@ -100,7 +100,9 @@ L.Control.textbox = L.Control.extend({
     // Add event listener for the "Reset" button
     const resetButton = this._container.querySelector("#resetButton");
     if (resetButton) {
-      resetButton.addEventListener("click", function () {
+      resetButton.addEventListener("click", function (e) {
+        e.stopPropagation();
+
         // Add back all functionalities
         map.on("click", clickMap);
         map.on("zoomend", segmentQuery);
@@ -201,30 +203,35 @@ map.on("load", segmentQuery);
 map.fire("load");
 
 // Event functions
-
 function clickMap(e) {
   // Open Pop-up
-  const popup = L.popup()
+  L.popup()
     .setLatLng(e.latlng)
     .setContent(
       `<div>
-        <code>lat: ${e.latlng.lat.toFixed(5)}, lng: ${e.latlng.lng.toFixed(
+          <code>lat: ${e.latlng.lat.toFixed(5)}, lng: ${e.latlng.lng.toFixed(
         5
       )}</code>
-        <br />
-        <code>Add point as next waypoint?</code>
-        <br />
-        <button id="add-marker-button" style="margin-top: 5px;">Add</button>
-      </div>`
+          <br />
+          <code>Add point as next waypoint?</code>
+          <br />
+          <button id="add-marker-button" data-lat='${e.latlng.lat}' data-lng='${
+        e.latlng.lng
+      }' style="margin-top: 5px;">Add</button>
+        </div>`
     )
     .openOn(map);
-
-  // Logic for button
-  document.getElementById("add-marker-button").addEventListener("click", () => {
-    addMarker(e.latlng.lat, e.latlng.lng);
-    map.closePopup(popup);
-  });
 }
+
+// Event delegation for dynamically added buttons
+document.addEventListener("click", function (e) {
+  if (e.target && e.target.id === "add-marker-button") {
+    const lat = parseFloat(e.target.dataset.lat);
+    const lng = parseFloat(e.target.dataset.lng);
+    addMarker(lat, lng);
+    map.closePopup();
+  }
+});
 
 function addMarker(lat, lng) {
   // Create Marker
@@ -328,6 +335,7 @@ function clickWaypoint(e, marker) {
     .openOn(map);
 
   // Popup "delete" button
+  // TODO: In future use event delegation
   document
     .getElementById("marker-delete-button")
     .addEventListener("click", () => {
@@ -468,6 +476,7 @@ function clickSegment(e, start, end, polyline, segmentName) {
   });
 
   // Logic for adding of segments
+  // TODO: In future use event delegation
   document
     .getElementById("polylineButton")
     .addEventListener("click", function () {
@@ -548,6 +557,7 @@ function clickSegmentWaypoint(e, start, end, polyline, segmentName) {
   });
 
   // Logic for removing of segments
+  // TODO: In future use event delegation
   document
     .getElementById("removeButton")
     .addEventListener("click", function () {

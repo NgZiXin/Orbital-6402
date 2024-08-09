@@ -12,7 +12,7 @@ import {
 
 import { globalStyles } from "../styles/global";
 import { Formik, FormikHelpers } from "formik";
-import { useNavigation } from "expo-router";
+import { useRouter } from "expo-router";
 import { setToken } from "../utility/general/userToken";
 import { useLoading } from "@/hooks/useLoading";
 
@@ -35,7 +35,7 @@ interface LoginValues {
 }
 
 export default function Login() {
-  const navigation: any = useNavigation();
+  const router: any = useRouter();
   const { showLoading, hideLoading } = useLoading();
 
   const handleSubmit = async (
@@ -83,7 +83,7 @@ export default function Login() {
 
       // Handle successful login (navigate to profile page)
       actions.resetForm();
-      navigation.navigate("(tabs)");
+      router.replace("/profile");
 
       // Catches other errors
     } catch (error: any) {
@@ -125,7 +125,7 @@ export default function Login() {
                   <SubmitButton
                     onPressHandler={() => {
                       formikProps.resetForm();
-                      navigation.navigate("sign-up");
+                      router.replace("/sign-up");
                     }}
                     text="Sign Up"
                   />

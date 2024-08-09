@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import AboutModal from "../modal/general/about";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -12,11 +12,19 @@ export default function Header({ navigation, style }: HeaderProps) {
   const accountPage = (): void => {
     navigation.navigate("profile");
   };
+  const goBack = (): void => {
+    navigation.goBack();
+  };
 
   return (
     <View style={[styles.header, style]}>
+      <Ionicons
+        name="arrow-back-circle-outline"
+        size={25}
+        onPress={goBack}
+        style={styles.icon}
+      />
       <AboutModal />
-      <Text style={styles.headerText}>Workout Wizards!</Text>
       <Ionicons
         size={25}
         name="person-circle-outline"
@@ -34,14 +42,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#E5E5E5",
-  },
-
-  headerText: {
-    fontFamily: "inter-bold",
-    fontWeight: "bold",
-    fontSize: 17,
-    color: "#333",
-    letterSpacing: 1,
   },
 
   icon: {
