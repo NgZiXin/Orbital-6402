@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "fitness-app",
-    "slug": "fitness-app",
+    "name": "Workout Wizards",
+    "slug": "Workout-Wizards",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -25,7 +25,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/icon.png"
     },
     "plugins": ["expo-router"],
     "experiments": {
