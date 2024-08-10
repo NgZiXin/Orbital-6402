@@ -15,6 +15,7 @@ import { numberToMonthMap } from "@/constants/monthMap";
 import SubmitButton from "./submit";
 import EditAgendaModal from "../modal/homePage/calendarPage/editAgenda";
 import DeleteAgendaModal from "../modal/homePage/calendarPage/deleteAgenda";
+import { useLoading } from "@/hooks/useLoading"; // REMOVE WHEN NOT USING TEMP CALENDAR
 
 interface CalendarItem {
   id?: number;
@@ -50,6 +51,7 @@ export default function AgendaCalendar({
   setUpdateFlag,
 }: AgendaCalendarProps) {
   const flashListRef = useRef<FlashList<any>>(null);
+  const { showLoading, hideLoading } = useLoading();
 
   // Need default values!
   // Before any agenda exists
@@ -78,6 +80,7 @@ export default function AgendaCalendar({
 
   const getItems = async (): Promise<void> => {
     try {
+      showLoading()
       const token: string | null = await getToken("token");
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_DOMAIN}calendar/`,
@@ -195,6 +198,8 @@ export default function AgendaCalendar({
       // Catch other errors
     } catch (error: any) {
       console.error(error.message);
+    } finally {
+      hideLoading();
     }
   };
 

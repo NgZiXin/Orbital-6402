@@ -3,6 +3,7 @@ import { globalStyles } from "@/styles/global";
 import GeneralModalTemplate from "../../templates/generalModalTemplate";
 import SubmitButton from "@/components/general/submit";
 import { getToken } from "@/utility/general/userToken";
+import { useLoading } from "@/hooks/useLoading"; // REMOVE WHEN NOT USING TEMP CALENDAR
 
 interface DeleteAgendaModalProps {
   visibility: boolean;
@@ -17,12 +18,15 @@ export default function DeleteAgendaModal({
   databaseId,
   setUpdateFlag,
 }: DeleteAgendaModalProps) {
+  const { showLoading, hideLoading } = useLoading();
   const handleCancel = (): void => {
     setVisibility(false);
   };
 
   const handleOk = async (): Promise<void> => {
     try {
+      showLoading();
+      setVisibility(false);
       const token: string | null = await getToken("token");
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_DOMAIN}calendar/${databaseId}/`,
@@ -39,14 +43,13 @@ export default function DeleteAgendaModal({
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
-      setVisibility(false);
       setUpdateFlag((prev) => !prev);
 
       // Catch other errors
     } catch (error: any) {
       console.error(error.message);
-      setVisibility(false);
+    } finally {
+      hideLoading();
     }
   };
 

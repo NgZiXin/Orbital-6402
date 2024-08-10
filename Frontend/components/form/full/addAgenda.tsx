@@ -1,6 +1,5 @@
 import { Alert, ScrollView } from "react-native";
 import { Formik, FormikHelpers } from "formik";
-import { useLoading } from "@/hooks/useLoading";
 import { getToken } from "@/utility/general/userToken";
 import SubmitButton from "../../general/submit";
 import HeaderField from "../fragments/addAgendaFields/header";
@@ -36,14 +35,11 @@ export default function AddAgendaForm({
   setAgendaModal,
   setUpdateFlag,
 }: AddAgendaFormProps) {
-  const { showLoading, hideLoading } = useLoading();
   const handleSubmit = async (
     values: AddAgendaFormValues,
     actions: FormikHelpers<AddAgendaFormValues>
   ): Promise<void> => {
     try {
-      showLoading();
-
       // Update date to UTC+8
       const date = values.agendaDate as Date;
       date.setHours(date.getHours() + 8);
@@ -147,8 +143,6 @@ export default function AddAgendaForm({
       // Catch other errors
     } catch (error: any) {
       console.error(error.message);
-    } finally {
-      hideLoading();
     }
   };
 
