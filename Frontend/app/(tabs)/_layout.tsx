@@ -86,7 +86,7 @@ export default function TabLayout() {
 
   return (
     <View style={styles.mainContainer}>
-      <Tabs screenOptions={screenOptions}>
+      <Tabs screenOptions={screenOptions} backBehavior="history">
         {/* Profile at the top, so after login --> profile */}
         <Tabs.Screen
           name="profile"
