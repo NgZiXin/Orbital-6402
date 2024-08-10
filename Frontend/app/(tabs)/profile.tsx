@@ -3,7 +3,6 @@ import { globalStyles } from "../../styles/global";
 import { useState, useEffect } from "react";
 import { getToken } from "../../utility/general/userToken";
 import { useLoading } from "@/hooks/useLoading";
-import LoadingOverlay from "@/components/general/loadingOverlay";
 import Card from "@/components/general/card";
 import EditModal from "@/components/modal/profilePage/edit";
 import LogoutModal from "@/components/modal/profilePage/logout";
@@ -135,7 +134,7 @@ export default function Profile() {
   return (
     <>
       {userDetails.length == 0 ? (
-        <LoadingOverlay />
+        <></>
       ) : (
         <ScrollView
           style={globalStyles.container}
