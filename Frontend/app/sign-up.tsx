@@ -151,7 +151,7 @@ export default function SignUp() {
                   formikProps.resetForm();
                   router.replace("/login");
                 }}
-                text="Go Back"
+                text="Log In"
               />
             </ScrollView>
           </View>
