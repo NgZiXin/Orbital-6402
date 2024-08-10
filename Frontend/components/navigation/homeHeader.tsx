@@ -23,12 +23,23 @@ export default function HomeHeader({ navigation, route }: any) {
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.topNavigation}
           onPress={() => navigation.navigate("calendar")}
         >
           <Text style={styles.text}>Calendar</Text>
           {isFocused && route.name == "calendar" && (
+            <View style={styles.underline} />
+          )}
+        </TouchableOpacity> */}
+
+        {/* Temporary Solution */}
+        <TouchableOpacity
+          style={styles.topNavigation}
+          onPress={() => navigation.navigate("tempCalendar")}
+        >
+          <Text style={styles.text}>Calendar</Text>
+          {isFocused && route.name == "tempCalendar" && (
             <View style={styles.underline} />
           )}
         </TouchableOpacity>

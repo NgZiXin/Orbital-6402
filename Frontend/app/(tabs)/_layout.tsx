@@ -159,6 +159,7 @@ export default function TabLayout() {
               />
             ),
             tabBarLabel: "Forum",
+            href: null, // Temporary
           }}
         />
       </Tabs>

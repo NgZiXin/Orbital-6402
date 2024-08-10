@@ -26,6 +26,7 @@ export default function HomeLayout() {
     <Tabs screenOptions={screenOptions}>
       <Tabs.Screen name="stats" options={{ href: null }} />
       <Tabs.Screen name="calendar" options={{ href: null }} />
+      <Tabs.Screen name="tempCalendar" options={{ href: null }} />
     </Tabs>
   );
 }
