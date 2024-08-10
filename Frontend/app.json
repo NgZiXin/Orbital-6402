@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "fitness-app",
-    "slug": "fitness-app",
+    "name": "Workout Wizards",
+    "slug": "Workout-Wizards",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
