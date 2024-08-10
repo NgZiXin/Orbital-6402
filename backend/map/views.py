@@ -13,7 +13,8 @@ def index(request):
           token = StravaToken.objects.get(user=request.user)
           strava_token = token.get_token()
      except Exception:
-          print("User NOT authorized")
+          # User Not Authorized
+          pass # TODO To make edge case more robust
      context = {
           "strava_token": strava_token,
           "url": request.build_absolute_uri(request.path)

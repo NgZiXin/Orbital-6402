@@ -1,6 +1,7 @@
 from rest_framework import generics
 from .serializers import CustomUserSerializer
 from rest_framework.authtoken.models import Token
+from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -26,7 +27,7 @@ class UserCreate(generics.CreateAPIView):
         token = Token.objects.get(user=user)
 
         # Custom output 
-        return Response({'token': token.key})
+        return Response({'token': token.key}, status=status.HTTP_201_CREATED)
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView): # GET, PUT, DEL

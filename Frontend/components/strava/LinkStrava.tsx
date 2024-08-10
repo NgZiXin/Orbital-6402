@@ -10,8 +10,7 @@ const SCOPE = "read,read_all,profile:read_all,activity:read_all";
 export default function LinkStrava({ callback, stravaClientId }: any) {
   // Create deepl link url
 
-  const redirect_uri = Linking.createURL("profile");
-
+  const redirect_uri = Linking.createURL("");
 
   const openAuth = async () => {
     const token: string | null = await getToken("token");
@@ -70,7 +69,7 @@ export default function LinkStrava({ callback, stravaClientId }: any) {
   return (
     <SubmitButton
       onPressHandler={handleSubmit}
-      text="Re-Sync"
+      text="Sync"
       style={styles.submitButton}
     />
   );

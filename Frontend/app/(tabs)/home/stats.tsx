@@ -111,7 +111,6 @@ export default function Stats() {
       - Update flag that deals with triggering getWeekDetails() 
   */
   const [weekToggleModal, setWeekToggleModal] = useState<boolean>(false);
-  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
   const [update, setUpdate] = useState<boolean>(false);
 
   // On component mount, run getWeekDetails()
@@ -156,7 +155,6 @@ export default function Stats() {
       // Invalid response
       if (!response.ok) {
         // User is not synced with Strava
-        setIsAuthorized(false);
         return;
       }
 
@@ -213,6 +211,12 @@ export default function Stats() {
             </Text>
           ),
           value: distanceThisDay,
+          topLabelComponent: () =>
+            distanceThisDay > 0 ? (
+              <Text style={styles.topLabel}>{distanceThisDay} km</Text>
+            ) : (
+              <></>
+            ),
           onPress: () => {
             setDailyDistanceValue(distanceThisDay);
             setDailyDurationValue(durationThisDay);
@@ -228,7 +232,6 @@ export default function Stats() {
 
       // @ts-ignore
       setBarData(updatedBarData);
-      setIsAuthorized(true);
 
       // Catch other errors
     } catch (error) {
@@ -326,158 +329,159 @@ export default function Stats() {
             topTextNoMarginTop={true}
           />
         </View>
-        {isAuthorized && (
-          <>
-            <View style={[styles.statsWrapper, styles.wrapperCommon]}>
-              <View style={styles.weekToggle}>
-                <TouchableOpacity onPress={handleGoBack}>
-                  <Ionicons
-                    name="arrow-undo-outline"
-                    size={25}
-                    style={styles.leftArrow}
-                  />
-                </TouchableOpacity>
-
-                <Text style={globalStyles.para}>
-                  {selectedWeek[0] + " - " + selectedWeek[1]}
-                </Text>
-
-                <TouchableOpacity onPress={handleGoForward}>
-                  <Ionicons
-                    name="arrow-redo-outline"
-                    size={25}
-                    style={styles.rightArrow}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.stats}>
-                <View style={styles.statsHalf}>
-                  <View style={[styles.statsCell, styles.statsCellExtra]}>
-                    <Text style={globalStyles.label}>Workouts:</Text>
-                    <Text style={globalStyles.label}>
-                      <Text style={styles.highlightedText}>
-                        {progressValues[0] + "% "}
-                      </Text>
-                      progress
-                    </Text>
-                    <Ionicons
-                      name="bicycle-outline"
-                      size={35}
-                      style={styles.statsIcon}
-                    />
-                    <ProgressBar
-                      leftLabel={weeklyValues[0]}
-                      rightLabel={weekGoalValues[0]}
-                      progress={progressValues[0]}
-                    />
-                  </View>
-
-                  <View style={styles.statsCell}>
-                    <Text style={globalStyles.label}>Hours:</Text>
-                    <Text style={globalStyles.label}>
-                      <Text style={styles.highlightedText}>
-                        {progressValues[3] + "% "}
-                      </Text>
-                      progress
-                    </Text>
-                    <Ionicons
-                      name="time-outline"
-                      size={35}
-                      style={styles.statsIcon}
-                    />
-                    <ProgressBar
-                      leftLabel={weeklyValues[3]}
-                      rightLabel={weekGoalValues[3]}
-                      progress={progressValues[3]}
-                    />
-                  </View>
-                </View>
-
-                <View style={styles.statsHalf}>
-                  <View style={[styles.statsCell, styles.statsCellExtra]}>
-                    <Text style={globalStyles.label}>Kilometers:</Text>
-                    <Text style={globalStyles.label}>
-                      <Text style={styles.highlightedText}>
-                        {progressValues[2] + "% "}
-                      </Text>
-                      progress
-                    </Text>
-                    <Ionicons
-                      name="flame-outline"
-                      size={35}
-                      style={styles.statsIcon}
-                    />
-
-                    <ProgressBar
-                      leftLabel={weeklyValues[2]}
-                      rightLabel={weekGoalValues[2]}
-                      progress={progressValues[2]}
-                    />
-                  </View>
-
-                  <View style={styles.statsCell}>
-                    <Text style={globalStyles.label}>Achievements:</Text>
-                    <Text style={globalStyles.label}>
-                      <Text style={styles.highlightedText}>
-                        {progressValues[1] + "% "}
-                      </Text>
-                      progress
-                    </Text>
-                    <Ionicons
-                      name="rocket-outline"
-                      size={35}
-                      style={[styles.statsIcon, styles.statsIconExtra]}
-                    />
-                    <ProgressBar
-                      leftLabel={weeklyValues[1]}
-                      rightLabel={weekGoalValues[1]}
-                      progress={progressValues[1]}
-                    />
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            <View style={[styles.buttonsWrapper, styles.wrapperCommon]}>
-              <SetGoalsModal
-                setWeekGoalValues={setWeekGoalValues}
-                setUpdate={setUpdate}
+        <View style={[styles.statsWrapper, styles.wrapperCommon]}>
+          <View style={styles.weekToggle}>
+            <TouchableOpacity onPress={handleGoBack}>
+              <Ionicons
+                name="arrow-undo-outline"
+                size={25}
+                style={styles.leftArrow}
               />
-            </View>
+            </TouchableOpacity>
 
-            <View style={styles.wrapperCommon}>
-              <PageHeader topText="" bottomText="Weekly Mileage" />
-              <View style={styles.barChart}>
-                <BarChart
-                  // General
-                  data={barData}
-                  width={screenWidth - 24} // Since padding of 12
-                  hideRules
-                  hideOrigin
-                  // Handle y-axis
-                  showYAxisIndices={false}
-                  hideYAxisText
-                  yAxisThickness={0}
-                  yAxisLabelWidth={0}
-                  // Handle x-axis
-                  disableScroll
-                  initialSpacing={0}
-                  spacing={20}
-                  // 24: Total horizontal padding
-                  // 120: Total spacing across 7 bars
-                  // 7: Split the remaining space across 7 bars
-                  barWidth={(screenWidth - 24 - 120) / 7}
-                  xAxisLength={screenWidth - 24}
-                  parentWidth={screenWidth - 24}
-                  //Styling
-                  frontColor="#FBB3B3"
-                  xAxisLabelTextStyle={globalStyles.label}
-                  barBorderBottomLeftRadius={0}
-                  barBorderBottomRightRadius={0}
-                  barBorderRadius={7}
+            <Text style={globalStyles.para}>
+              {selectedWeek[0] + " - " + selectedWeek[1]}
+            </Text>
+
+            <TouchableOpacity onPress={handleGoForward}>
+              <Ionicons
+                name="arrow-redo-outline"
+                size={25}
+                style={styles.rightArrow}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.stats}>
+            <View style={styles.statsHalf}>
+              <View style={[styles.statsCell, styles.statsCellExtra]}>
+                <Text style={globalStyles.label}>Workouts:</Text>
+                <Text style={globalStyles.label}>
+                  <Text style={styles.highlightedText}>
+                    {progressValues[0] + "% "}
+                  </Text>
+                  progress
+                </Text>
+                <Ionicons
+                  name="bicycle-outline"
+                  size={35}
+                  style={styles.statsIcon}
+                />
+                <ProgressBar
+                  leftLabel={weeklyValues[0]}
+                  rightLabel={weekGoalValues[0]}
+                  progress={progressValues[0]}
                 />
               </View>
+
+              <View style={styles.statsCell}>
+                <Text style={globalStyles.label}>Hours:</Text>
+                <Text style={globalStyles.label}>
+                  <Text style={styles.highlightedText}>
+                    {progressValues[3] + "% "}
+                  </Text>
+                  progress
+                </Text>
+                <Ionicons
+                  name="time-outline"
+                  size={35}
+                  style={styles.statsIcon}
+                />
+                <ProgressBar
+                  leftLabel={weeklyValues[3]}
+                  rightLabel={weekGoalValues[3]}
+                  progress={progressValues[3]}
+                />
+              </View>
+            </View>
+
+            <View style={styles.statsHalf}>
+              <View style={[styles.statsCell, styles.statsCellExtra]}>
+                <Text style={globalStyles.label}>Kilometers:</Text>
+                <Text style={globalStyles.label}>
+                  <Text style={styles.highlightedText}>
+                    {progressValues[2] + "% "}
+                  </Text>
+                  progress
+                </Text>
+                <Ionicons
+                  name="flame-outline"
+                  size={35}
+                  style={styles.statsIcon}
+                />
+
+                <ProgressBar
+                  leftLabel={weeklyValues[2]}
+                  rightLabel={weekGoalValues[2]}
+                  progress={progressValues[2]}
+                />
+              </View>
+
+              <View style={styles.statsCell}>
+                <Text style={globalStyles.label}>Achievements:</Text>
+                <Text style={globalStyles.label}>
+                  <Text style={styles.highlightedText}>
+                    {progressValues[1] + "% "}
+                  </Text>
+                  progress
+                </Text>
+                <Ionicons
+                  name="rocket-outline"
+                  size={35}
+                  style={[styles.statsIcon, styles.statsIconExtra]}
+                />
+                <ProgressBar
+                  leftLabel={weeklyValues[1]}
+                  rightLabel={weekGoalValues[1]}
+                  progress={progressValues[1]}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View style={[styles.buttonsWrapper, styles.wrapperCommon]}>
+          <SetGoalsModal
+            setWeekGoalValues={setWeekGoalValues}
+            setUpdate={setUpdate}
+          />
+        </View>
+
+        <PageHeader topText="" bottomText="Daily Mileage" />
+        <View style={styles.wrapperCommon}>
+          <View style={styles.mileageWrapper}>
+            <View style={styles.barChart}>
+              <BarChart
+                // General
+                data={barData}
+                width={screenWidth - 24} // Since padding of 12
+                hideRules
+                hideOrigin
+                // Handle y-axis
+                showYAxisIndices={false}
+                hideYAxisText
+                yAxisThickness={0}
+                yAxisLabelWidth={0}
+                // Handle x-axis
+                disableScroll
+                initialSpacing={3}
+                height={120}
+                spacing={20}
+                // 24: Total horizontal padding
+                // 5: Initial Padding
+                // 12: Addtional padding and margins
+                // 120: Total spacing across 7 bars
+                // 7: Split the remaining space across 7 bars
+                barWidth={(screenWidth - 17 - 24 - 120) / 7}
+                xAxisLength={screenWidth - 12 - 24}
+                parentWidth={screenWidth - 12 - 24}
+                //Styling
+                frontColor="#FBB3B3"
+                xAxisLabelTextStyle={globalStyles.label}
+                barBorderBottomLeftRadius={0}
+                barBorderBottomRightRadius={0}
+                barBorderRadius={7}
+              />
             </View>
 
             <View
@@ -496,23 +500,13 @@ export default function Stats() {
                 </Text>
               </View>
             </View>
-
-            <WeekToggleModal
-              visibility={weekToggleModal}
-              setVisibility={setWeekToggleModal}
-            />
-          </>
-        )}
-
-        {!isAuthorized && (
-          <View style={styles.wrapperCommon}>
-            <Text style={globalStyles.header}>Oops!</Text>
-            <Text style={globalStyles.para}>
-              You must log in and sync with Strava first before viewing your
-              workout statistics!
-            </Text>
           </View>
-        )}
+        </View>
+
+        <WeekToggleModal
+          visibility={weekToggleModal}
+          setVisibility={setWeekToggleModal}
+        />
       </ScrollView>
     </View>
   );
@@ -616,9 +610,19 @@ const styles = StyleSheet.create({
   },
 
   barChart: {
-    marginBottom: "10%",
-    paddingHorizontal: 2,
-    marginTop: -10,
+    marginBottom: "7%",
+    padding: 5,
+  },
+
+  topLabel: {
+    fontSize: 7,
+    color: "#FBB3B3",
+  },
+
+  mileageWrapper: {
+    ...globalStyles.cardV2,
+    marginBottom: 30,
+    marginTop: -12,
   },
 
   selectedDayStatsWrapper: {
@@ -635,11 +639,14 @@ const styles = StyleSheet.create({
     ...globalStyles.header,
     fontSize: 16,
     marginBottom: -5,
+    marginLeft: 12,
   },
 
   bottomText: {
     ...globalStyles.para,
     lineHeight: 17,
+    marginLeft: 12,
+    marginBottom: -30,
   },
 
   highlighted: {

@@ -1,8 +1,6 @@
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
-
 import { globalStyles } from "../../../styles/global";
 import { useState } from "react";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import GeneralModalTemplate from "../templates/generalModalTemplate";
 import SubmitButton from "@/components/general/submit";
 
@@ -11,7 +9,7 @@ export default function AboutModal() {
   return (
     <>
       <TouchableOpacity onPress={() => setVisibility(true)}>
-        <Ionicons name="help-circle-outline" size={26} style={styles.icon} />
+        <Text style={styles.headerText}>Workout Wizards!</Text>
       </TouchableOpacity>
 
       <GeneralModalTemplate visibleState={visibility}>
@@ -42,8 +40,12 @@ export default function AboutModal() {
 }
 
 const styles = StyleSheet.create({
-  icon: {
-    paddingTop: 2,
+  headerText: {
+    fontFamily: "inter-bold",
+    fontWeight: "bold",
+    fontSize: 17,
+    color: "#333",
+    letterSpacing: 1,
   },
 
   submitButton: {

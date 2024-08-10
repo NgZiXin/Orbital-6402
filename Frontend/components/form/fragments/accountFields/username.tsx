@@ -7,10 +7,10 @@ export default function UsernameField({ formikProps }: any) {
   return (
     <>
       <View style={formStyles.noSliderFormCommon}>
-        <Text style={globalStyles.label}>Name:</Text>
+        <Text style={globalStyles.label}>Username (case-sensitive):</Text>
         <CustomTextInput
           style={globalStyles.input}
-          placeholder="John Cena"
+          placeholder="JohnCena"
           onChangeText={formikProps.handleChange("username")}
           value={formikProps.values.username}
           // When we click away, run the validation schema on username field

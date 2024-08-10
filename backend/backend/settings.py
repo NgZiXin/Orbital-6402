@@ -169,6 +169,3 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
-
-# Details About Strava App
-SCOPE = "read,read_all,profile:read_all,profile:write,activity:read_all,activity:write"

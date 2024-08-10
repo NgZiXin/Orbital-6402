@@ -1,7 +1,6 @@
 import { Tabs, useNavigation } from "expo-router";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Platform, StyleSheet, View } from "react-native";
-import { useLoading } from "@/hooks/useLoading";
 import { useEffect, useState } from "react";
 import { getToken } from "@/utility/general/userToken";
 import Header from "../../components/navigation/header";
@@ -9,7 +8,6 @@ import StravaSyncModal from "@/components/modal/general/stravaSync";
 import StravaReSyncModal from "@/components/modal/general/stravaReSync";
 
 export default function TabLayout() {
-  const { showLoading, hideLoading } = useLoading();
   const navigation = useNavigation();
   const [syncStrava, setSyncStrava] = useState<boolean>(false);
   const [status, setStatus] = useState<string>("AUTHORIZED");
@@ -18,7 +16,6 @@ export default function TabLayout() {
   // Check if current user is synced with Strava
   const verify = async () => {
     try {
-      showLoading();
 
       // getItem('token') returns a Promise
       // Hence, we await to wait for the Promise to complete and grab its value
@@ -57,8 +54,6 @@ export default function TabLayout() {
       // Catch any errors
     } catch (error) {
       console.log(error);
-    } finally {
-      hideLoading();
     }
   };
 
@@ -67,7 +62,7 @@ export default function TabLayout() {
     // So that there is time for initial setup before first run (on mount)
     // So that there is time for Strava to update sync status before re-run (if first run fails and triggers sync/re-sync)
     const timer = setTimeout(() => {
-      verify();
+      verify(); // Comment this to disable Strava Sync
     }, 1000); // Set timer to improve UX by reducing race conditions
 
     return () => clearTimeout(timer);
