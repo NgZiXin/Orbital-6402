@@ -1,5 +1,4 @@
-import { ScrollView, View, Alert } from "react-native";
-import { globalStyles } from "../../../styles/global";
+import { ScrollView, Alert } from "react-native";
 import { Formik, FormikHelpers } from "formik";
 import { useState } from "react";
 import SubmitButton from "../../general/submit";
@@ -7,26 +6,27 @@ import { getToken } from "@/utility/general/userToken";
 import { useLoading } from "@/hooks/useLoading";
 
 import DistanceField from "../fragments/workoutFields/runWorkoutFields/distance";
-import DurationPicker from "../fragments/workoutFields/runWorkoutFields/duration";
+import DurationSetter from "../fragments/workoutFields/runWorkoutFields/duration";
 import WeekSlider from "../fragments/workoutFields/runWorkoutFields/week";
 import HealthConditions from "../fragments/workoutFields/healthConditions";
 import OtherRemarks from "../fragments/workoutFields/otherRemarks";
+import runWorkoutValidationSchema from "../validationSchema/runWorkout";
 
 type RunWorkoutValues = {
-  distance: number;
-  duration_hours: number;
-  duration_minutes: number;
-  duration_seconds: number;
+  distance: string;
+  duration_hours: string;
+  duration_minutes: string;
+  duration_seconds: string;
   weeks: number;
   healthConds: string;
   otherRemarks: string;
 };
 
 const initialValues: RunWorkoutValues = {
-  distance: 10.0,
-  duration_hours: 1,
-  duration_minutes: 10,
-  duration_seconds: 0,
+  distance: "",
+  duration_hours: "",
+  duration_minutes: "",
+  duration_seconds: "",
   weeks: 4,
   healthConds: "",
   otherRemarks: "",
@@ -104,6 +104,7 @@ export default function RunWorkoutForm({
         initialValues={initialValues}
         validateOnChange={false}
         validateOnBlur={false}
+        validationSchema={runWorkoutValidationSchema}
         onSubmit={handleSubmit}
       >
         {(formikProps) => (
@@ -112,7 +113,7 @@ export default function RunWorkoutForm({
             scrollEnabled={scroll}
           >
             <DistanceField formikProps={formikProps} />
-            <DurationPicker formikProps={formikProps} />
+            <DurationSetter formikProps={formikProps} />
             <WeekSlider formikProps={formikProps} setScroll={setScroll} />
             <HealthConditions formikProps={formikProps} />
             <OtherRemarks formikProps={formikProps} />
